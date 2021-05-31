@@ -26,7 +26,8 @@
       }
     ],
     "max-len": ["warn", { "code": 80 }],
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "prettier/prettier": ["off", { "singleQuote": true }]
   },
   "settings": {
     "import/resolver": {

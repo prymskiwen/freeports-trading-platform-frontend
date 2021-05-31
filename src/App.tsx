@@ -1,11 +1,16 @@
-import React, { useContext } from "react";
+import React from "react";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import purple from "@material-ui/core/colors/purple";
 import green from "@material-ui/core/colors/green";
-import Store from "./store";
 
-function App() {
-  const store = useContext(Store);
+// import Store from "./store";
+import Routes from "./routes";
+
+import "./App.css";
+import "./Custom.css";
+
+const App = (): React.ReactElement => {
+  // const store = useContext(Store);
   const theme = createMuiTheme({
     palette: {
       primary: {
@@ -19,9 +24,9 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="App">{store.title}</div>
+      <Routes />
     </ThemeProvider>
   );
-}
+};
 
 export default App;
