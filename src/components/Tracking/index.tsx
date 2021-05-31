@@ -1,9 +1,12 @@
 import React from "react";
+import { Container } from "@material-ui/core";
 
 const Tracking = (): React.ReactElement => {
   return (
-    <div className="tracking flex-center">
-      <span>Tracking</span>
+    <div className="main-wrapper">
+      <Container>
+        <span>Tracking</span>
+      </Container>
     </div>
   );
 };

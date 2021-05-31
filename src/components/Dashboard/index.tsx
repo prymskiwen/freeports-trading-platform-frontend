@@ -1,9 +1,12 @@
 import React from "react";
+import { Container } from "@material-ui/core";
 
 const Dashboard = (): React.ReactElement => {
   return (
-    <div className="dashboard flex-center">
-      <span>Dashboard</span>
+    <div className="main-wrapper">
+      <Container>
+        <span>Dashboard</span>
+      </Container>
     </div>
   );
 };

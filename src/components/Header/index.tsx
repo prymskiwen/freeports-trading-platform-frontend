@@ -5,7 +5,6 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   makeStyles,
   Toolbar,
@@ -18,13 +17,13 @@ import {
   Settings,
 } from "@material-ui/icons";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const navLinks = [
-  { title: `Dashboard`, path: `/dashboard` },
-  { title: `Organisations`, path: `/organisations` },
-  { title: `Nostro Accounts`, path: `/nostro-accounts` },
-  { title: `Tracking`, path: `/tracking` },
+  { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
+  { title: `Organisations`, path: `/organisations`, hasChildren: false },
+  { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
+  { title: `Tracking`, path: `/tracking`, hasChildren: true },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {
@@ -38,7 +37,6 @@ const useStyles = makeStyles({
 });
 const Header = (): React.ReactElement => {
   const classes = useStyles();
-  const location = useLocation();
 
   return (
     <AppBar position="static">
@@ -53,14 +51,10 @@ const Header = (): React.ReactElement => {
               aria-labelledby="main navigation"
               className={classes.navDisplayFlex}
             >
-              {navLinks.map(({ title, path }) => (
+              {navLinks.map(({ title, path, hasChildren }) => (
                 <Link to={path} key={title} className={classes.linkText}>
                   <ListItem button>
-                    {location.pathname === path ? (
-                      <ExpandMore />
-                    ) : (
-                      <ChevronRight />
-                    )}
+                    {hasChildren ? <ExpandMore /> : <ChevronRight />}
                     <ListItemText primary={title} />
                   </ListItem>
                 </Link>

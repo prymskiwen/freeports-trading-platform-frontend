@@ -1,9 +1,12 @@
 import React from "react";
+import { Container } from "@material-ui/core";
 
 const Organisations = (): React.ReactElement => {
   return (
-    <div className="organisations flex-center">
-      <span>Organisations</span>
+    <div className="main-wrapper">
+      <Container>
+        <span>Organisations</span>
+      </Container>
     </div>
   );
 };
