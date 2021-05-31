@@ -45,6 +45,7 @@ const columns = [
             return (
               <ProgressBar
                 className="w-100 mr-10"
+                variant="secondary"
                 striped
                 now={ele}
                 label={`${ele}%`}
