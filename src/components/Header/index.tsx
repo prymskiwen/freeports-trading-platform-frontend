@@ -16,8 +16,10 @@ import {
   Home,
   Settings,
 } from "@material-ui/icons";
-
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { Link } from "react-router-dom";
+
+import useAuth from "../../hooks";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
@@ -37,6 +39,7 @@ const useStyles = makeStyles({
 });
 const Header = (): React.ReactElement => {
   const classes = useStyles();
+  const { isAuthenticated } = useAuth();
 
   return (
     <AppBar position="static">
@@ -46,29 +49,40 @@ const Header = (): React.ReactElement => {
             <IconButton edge="start" color="inherit" aria-label="home">
               <Home fontSize="large" />
             </IconButton>
-            <List
-              component="nav"
-              aria-labelledby="main navigation"
-              className={classes.navDisplayFlex}
-            >
-              {navLinks.map(({ title, path, hasChildren }) => (
-                <Link to={path} key={title} className={classes.linkText}>
-                  <ListItem button>
-                    {hasChildren ? <ExpandMore /> : <ChevronRight />}
-                    <ListItemText primary={title} />
-                  </ListItem>
-                </Link>
-              ))}
-            </List>
+            {isAuthenticated ? (
+              <List
+                component="nav"
+                aria-labelledby="main navigation"
+                className={classes.navDisplayFlex}
+              >
+                {navLinks.map(({ title, path, hasChildren }) => (
+                  <Link to={path} key={title} className={classes.linkText}>
+                    <ListItem button>
+                      {hasChildren ? <ExpandMore /> : <ChevronRight />}
+                      <ListItemText primary={title} />
+                    </ListItem>
+                  </Link>
+                ))}
+              </List>
+            ) : (
+              <></>
+            )}
           </div>
-          <div>
-            <IconButton edge="start" color="inherit" aria-label="settings">
-              <Settings fontSize="large" />
-            </IconButton>
-            <IconButton edge="start" color="inherit" aria-label="happy">
-              <EmojiEmotions fontSize="large" />
-            </IconButton>
-          </div>
+          {isAuthenticated ? (
+            <div>
+              <IconButton edge="start" color="inherit" aria-label="settings">
+                <Settings fontSize="large" />
+              </IconButton>
+              <IconButton edge="start" color="inherit" aria-label="happy">
+                <EmojiEmotions fontSize="large" />
+              </IconButton>
+              <IconButton edge="start" color="inherit" aria-label="signout">
+                <ExitToAppIcon fontSize="large" />
+              </IconButton>
+            </div>
+          ) : (
+            <></>
+          )}
         </Container>
       </Toolbar>
     </AppBar>

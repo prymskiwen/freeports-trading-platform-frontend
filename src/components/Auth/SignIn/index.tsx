@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer } from "react";
 import { Link, Redirect } from "react-router-dom";
 import {
   Avatar,
@@ -16,16 +16,13 @@ import {
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import useAuth from "../../../hooks";
 
-// import Store from "../../../store";
-
-function Copyright() {
-  // const store = React.useContext(Store);
+const Copyright = (): React.ReactElement => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {/* Copyright © {store.title} {new Date().getFullYear()}. */}
+      Copyright © Freeports {new Date().getFullYear()}.
     </Typography>
   );
-}
+};
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -47,17 +44,34 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignIn = (): React.ReactElement => {
-  const { isAuthenticated, signIn } = useAuth()
-  const classes = useStyles();
+type State = {
+  email?: string;
+  password?: string;
+};
 
-  const handleLogin = () => {
-    const credential = {}
-    signIn(credential)
-  }
+const SignIn = (): React.ReactElement => {
+  const { isAuthenticated, signIn } = useAuth();
+  const classes = useStyles();
+  const [formInput, setFormInput] = useReducer(
+    (state: State, newState: State) => ({ ...state, ...newState }),
+    {
+      email: "",
+      password: "",
+    }
+  );
+
+  const handleLoginSubmit = () => {
+    signIn(formInput);
+  };
+
+  const handleInput = (evt: { target: { name: string; value: string } }) => {
+    const { name } = evt.target;
+    const newValue = evt.target.value;
+    setFormInput({ [name]: newValue });
+  };
 
   if (isAuthenticated) {
-    return <Redirect to="/dashboard" />
+    return <Redirect to="/dashboard" />;
   }
 
   return (
@@ -70,8 +84,9 @@ const SignIn = (): React.ReactElement => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} onSubmit={handleLoginSubmit}>
           <TextField
+            autoFocus
             variant="outlined"
             margin="normal"
             required
@@ -79,8 +94,8 @@ const SignIn = (): React.ReactElement => {
             id="email"
             label="Email Address"
             name="email"
-            autoComplete="email"
-            autoFocus
+            type="email"
+            onChange={handleInput}
           />
           <TextField
             variant="outlined"
@@ -91,7 +106,7 @@ const SignIn = (): React.ReactElement => {
             label="Password"
             type="password"
             id="password"
-            autoComplete="current-password"
+            onChange={handleInput}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -103,7 +118,6 @@ const SignIn = (): React.ReactElement => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={handleLogin}
           >
             Sign In
           </Button>

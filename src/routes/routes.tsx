@@ -1,44 +1,44 @@
-import { lazy } from 'react'
+import { lazy } from "react";
 
 export default [
   {
-    path: "/auth/login",
+    path: "/signin",
     exact: true,
-    component: lazy(() => import("../components/Auth/SignIn"))
+    component: lazy(() => import("../components/Auth/SignIn")),
   },
   {
-    path: "/auth/register",
+    path: "/signup",
     exact: true,
-    component: lazy(() => import("../components/Auth/SignUp"))
+    component: lazy(() => import("../components/Auth/SignUp")),
   },
   {
-    path: '/dashboard',
+    path: "/dashboard",
     exact: true,
     auth: true,
-    component: lazy(() => import('../components/Dashboard')),
+    component: lazy(() => import("../components/Dashboard")),
   },
   {
-    path: '/organisations',
+    path: "/organisations",
     exact: true,
     auth: true,
-    component: lazy(() => import('../components/Organisations')),
+    component: lazy(() => import("../components/Organisations")),
   },
   {
-    path: '/nostro-accounts',
+    path: "/nostro-accounts",
     exact: true,
     auth: true,
-    component: lazy(() => import('../components/NostroAccounts')),
+    component: lazy(() => import("../components/NostroAccounts")),
   },
   {
-    path: '/tracking',
+    path: "/tracking",
     exact: true,
     auth: true,
-    component: lazy(() => import('../components/Tracking')),
+    component: lazy(() => import("../components/Tracking")),
   },
   {
-    path: '/',
+    path: "/",
     exact: true,
     auth: true,
-    component: lazy(() => import('../components/Dashboard')),
+    component: lazy(() => import("../components/Dashboard")),
   },
 ];
