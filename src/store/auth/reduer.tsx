@@ -2,7 +2,7 @@
 // import HTTP from '../../../utils/Http';
 // import Lockr from 'lockr';
 
-import ReduxAction from '../redux-action';
+import ReduxAction from "../redux-action";
 import {
   AUTH_CHECK,
   AUTH_LOGIN,
@@ -11,31 +11,29 @@ import {
   AUTH_REFRESH_TOKEN,
   AUTH_RESET_PASSWORD,
   AUTH_ERRORS,
-} from './action-types';
+} from "./action-types";
 
 const initialState = {
   isAuthenticated: false,
   loading: false,
-  errors: []
+  errors: [],
 };
 
 function login(state: any, payload: any) {
-  // eslint-disable-next-line no-console
-  console.log('login', { state, payload })
-  // localStorage.setItem('access_token', payload.token);
+  localStorage.setItem("access_token", payload.token);
   // HTTP.defaults.headers.common['Authorization'] = `Bearer ${payload.token}`;
 
   return {
     ...state,
     isAuthenticated: true,
-  }
+  };
 }
 
 function checkAuth(state: any) {
   const newState = {
     ...state,
-    isAuthenticated: !!localStorage.getItem('access_token')
-  }
+    isAuthenticated: !!localStorage.getItem("access_token"),
+  };
 
   // if (state.isAuthenticated) {
   //   const bearer = `Bearer ${localStorage.getItem('access_token')}`
@@ -46,24 +44,26 @@ function checkAuth(state: any) {
 }
 
 function logout(state: any) {
-  localStorage.removeItem('access_token')
+  localStorage.removeItem("access_token");
 
   return {
-    ...state, isAuthenticated: false
-  }
+    ...state,
+    isAuthenticated: false,
+  };
 }
 
 function resetPassword(state: any) {
   return {
-    ...state, resetPassword: true,
-  }
+    ...state,
+    resetPassword: true,
+  };
 }
 
 const reducer = (
-  state = initialState, 
-  { type, payload = null } : ReduxAction
+  state = initialState,
+  { type, payload = null }: ReduxAction
 ): typeof initialState => {
-  switch(type) {
+  switch (type) {
     case AUTH_LOGIN:
       return {
         ...state,
@@ -86,8 +86,8 @@ const reducer = (
     case AUTH_ERRORS:
       return {
         ...state,
-        errors: payload
-      }
+        errors: payload,
+      };
     default:
       return state;
   }

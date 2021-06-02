@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useState } from "react";
 import { Link, Redirect } from "react-router-dom";
 import {
   Avatar,
@@ -14,12 +14,15 @@ import {
   Typography,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import * as dotenv from "dotenv";
 import useAuth from "../../../hooks";
+
+dotenv.config();
 
 const Copyright = (): React.ReactElement => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      Copyright © Freeports {new Date().getFullYear()}.
+      Copyright © {process.env.REACT_APP_NAME} {new Date().getFullYear()}.
     </Typography>
   );
 };
@@ -33,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.secondary.main,
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -44,30 +47,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type State = {
-  email?: string;
-  password?: string;
-};
-
 const SignIn = (): React.ReactElement => {
   const { isAuthenticated, signIn } = useAuth();
   const classes = useStyles();
-  const [formInput, setFormInput] = useReducer(
-    (state: State, newState: State) => ({ ...state, ...newState }),
-    {
-      email: "",
-      password: "",
-    }
-  );
+  const [formInput, setFormInput] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleLoginSubmit = () => {
     signIn(formInput);
   };
 
   const handleInput = (evt: { target: { name: string; value: string } }) => {
-    const { name } = evt.target;
-    const newValue = evt.target.value;
-    setFormInput({ [name]: newValue });
+    const { name, value } = evt.target;
+
+    setFormInput({ ...formInput, [name]: value });
   };
 
   if (isAuthenticated) {
