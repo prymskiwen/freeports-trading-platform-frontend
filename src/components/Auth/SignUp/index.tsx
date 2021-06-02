@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Avatar,
@@ -14,12 +14,14 @@ import {
   Typography,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      Copyright © <Link to="https://material-ui.com/">Your Website</Link>
-      {new Date().getFullYear()}.
+      Copyright © {process.env.REACT_APP_NAME} {new Date().getFullYear()}.
     </Typography>
   );
 }
@@ -46,6 +48,58 @@ const useStyles = makeStyles((theme) => ({
 
 const SignUp = (): React.ReactElement => {
   const classes = useStyles();
+  const [formInput, setFormInput] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    emailErrorText: "",
+    password: "",
+    confirmPassword: "",
+    confirmPasswordErrorText: "",
+  });
+
+  const validateEmail = (email: string) => {
+    const regexp =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regexp.test(email);
+  };
+
+  const handleInputChange = (e: {
+    target: { name: string; value: string };
+  }) => {
+    const { name } = e.target;
+    const newValue = e.target.value;
+
+    setFormInput({ ...formInput, [name]: newValue });
+  };
+
+  const handleEmailChange = (e: {
+    target: { name: string; value: string };
+  }) => {
+    let errorText = "";
+    const { value } = e.target;
+
+    if (!validateEmail(value)) {
+      errorText = "Invalid Email Address";
+    }
+    setFormInput({ ...formInput, emailErrorText: errorText, email: value });
+  };
+
+  const handleConfirmPasswordChange = (e: {
+    target: { name: string; value: string };
+  }) => {
+    let errorText = "";
+    const { value } = e.target;
+
+    if (value !== formInput.password) {
+      errorText = "Passwords are not matched";
+    }
+    setFormInput({
+      ...formInput,
+      confirmPassword: value,
+      confirmPasswordErrorText: errorText,
+    });
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -55,7 +109,7 @@ const SignUp = (): React.ReactElement => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Sign up
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -63,26 +117,57 @@ const SignUp = (): React.ReactElement => {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
+            id="firstname"
+            label="First Name"
+            name="firstName"
+            onChange={handleInputChange}
           />
           <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
+            id="lastname"
+            label="Last Name"
+            name="lastName"
+            onChange={handleInputChange}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            name="email"
+            label="Email Address"
+            helperText={formInput.emailErrorText}
+            error={formInput.emailErrorText !== ""}
+            type="email"
+            onChange={handleEmailChange}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="password"
             name="password"
             label="Password"
             type="password"
-            id="password"
-            autoComplete="current-password"
+            onChange={handleInputChange}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="confirm-password"
+            name="confirmPassword"
+            label="Confirm Password"
+            helperText={formInput.confirmPasswordErrorText}
+            error={formInput.confirmPasswordErrorText !== ""}
+            type="password"
+            onChange={handleConfirmPasswordChange}
           />
           <Button
             type="submit"
@@ -91,14 +176,12 @@ const SignUp = (): React.ReactElement => {
             color="primary"
             className={classes.submit}
           >
-            Sign In
+            Sign Up
           </Button>
           <Grid container>
-            <Grid item xs>
-              <Link to="/">Forgot password?</Link>
-            </Grid>
+            <Grid item xs />
             <Grid item>
-              <Link to="/">Don&apos;t have an account? Sign Up</Link>
+              <Link to="/signin">Already have an account? Sign In</Link>
             </Grid>
           </Grid>
         </form>
