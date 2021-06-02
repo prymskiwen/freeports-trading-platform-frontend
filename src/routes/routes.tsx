@@ -7,11 +7,6 @@ export default [
     component: lazy(() => import("../components/Auth/SignIn")),
   },
   {
-    path: "/signup",
-    exact: true,
-    component: lazy(() => import("../components/Auth/SignUp")),
-  },
-  {
     path: "/dashboard",
     exact: true,
     auth: true,
