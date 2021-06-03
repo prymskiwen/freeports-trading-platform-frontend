@@ -23,8 +23,7 @@ function useAuth(): any {
 
     await login(credentials)
       .then((data) => {
-        console.log(data);
-        // dispatch(authLoginSuccess(data));
+        dispatch(authLoginSuccess(data));
       })
       .catch((err) => {
         dispatch(authLoginError(err.message));
