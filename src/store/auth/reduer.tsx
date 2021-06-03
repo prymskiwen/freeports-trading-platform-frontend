@@ -7,13 +7,15 @@ import {
   AUTH_CHECK,
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
-  AUTH_LOGIN_ERROR,
+  AUTH_OTP_CHECK,
+  AUTH_OTP_CHECK_SUCCESS,
+  AUTH_ERROR,
   AUTH_LOGOUT,
   AUTH_REFRESH_TOKEN,
-  AUTH_RESET_PASSWORD,
 } from "./action-types";
 
 const initialState = {
+  isSignInAuthenticated: false,
   isAuthenticated: false,
   loading: false,
   error: "",
@@ -21,6 +23,17 @@ const initialState = {
 
 function login(state: any, payload: any) {
   const { accessToken } = payload.token;
+
+  // localStorage.setItem("access_token", accessToken);
+
+  return {
+    ...state,
+    isSignInAuthenticated: true,
+  };
+}
+
+function checkOTP(state: any, payload: any) {
+  const accessToken = "test";
 
   localStorage.setItem("access_token", accessToken);
 
@@ -49,14 +62,8 @@ function logout(state: any) {
 
   return {
     ...state,
+    isSignInAuthenticated: false,
     isAuthenticated: false,
-  };
-}
-
-function resetPassword(state: any) {
-  return {
-    ...state,
-    resetPassword: true,
   };
 }
 
@@ -76,7 +83,18 @@ const reducer = (
         ...login(state, payload),
         loading: false,
       };
-    case AUTH_LOGIN_ERROR:
+    case AUTH_OTP_CHECK:
+      return {
+        ...state,
+        loading: true,
+        error: "",
+      };
+    case AUTH_OTP_CHECK_SUCCESS:
+      return {
+        ...checkOTP(state, payload),
+        loading: false,
+      };
+    case AUTH_ERROR:
       return {
         ...state,
         error: payload,
@@ -87,8 +105,6 @@ const reducer = (
       return checkAuth(state);
     case AUTH_LOGOUT:
       return logout(state);
-    case AUTH_RESET_PASSWORD:
-      return resetPassword(state);
     default:
       return state;
   }

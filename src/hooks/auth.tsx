@@ -3,20 +3,28 @@ import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import reduxActions from "../store/actions";
 import { login } from "../services/authService";
 
-const { authLogin, authLoginSuccess, authLogout, authLoginError } =
-  reduxActions;
+const {
+  authLogin,
+  authLoginSuccess,
+  authLogout,
+  setAuthError,
+  authOTPCheck,
+  authOTPCheckSuccess,
+} = reduxActions;
 
 function useAuth(): any {
   const dispatch = useDispatch();
 
-  const { isAuthenticated, loading, error } = useSelector(
-    (state: any) => ({
-      isAuthenticated: state.auth.isAuthenticated,
-      loading: state.auth.loading,
-      error: state.auth.error,
-    }),
-    shallowEqual
-  );
+  const { isSignInAuthenticated, isAuthenticated, loading, error } =
+    useSelector(
+      (state: any) => ({
+        isSignInAuthenticated: state.auth.isSignInAuthenticated,
+        isAuthenticated: state.auth.isAuthenticated,
+        loading: state.auth.loading,
+        error: state.auth.error,
+      }),
+      shallowEqual
+    );
 
   const signIn = async (credentials: any) => {
     dispatch(authLogin());
@@ -26,7 +34,7 @@ function useAuth(): any {
         dispatch(authLoginSuccess(data));
       })
       .catch((err) => {
-        dispatch(authLoginError(err.message));
+        dispatch(setAuthError(err.message));
       });
   };
 
@@ -40,16 +48,24 @@ function useAuth(): any {
   };
 
   const setError = (err: any) => {
-    dispatch(authLoginError(err));
+    dispatch(setAuthError(err));
+  };
+
+  const checkOTP = (password: string) => {
+    dispatch(authOTPCheck());
+
+    dispatch(authOTPCheckSuccess(password));
   };
 
   return {
+    isSignInAuthenticated,
     isAuthenticated,
     loading,
     error,
     signIn,
     signOut,
     setError,
+    checkOTP,
   };
 }
 

@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const SignIn = (): React.ReactElement => {
-  const { isAuthenticated, error, signIn } = useAuth();
+  const { isSignInAuthenticated, error, signIn } = useAuth();
   const classes = useStyles();
   const [formInput, setFormInput] = useState({
     email: "",
@@ -71,8 +71,9 @@ const SignIn = (): React.ReactElement => {
     }
   }, [error]);
 
-  if (isAuthenticated) {
-    return <Redirect to="/dashboard" />;
+  if (isSignInAuthenticated) {
+    console.log("AAAAAAAAAAA");
+    return <Redirect to="/signin-otp" />;
   }
 
   return (

@@ -7,6 +7,11 @@ export default [
     component: lazy(() => import("../components/Auth/SignIn")),
   },
   {
+    path: "/signin-otp",
+    exact: true,
+    component: lazy(() => import("../components/Auth/OTPSignIn")),
+  },
+  {
     path: "/dashboard",
     exact: true,
     auth: true,

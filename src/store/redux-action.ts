@@ -1,8 +1,6 @@
-
 interface ReduxAction {
-    type: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload?: any 
+  type: string;
+  payload?: any;
 }
 
-export default ReduxAction
+export default ReduxAction;
