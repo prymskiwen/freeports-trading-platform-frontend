@@ -1,8 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
+
 import App from "./App";
+import store from "./store";
+import authActions from "./store/auth/actions";
 import reportWebVitals from "./reportWebVitals";
+
+import "./index.css";
+
+const { authCheck } = authActions;
+
+store.dispatch(authCheck());
 
 ReactDOM.render(
   <React.StrictMode>
