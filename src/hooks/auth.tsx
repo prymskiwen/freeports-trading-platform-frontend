@@ -1,18 +1,11 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import reduxActions from "../store/actions";
-// import { login } from '../service';  //, register, logout
+import { login } from "../services/authService";
 
-const {
-  authLogin,
-  authLoginSuccess,
-  authLogout,
-  //   authErrors,
-} = reduxActions;
+const { authLogin, authLoginSuccess, authLogout, authLoginError } =
+  reduxActions;
 
-// redux hook
 function useAuth(): any {
   const dispatch = useDispatch();
 
@@ -28,9 +21,14 @@ function useAuth(): any {
   const signIn = async (credentials: any) => {
     dispatch(authLogin());
 
-    // const { data } = await login(credentials);
-
-    // dispatch(authLoginSuccess(data));
+    await login(credentials)
+      .then((data) => {
+        console.log(data);
+        // dispatch(authLoginSuccess(data));
+      })
+      .catch((err) => {
+        dispatch(authLoginError(err.message));
+      });
   };
 
   const signOut = () => {
@@ -40,9 +38,8 @@ function useAuth(): any {
     // });
   };
 
-  const setErrors = (_errors: any) => {
-    // dispatch(authErrors(errors));
-    console.log("errors", _errors);
+  const setError = (error: any) => {
+    dispatch(authLoginError(error));
   };
 
   return {
@@ -51,7 +48,7 @@ function useAuth(): any {
     errors,
     signIn,
     signOut,
-    setErrors,
+    setError,
   };
 }
 

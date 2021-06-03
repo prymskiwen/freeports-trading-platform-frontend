@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import {
   Avatar,
   Box,
@@ -8,13 +8,13 @@ import {
   Container,
   CssBaseline,
   FormControlLabel,
-  Grid,
   makeStyles,
   TextField,
   Typography,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import * as dotenv from "dotenv";
+
 import useAuth from "../../../hooks";
 
 dotenv.config();
@@ -26,7 +26,6 @@ const Copyright = (): React.ReactElement => {
     </Typography>
   );
 };
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -46,21 +45,21 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
   },
 }));
-
 const SignIn = (): React.ReactElement => {
-  const { isAuthenticated, signIn } = useAuth();
+  const { isAuthenticated, error, signIn } = useAuth();
   const classes = useStyles();
   const [formInput, setFormInput] = useState({
     email: "",
     password: "",
   });
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = (e: any) => {
+    e.preventDefault();
+
     signIn(formInput);
   };
-
-  const handleInput = (evt: { target: { name: string; value: string } }) => {
-    const { name, value } = evt.target;
+  const handleInput = (e: { target: { name: string; value: string } }) => {
+    const { name, value } = e.target;
 
     setFormInput({ ...formInput, [name]: value });
   };
@@ -80,6 +79,13 @@ const SignIn = (): React.ReactElement => {
           Sign in
         </Typography>
         <form className={classes.form} onSubmit={handleLoginSubmit}>
+          {error !== "" ? (
+            <Typography component="h3" variant="h5" color="error">
+              {error}
+            </Typography>
+          ) : (
+            <></>
+          )}
           <TextField
             autoFocus
             variant="outlined"
@@ -116,14 +122,6 @@ const SignIn = (): React.ReactElement => {
           >
             Sign In
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link to="/">Forgot password?</Link>
-            </Grid>
-            <Grid item>
-              <Link to="/signup">Don&apos;t have an account? Sign Up</Link>
-            </Grid>
-          </Grid>
         </form>
       </div>
       <Box mt={8}>

@@ -1,6 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { Suspense } from "react";
 import { Route, Redirect } from "react-router-dom";
+import { CircularProgress } from "@material-ui/core";
+
 import { useAuth } from "../hooks";
 import RouteCompProps from "./routeCompProps";
 
@@ -15,14 +17,14 @@ const PrivateRoute: React.FC<RouteCompProps> = ({
       {...rest}
       render={(props) => {
         return (
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<CircularProgress color="primary" />}>
             {isAuthenticated ? (
               <Component {...props} />
             ) : (
               <Redirect
                 to={{
                   pathname: "/signin",
-                  // state: { from: props.location },
+                  state: { from: props.location },
                 }}
               />
             )}

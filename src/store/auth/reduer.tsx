@@ -7,21 +7,22 @@ import {
   AUTH_CHECK,
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
+  AUTH_LOGIN_ERROR,
   AUTH_LOGOUT,
   AUTH_REFRESH_TOKEN,
   AUTH_RESET_PASSWORD,
-  AUTH_ERRORS,
 } from "./action-types";
 
 const initialState = {
   isAuthenticated: false,
   loading: false,
-  errors: [],
+  error: "",
 };
 
 function login(state: any, payload: any) {
-  localStorage.setItem("access_token", payload.token);
-  // HTTP.defaults.headers.common['Authorization'] = `Bearer ${payload.token}`;
+  const { accessToken } = payload.token;
+
+  localStorage.setItem("access_token", accessToken);
 
   return {
     ...state,
@@ -68,12 +69,17 @@ const reducer = (
       return {
         ...state,
         loading: true,
+        error: "",
       };
     case AUTH_LOGIN_SUCCESS:
-      // setIdentity(payload);
       return {
         ...login(state, payload),
         loading: false,
+      };
+    case AUTH_LOGIN_ERROR:
+      return {
+        ...state,
+        error: payload,
       };
     case AUTH_REFRESH_TOKEN:
       return login(state, payload);
@@ -83,11 +89,6 @@ const reducer = (
       return logout(state);
     case AUTH_RESET_PASSWORD:
       return resetPassword(state);
-    case AUTH_ERRORS:
-      return {
-        ...state,
-        errors: payload,
-      };
     default:
       return state;
   }

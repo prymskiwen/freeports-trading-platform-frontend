@@ -8,23 +8,23 @@
  * auth module.
  */
 
-import ReduxAction from '../redux-action'
+import ReduxAction from "../redux-action";
 
 import {
   AUTH_CHECK,
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
+  AUTH_LOGIN_ERROR,
   AUTH_LOGOUT,
   AUTH_REFRESH_TOKEN,
   AUTH_RESET_PASSWORD,
   AUTH_USER,
-  AUTH_ERRORS,
-} from './action-types';
+} from "./action-types";
 
 function authCheck(): ReduxAction {
   return {
     type: AUTH_CHECK,
-  }
+  };
 }
 
 function authLogin(): ReduxAction {
@@ -40,9 +40,9 @@ function authLoginSuccess(payload: any): ReduxAction {
   };
 }
 
-function authErrors(payload: any): ReduxAction {
+function authLoginError(payload: any): ReduxAction {
   return {
-    type: AUTH_ERRORS,
+    type: AUTH_LOGIN_ERROR,
     payload,
   };
 }
@@ -50,36 +50,36 @@ function authErrors(payload: any): ReduxAction {
 function authLogout(): ReduxAction {
   return {
     type: AUTH_LOGOUT,
-  }
+  };
 }
 
 function authRefreshToken(payload: any): ReduxAction {
   return {
     type: AUTH_REFRESH_TOKEN,
-    payload
-  }
+    payload,
+  };
 }
 
 function authResetPassword(): ReduxAction {
   return {
     type: AUTH_RESET_PASSWORD,
-  }
+  };
 }
 
 function authUser(payload: any): ReduxAction {
   return {
     type: AUTH_USER,
-    payload
-  }
+    payload,
+  };
 }
 
 export default {
   authCheck,
   authLogin,
   authLoginSuccess,
-  authErrors,
+  authLoginError,
   authLogout,
   authRefreshToken,
   authResetPassword,
   authUser,
-}
+};
