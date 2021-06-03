@@ -9,11 +9,11 @@ const { authLogin, authLoginSuccess, authLogout, authLoginError } =
 function useAuth(): any {
   const dispatch = useDispatch();
 
-  const { isAuthenticated, loading, errors } = useSelector(
+  const { isAuthenticated, loading, error } = useSelector(
     (state: any) => ({
       isAuthenticated: state.auth.isAuthenticated,
       loading: state.auth.loading,
-      errors: state.auth.errors,
+      error: state.auth.error,
     }),
     shallowEqual
   );
@@ -30,6 +30,8 @@ function useAuth(): any {
       });
   };
 
+  // const checkOTP = async (password: string) => {};
+
   const signOut = () => {
     dispatch(authLogout());
     // return new Promise((resolve) => {
@@ -37,14 +39,14 @@ function useAuth(): any {
     // });
   };
 
-  const setError = (error: any) => {
-    dispatch(authLoginError(error));
+  const setError = (err: any) => {
+    dispatch(authLoginError(err));
   };
 
   return {
     isAuthenticated,
     loading,
-    errors,
+    error,
     signIn,
     signOut,
     setError,

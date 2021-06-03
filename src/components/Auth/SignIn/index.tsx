@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import {
   Avatar,
@@ -52,6 +52,7 @@ const SignIn = (): React.ReactElement => {
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLoginSubmit = (e: any) => {
     e.preventDefault();
@@ -63,6 +64,12 @@ const SignIn = (): React.ReactElement => {
 
     setFormInput({ ...formInput, [name]: value });
   };
+
+  useEffect(() => {
+    if (error !== "") {
+      setErrorMessage(error);
+    }
+  }, [error]);
 
   if (isAuthenticated) {
     return <Redirect to="/dashboard" />;
@@ -79,13 +86,6 @@ const SignIn = (): React.ReactElement => {
           Sign in
         </Typography>
         <form className={classes.form} onSubmit={handleLoginSubmit}>
-          {error !== "" ? (
-            <Typography component="h3" variant="h5" color="error">
-              {error}
-            </Typography>
-          ) : (
-            <></>
-          )}
           <TextField
             autoFocus
             variant="outlined"
@@ -109,6 +109,13 @@ const SignIn = (): React.ReactElement => {
             id="password"
             onChange={handleInput}
           />
+          {error !== "" ? (
+            <Typography component="p" variant="caption" color="error">
+              {errorMessage}
+            </Typography>
+          ) : (
+            <></>
+          )}
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
