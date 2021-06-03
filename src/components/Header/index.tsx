@@ -39,7 +39,7 @@ const useStyles = makeStyles({
 });
 const Header = (): React.ReactElement => {
   const classes = useStyles();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, signOut } = useAuth();
 
   return (
     <AppBar position="static">
@@ -76,7 +76,12 @@ const Header = (): React.ReactElement => {
               <IconButton edge="start" color="inherit" aria-label="happy">
                 <EmojiEmotions fontSize="large" />
               </IconButton>
-              <IconButton edge="start" color="inherit" aria-label="signout">
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="signout"
+                onClick={signOut}
+              >
                 <ExitToAppIcon fontSize="large" />
               </IconButton>
             </div>
