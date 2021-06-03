@@ -1,18 +1,27 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { Suspense } from 'react'
-import { Route } from 'react-router-dom'
-import RouteCompProps from './routeCompProps';
+import React, { Suspense } from "react";
+import { Route } from "react-router-dom";
+import { CircularProgress } from "@material-ui/core";
 
-const PublicRoutes: React.FC<RouteCompProps> = 
-    (params: RouteCompProps): React.ReactElement => {
+import RouteCompProps from "./routeCompProps";
 
+const PublicRoutes: React.FC<RouteCompProps> = (
+  params: RouteCompProps
+): React.ReactElement => {
   const { component: Component, ...rest } = params;
 
-  return <Route {...rest} render={props => {
-    return <Suspense fallback={<div>Loading...</div>}>
-      <Component {...props}/>
-    </Suspense>
-  }}/>
-}
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        return (
+          <Suspense fallback={<CircularProgress color="primary" />}>
+            <Component {...props} />
+          </Suspense>
+        );
+      }}
+    />
+  );
+};
 
-export default PublicRoutes
+export default PublicRoutes;
