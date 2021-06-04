@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import QRCode from "react-qr-code";
 import { Redirect } from "react-router-dom";
 import {
-  Avatar,
   Box,
   Button,
-  Checkbox,
   Container,
   CssBaseline,
-  FormControlLabel,
   makeStyles,
   TextField,
   Typography,
@@ -74,8 +71,9 @@ const OTPSignIn = (): React.ReactElement => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="subtitle1">
-          Scan this QR Code image with Google Authenticator
+        <Typography component="h1" variant="subtitle1" align="center">
+          Scan this QR Code image with any Google Authenticator compatible
+          program
         </Typography>
         <div className={classes.qrCode}>
           <QRCode value="demo" />
@@ -94,7 +92,7 @@ const OTPSignIn = (): React.ReactElement => {
             required
             fullWidth
             name="password"
-            label="OTP code"
+            label="Confirm the OTP code"
             type="password"
             id="password"
             onChange={handleInput}
