@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../util/axios";
 
 interface LoginParamsType {
   email: string;
@@ -19,14 +19,13 @@ interface LoginTokenResponseType {
 interface LoginResponseType {
   user: LoginUserResponseType;
   token: LoginTokenResponseType;
+  isOTPDefined: boolean;
 }
-
-const API_URL = process.env.REACT_APP_API_URL;
 
 const login = (credentials: LoginParamsType): Promise<LoginResponseType> => {
   return new Promise((resolve, reject) => {
     axios
-      .post(`${API_URL}/auth/login`, credentials)
+      .post(`/auth/login`, credentials)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -36,4 +35,18 @@ const login = (credentials: LoginParamsType): Promise<LoginResponseType> => {
   });
 };
 
-export { login as default, login };
+const qrCodeGen = (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post("/auth/2fa/generate")
+      .then((res: any) => {
+        console.log(res.data);
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+export { login as default, login, qrCodeGen };

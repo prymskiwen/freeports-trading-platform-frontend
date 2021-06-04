@@ -1,7 +1,7 @@
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import reduxActions from "../store/actions";
-import { login } from "../services/authService";
+import { login, qrCodeGen } from "../services/authService";
 
 const {
   authLogin,
@@ -38,8 +38,6 @@ function useAuth(): any {
       });
   };
 
-  // const checkOTP = async (password: string) => {};
-
   const signOut = () => {
     dispatch(authLogout());
     // return new Promise((resolve) => {
@@ -49,6 +47,16 @@ function useAuth(): any {
 
   const setError = (err: any) => {
     dispatch(setAuthError(err));
+  };
+
+  const generateQRCode = async () => {
+    await qrCodeGen()
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err.response.message);
+      });
   };
 
   const checkOTP = (password: string) => {
@@ -65,6 +73,7 @@ function useAuth(): any {
     signIn,
     signOut,
     setError,
+    generateQRCode,
     checkOTP,
   };
 }

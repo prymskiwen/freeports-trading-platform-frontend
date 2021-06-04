@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import { Redirect } from "react-router-dom";
 import {
@@ -43,7 +43,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const OTPSignIn = (): React.ReactElement => {
-  const { isSignInAuthenticated, isAuthenticated, error, checkOTP } = useAuth();
+  const {
+    isSignInAuthenticated,
+    isAuthenticated,
+    isOTPDefined,
+    error,
+    generateQRCode,
+    checkOTP,
+  } = useAuth();
   const classes = useStyles();
   const [OTPassword, setOTPassword] = useState("");
 
@@ -59,6 +66,12 @@ const OTPSignIn = (): React.ReactElement => {
     checkOTP(OTPassword);
   };
 
+  useEffect(() => {
+    if (!isOTPDefined) {
+      generateQRCode();
+    }
+  }, [isOTPDefined]);
+
   if (!isSignInAuthenticated) {
     return <Redirect to="/signin" />;
   }
@@ -71,13 +84,19 @@ const OTPSignIn = (): React.ReactElement => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="subtitle1" align="center">
-          Scan this QR Code image with any Google Authenticator compatible
-          program
-        </Typography>
-        <div className={classes.qrCode}>
-          <QRCode value="demo" />
-        </div>
+        {!isOTPDefined ? (
+          <>
+            <Typography component="h1" variant="subtitle1" align="center">
+              Scan this QR Code image with any Google Authenticator compatible
+              program
+            </Typography>
+            <div className={classes.qrCode}>
+              <QRCode value="demo" />
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
         <form className={classes.form} onSubmit={handleOTPSubmit}>
           {error !== "" ? (
             <Typography component="h3" variant="h5" color="error">

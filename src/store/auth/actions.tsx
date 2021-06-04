@@ -15,6 +15,7 @@ import {
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
   AUTH_ERROR,
+  QR_CODE_GENERATE,
   AUTH_OTP_CHECK,
   AUTH_OTP_CHECK_SUCCESS,
   AUTH_LOGOUT,
@@ -45,6 +46,12 @@ function setAuthError(payload: any): ReduxAction {
   return {
     type: AUTH_ERROR,
     payload,
+  };
+}
+
+function qrCodeGenerate(): ReduxAction {
+  return {
+    type: QR_CODE_GENERATE,
   };
 }
 
@@ -86,6 +93,7 @@ export default {
   authLogin,
   authLoginSuccess,
   setAuthError,
+  qrCodeGenerate,
   authOTPCheck,
   authOTPCheckSuccess,
   authLogout,

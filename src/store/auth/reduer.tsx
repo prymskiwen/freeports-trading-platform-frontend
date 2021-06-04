@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// import HTTP from '../../../utils/Http';
-// import Lockr from 'lockr';
+import Lockr from "lockr";
 
+import axios from "../../util/axios";
 import ReduxAction from "../redux-action";
 import {
   AUTH_CHECK,
@@ -17,6 +16,7 @@ import {
 const initialState = {
   isSignInAuthenticated: false,
   isAuthenticated: false,
+  isOTPDefined: false,
   loading: false,
   error: "",
 };
@@ -24,18 +24,46 @@ const initialState = {
 function login(state: any, payload: any) {
   const { accessToken } = payload.token;
 
-  localStorage.setItem("access_token1", accessToken);
+  axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
   return {
     ...state,
     isSignInAuthenticated: true,
+    isOTPDefined: payload.isOTPDefined,
   };
+}
+interface LoginUserResponseType {
+  id: string;
+  nickname: string;
+  email: string;
+}
+interface LoginTokenResponseType {
+  tokenType: string;
+  accessToken: string;
+  accessTokenExpires: string;
+  refreshToken: string;
+  refreshTokenExpires: string;
+}
+interface LoginResponseType {
+  user: LoginUserResponseType;
+  token: LoginTokenResponseType;
+  isOTPDefined: boolean;
+}
+
+function setIdentity(data: LoginResponseType) {
+  Lockr.set("AUTH_TOKEN", data.token.accessToken);
+  Lockr.set("USER_DATA", {
+    id: data.user.id,
+    email: data.user.email,
+    nickname: data.user.nickname,
+  });
+  Lockr.set("IS_OTP_DEFINED", data.isOTPDefined);
 }
 
 function checkOTP(state: any, payload: any) {
   const accessToken = "test";
 
-  localStorage.setItem("access_token2", accessToken);
+  Lockr.set("2fa_access_token", accessToken);
 
   return {
     ...state,
@@ -46,21 +74,22 @@ function checkOTP(state: any, payload: any) {
 function checkAuth(state: any) {
   const newState = {
     ...state,
-    isSignInAuthenticated: !!localStorage.getItem("access_token1"),
-    isAuthenticated: !!localStorage.getItem("access_token2"),
+    isSignInAuthenticated: !!Lockr.get("login_access_token"),
+    isAuthenticated: !!Lockr.get("2fa_access_token"),
+    isOTPDefined: !!Lockr.get("IS_OTP_DEFINED"),
   };
 
-  // if (state.isAuthenticated) {
-  //   const bearer = `Bearer ${localStorage.getItem('access_token')}`
-  //   HTTP.defaults.headers.common['Authorization'] = bearer;
-  // }
+  if (state.isAuthenticated) {
+    const bearer = `Bearer ${Lockr.get("ACCESS_TOKEN")}`;
+    axios.defaults.headers.common.Authorization = bearer;
+  }
 
   return newState;
 }
 
 function logout(state: any) {
-  localStorage.removeItem("access_token1");
-  localStorage.removeItem("access_token2");
+  Lockr.rm("login_access_token");
+  Lockr.rm("2fa_access_token");
 
   return {
     ...state,
@@ -81,6 +110,7 @@ const reducer = (
         error: "",
       };
     case AUTH_LOGIN_SUCCESS:
+      setIdentity(payload);
       return {
         ...login(state, payload),
         loading: false,
