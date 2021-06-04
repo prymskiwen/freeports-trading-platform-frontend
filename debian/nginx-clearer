@@ -8,13 +8,13 @@ server {
     server_name <replace-by-my-domain>;
     client_max_body_size 20M;
 
-    root /usr/share/freeports-trading-platform-clearer;
+    root /usr/share/freeports-trading-platform/clearer;
 
     location ~/(api|socket\.io|__getcookie) {
-         include /etc/freeports-trading-platform/nginx-proxy;
+         include /etc/freeports-trading-platform/backend/nginx-proxy;
     }
 
-    include /etc/freeports-trading-platform/nginx-common;
+    include /etc/freeports-trading-platform/backend/nginx-common;
 
     listen 80;
 
