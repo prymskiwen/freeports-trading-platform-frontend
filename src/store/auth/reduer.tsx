@@ -24,7 +24,7 @@ const initialState = {
 function login(state: any, payload: any) {
   const { accessToken } = payload.token;
 
-  // localStorage.setItem("access_token", accessToken);
+  localStorage.setItem("access_token1", accessToken);
 
   return {
     ...state,
@@ -35,7 +35,7 @@ function login(state: any, payload: any) {
 function checkOTP(state: any, payload: any) {
   const accessToken = "test";
 
-  localStorage.setItem("access_token", accessToken);
+  localStorage.setItem("access_token2", accessToken);
 
   return {
     ...state,
@@ -46,7 +46,8 @@ function checkOTP(state: any, payload: any) {
 function checkAuth(state: any) {
   const newState = {
     ...state,
-    isAuthenticated: !!localStorage.getItem("access_token"),
+    isSignInAuthenticated: !!localStorage.getItem("access_token1"),
+    isAuthenticated: !!localStorage.getItem("access_token2"),
   };
 
   // if (state.isAuthenticated) {
@@ -58,7 +59,8 @@ function checkAuth(state: any) {
 }
 
 function logout(state: any) {
-  localStorage.removeItem("access_token");
+  localStorage.removeItem("access_token1");
+  localStorage.removeItem("access_token2");
 
   return {
     ...state,

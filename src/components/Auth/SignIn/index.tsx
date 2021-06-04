@@ -72,7 +72,6 @@ const SignIn = (): React.ReactElement => {
   }, [error]);
 
   if (isSignInAuthenticated) {
-    console.log("AAAAAAAAAAA");
     return <Redirect to="/signin-otp" />;
   }
 
