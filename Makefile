@@ -16,7 +16,7 @@ install: node_modules
 	cp -R build/* $(DESTDIR)$(STATIC)/$(PROJECT)/
 	## Create nginx sample config files
 	mkdir -p $(DESTDIR)$(STATIC)/doc/$(PROJECT)/
-	cp nginx-clearer $(DESTDIR)$(STATIC)/doc/$(PROJECT)/
+	cp debian/nginx-clearer $(DESTDIR)$(STATIC)/doc/$(PROJECT)/
 
 clean:
 	rm -rf dist/ node_modules/
