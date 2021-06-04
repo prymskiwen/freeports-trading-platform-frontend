@@ -13,7 +13,7 @@ build:
 install: node_modules
 	## Copy static files
 	mkdir -p $(DESTDIR)$(STATIC)/$(PROJECT)/
-	cp -R dist/* $(DESTDIR)$(STATIC)/$(PROJECT)/
+	cp -R build/* $(DESTDIR)$(STATIC)/$(PROJECT)/
 
 clean:
 	rm -rf dist/ node_modules/
