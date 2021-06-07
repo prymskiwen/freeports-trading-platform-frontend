@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const OTPSignIn = (): React.ReactElement => {
   const {
-    isSignInAuthenticated,
+    authStep,
     isAuthenticated,
     isOTPDefined,
     error,
@@ -53,6 +53,7 @@ const OTPSignIn = (): React.ReactElement => {
   } = useAuth();
   const classes = useStyles();
   const [OTPassword, setOTPassword] = useState("");
+  const [qrCode, setQRCode] = useState("");
 
   const handleInput = (e: { target: { name: string; value: string } }) => {
     const { value } = e.target;
@@ -67,12 +68,22 @@ const OTPSignIn = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    if (!isOTPDefined) {
-      generateQRCode();
-    }
+    const getQRCode = async () => {
+      if (!isOTPDefined) {
+        let qrImg = "";
+        const qr = await generateQRCode();
+
+        console.log(qr);
+        qrImg = `data:image/png;base64,${btoa(qr)}`;
+        console.log(qrImg);
+        setQRCode(qrImg);
+      }
+    };
+
+    getQRCode();
   }, [isOTPDefined]);
 
-  if (!isSignInAuthenticated) {
+  if (authStep !== "otp") {
     return <Redirect to="/signin" />;
   }
 
@@ -91,7 +102,7 @@ const OTPSignIn = (): React.ReactElement => {
               program
             </Typography>
             <div className={classes.qrCode}>
-              <QRCode value="demo" />
+              <img src={qrCode} alt="QR Code" />
             </div>
           </>
         ) : (

@@ -15,11 +15,12 @@ const {
 function useAuth(): any {
   const dispatch = useDispatch();
 
-  const { isSignInAuthenticated, isAuthenticated, loading, error } =
+  const { authStep, isAuthenticated, isOTPDefined, loading, error } =
     useSelector(
       (state: any) => ({
-        isSignInAuthenticated: state.auth.isSignInAuthenticated,
+        authStep: state.auth.authStep,
         isAuthenticated: state.auth.isAuthenticated,
+        isOTPDefined: state.auth.isOTPDefined,
         loading: state.auth.loading,
         error: state.auth.error,
       }),
@@ -40,9 +41,6 @@ function useAuth(): any {
 
   const signOut = () => {
     dispatch(authLogout());
-    // return new Promise((resolve) => {
-    //   resolve('log out');
-    // });
   };
 
   const setError = (err: any) => {
@@ -50,13 +48,17 @@ function useAuth(): any {
   };
 
   const generateQRCode = async () => {
+    let qrCode = "";
+
     await qrCodeGen()
       .then((data) => {
-        console.log(data);
+        qrCode = data;
       })
       .catch((err) => {
-        console.log(err.response.message);
+        dispatch(setAuthError(err.message));
       });
+
+    return qrCode;
   };
 
   const checkOTP = (password: string) => {
@@ -66,8 +68,9 @@ function useAuth(): any {
   };
 
   return {
-    isSignInAuthenticated,
+    authStep,
     isAuthenticated,
+    isOTPDefined,
     loading,
     error,
     signIn,

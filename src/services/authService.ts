@@ -40,7 +40,6 @@ const qrCodeGen = (): Promise<string> => {
     axios
       .post("/auth/2fa/generate")
       .then((res: any) => {
-        console.log(res.data);
         return resolve(res.data);
       })
       .catch((err) => {

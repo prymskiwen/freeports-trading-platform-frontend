@@ -14,24 +14,12 @@ import {
 } from "./action-types";
 
 const initialState = {
-  isSignInAuthenticated: false,
+  authStep: "login",
   isAuthenticated: false,
   isOTPDefined: false,
   loading: false,
   error: "",
 };
-
-function login(state: any, payload: any) {
-  const { accessToken } = payload.token;
-
-  axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-
-  return {
-    ...state,
-    isSignInAuthenticated: true,
-    isOTPDefined: payload.isOTPDefined,
-  };
-}
 interface LoginUserResponseType {
   id: string;
   nickname: string;
@@ -50,6 +38,19 @@ interface LoginResponseType {
   isOTPDefined: boolean;
 }
 
+function login(state: any, payload: any) {
+  const { accessToken } = payload.token;
+
+  Lockr.set("AUTH_STEP", "otp");
+  axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+  return {
+    ...state,
+    authStep: "otp",
+    isOTPDefined: payload.isOTPDefined,
+  };
+}
+
 function setIdentity(data: LoginResponseType) {
   Lockr.set("AUTH_TOKEN", data.token.accessToken);
   Lockr.set("USER_DATA", {
@@ -57,14 +58,9 @@ function setIdentity(data: LoginResponseType) {
     email: data.user.email,
     nickname: data.user.nickname,
   });
-  Lockr.set("IS_OTP_DEFINED", data.isOTPDefined);
 }
 
 function checkOTP(state: any, payload: any) {
-  const accessToken = "test";
-
-  Lockr.set("2fa_access_token", accessToken);
-
   return {
     ...state,
     isAuthenticated: true,
@@ -74,9 +70,9 @@ function checkOTP(state: any, payload: any) {
 function checkAuth(state: any) {
   const newState = {
     ...state,
-    isSignInAuthenticated: !!Lockr.get("login_access_token"),
-    isAuthenticated: !!Lockr.get("2fa_access_token"),
-    isOTPDefined: !!Lockr.get("IS_OTP_DEFINED"),
+    authStep: !!Lockr.get("AUTH_STEP"),
+    isAuthenticated:
+      !!Lockr.get("AUTH_TOKEN") && Lockr.get("AUTH_STEP") === "passed",
   };
 
   if (state.isAuthenticated) {
@@ -88,12 +84,13 @@ function checkAuth(state: any) {
 }
 
 function logout(state: any) {
-  Lockr.rm("login_access_token");
-  Lockr.rm("2fa_access_token");
+  Lockr.rm("AUTH_STEP");
+  Lockr.rm("ACCESS_TOKEN");
+  Lockr.rm("USER_DATA");
 
   return {
     ...state,
-    isSignInAuthenticated: false,
+    authStep: "login",
     isAuthenticated: false,
   };
 }
