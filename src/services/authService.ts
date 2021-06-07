@@ -38,9 +38,9 @@ const login = (credentials: LoginParamsType): Promise<LoginResponseType> => {
 const qrCodeGen = (): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
-      .post("/auth/2fa/generate")
+      .post("/auth/2fa/generate", null, { responseType: 'arraybuffer' })
       .then((res: any) => {
-        return resolve(res.data);
+        return resolve(Buffer.from(res.data, 'binary').toString('base64'));
       })
       .catch((err) => {
         return reject(err.response.data);
