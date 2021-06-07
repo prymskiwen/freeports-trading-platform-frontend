@@ -20,7 +20,7 @@ axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 axios.interceptors.request.use(
   (config: any) => {
-    const jwtToken = Lockr.get("AUTH_TOKEN");
+    const jwtToken = Lockr.get("ACCESS_TOKEN");
 
     if (jwtToken) {
       // eslint-disable-next-line no-param-reassign
@@ -43,7 +43,7 @@ axios.interceptors.request.use(
   }
 );
 
-axios.interceptors.response.use(
+/* axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
@@ -51,6 +51,6 @@ axios.interceptors.response.use(
     }
     return Promise.reject(error);
   }
-);
+); */
 
 export default axios;

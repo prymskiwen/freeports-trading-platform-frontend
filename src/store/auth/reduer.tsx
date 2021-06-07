@@ -52,17 +52,27 @@ function login(state: any, payload: any) {
 }
 
 function setIdentity(data: LoginResponseType) {
-  Lockr.set("AUTH_TOKEN", data.token.accessToken);
+  Lockr.set("ACCESS_TOKEN", data.token.accessToken);
   Lockr.set("USER_DATA", {
     id: data.user.id,
     email: data.user.email,
     nickname: data.user.nickname,
   });
+  Lockr.set("OTP_DEFINED", data.isOTPDefined);
+}
+
+function addTokenToHeader() {
+  const token = Lockr.get("ACCESS_TOKEN");
+
+  axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 }
 
 function checkOTP(state: any, payload: any) {
+  Lockr.set("AUTH_STEP", "passed");
+
   return {
     ...state,
+    authStep: "passed",
     isAuthenticated: true,
   };
 }
@@ -70,9 +80,10 @@ function checkOTP(state: any, payload: any) {
 function checkAuth(state: any) {
   const newState = {
     ...state,
-    authStep: !!Lockr.get("AUTH_STEP"),
+    authStep: Lockr.get("AUTH_STEP"),
     isAuthenticated:
-      !!Lockr.get("AUTH_TOKEN") && Lockr.get("AUTH_STEP") === "passed",
+      !!Lockr.get("ACCESS_TOKEN") && Lockr.get("AUTH_STEP") === "passed",
+    isOTPDefined: Lockr.get("OTP_DEFINED"),
   };
 
   if (state.isAuthenticated) {
@@ -87,6 +98,7 @@ function logout(state: any) {
   Lockr.rm("AUTH_STEP");
   Lockr.rm("ACCESS_TOKEN");
   Lockr.rm("USER_DATA");
+  Lockr.rm("OTP_DEFINED");
 
   return {
     ...state,
@@ -113,12 +125,14 @@ const reducer = (
         loading: false,
       };
     case AUTH_OTP_CHECK:
+      addTokenToHeader();
       return {
         ...state,
         loading: true,
         error: "",
       };
     case AUTH_OTP_CHECK_SUCCESS:
+      setIdentity(payload);
       return {
         ...checkOTP(state, payload),
         loading: false,
