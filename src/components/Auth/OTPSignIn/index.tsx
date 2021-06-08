@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import QRCode from "react-qr-code";
 import { Redirect } from "react-router-dom";
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   CssBaseline,
   makeStyles,
@@ -39,6 +39,18 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
+  progressButtonWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  progressButton: {
+    color: theme.palette.primary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
@@ -48,6 +60,7 @@ const OTPSignIn = (): React.ReactElement => {
     authStep,
     isAuthenticated,
     isOTPDefined,
+    loading,
     error,
     generateQRCode,
     checkOTP,
@@ -151,15 +164,21 @@ const OTPSignIn = (): React.ReactElement => {
           ) : (
             <></>
           )}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Submit
-          </Button>
+          <div className={classes.progressButtonWrapper}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              disabled={loading}
+            >
+              Submit
+            </Button>
+            {loading && (
+              <CircularProgress size={24} className={classes.progressButton} />
+            )}
+          </div>
         </form>
       </div>
       <Box mt={8}>

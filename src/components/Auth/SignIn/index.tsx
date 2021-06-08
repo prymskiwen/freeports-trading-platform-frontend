@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Container,
   CssBaseline,
   FormControlLabel,
@@ -41,12 +42,24 @@ const useStyles = makeStyles((theme) => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
+  progressButtonWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  progressButton: {
+    color: theme.palette.primary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
 }));
 const SignIn = (): React.ReactElement => {
-  const { authStep, error, signIn } = useAuth();
+  const { authStep, error, signIn, loading } = useAuth();
   const classes = useStyles();
   const [formInput, setFormInput] = useState({
     email: "",
@@ -120,15 +133,21 @@ const SignIn = (): React.ReactElement => {
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign In
-          </Button>
+          <div className={classes.progressButtonWrapper}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              disabled={loading}
+            >
+              Sign In
+            </Button>
+            {loading && (
+              <CircularProgress size={24} className={classes.progressButton} />
+            )}
+          </div>
         </form>
       </div>
       <Box mt={8}>

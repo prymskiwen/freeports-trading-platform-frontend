@@ -141,6 +141,7 @@ const reducer = (
       return {
         ...state,
         error: payload,
+        loading: false,
       };
     case AUTH_REFRESH_TOKEN:
       return login(state, payload);
