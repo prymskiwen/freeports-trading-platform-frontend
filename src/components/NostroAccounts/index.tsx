@@ -18,6 +18,7 @@ import MaterialTable from "material-table";
 import { ProgressBar } from "react-bootstrap";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+
 import data from "./data";
 
 const columns = [

@@ -36,6 +36,12 @@ export default [
     component: lazy(() => import("../components/Tracking")),
   },
   {
+    path: "/roles",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Roles")),
+  },
+  {
     path: "/",
     exact: true,
     auth: true,

@@ -1,12 +1,17 @@
-import * as React from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import {
   AppBar,
   Container,
   IconButton,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   makeStyles,
+  Menu,
+  MenuItem,
   Toolbar,
 } from "@material-ui/core";
 import {
@@ -17,7 +22,7 @@ import {
   Settings,
 } from "@material-ui/icons";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import { Link } from "react-router-dom";
+import SendIcon from "@material-ui/icons/Send";
 
 import useAuth from "../../hooks";
 
@@ -35,11 +40,31 @@ const useStyles = makeStyles({
   linkText: {
     textDecoration: `none`,
     color: `white`,
+    "&:hover": {
+      textDecoration: `none`,
+    },
   },
 });
 const Header = (): React.ReactElement => {
   const classes = useStyles();
+  const history = useHistory();
   const { isAuthenticated, signOut } = useAuth();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const goToRoles = () => {
+    setAnchorEl(null);
+    history.push("/roles");
+  };
+
+  const handleSettingsMenuClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleSettingsMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <AppBar position="static">
@@ -70,19 +95,38 @@ const Header = (): React.ReactElement => {
           </div>
           {isAuthenticated ? (
             <div>
-              <IconButton edge="start" color="inherit" aria-label="settings">
-                <Settings fontSize="large" />
-              </IconButton>
-              <IconButton edge="start" color="inherit" aria-label="happy">
-                <EmojiEmotions fontSize="large" />
-              </IconButton>
               <IconButton
+                aria-controls="settings-menu"
+                aria-haspopup="true"
                 edge="start"
                 color="inherit"
-                aria-label="signout"
-                onClick={signOut}
+                aria-label="settings"
+                onClick={handleSettingsMenuClick}
               >
-                <ExitToAppIcon fontSize="large" />
+                <Settings fontSize="large" />
+              </IconButton>
+              <Menu
+                id="settings-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleSettingsMenuClose}
+              >
+                <MenuItem onClick={goToRoles}>
+                  <ListItemIcon>
+                    <SendIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Roles" />
+                </MenuItem>
+                <MenuItem onClick={signOut}>
+                  <ListItemIcon>
+                    <ExitToAppIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Sign out" />
+                </MenuItem>
+              </Menu>
+              <IconButton edge="start" color="inherit" aria-label="happy">
+                <EmojiEmotions fontSize="large" />
               </IconButton>
             </div>
           ) : (
