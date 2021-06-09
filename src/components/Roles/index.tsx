@@ -51,11 +51,6 @@ const useStyles = makeStyles((theme: Theme) =>
     checkboxLabel: {
       margin: "0px",
     },
-    icon: {
-      verticalAlign: "bottom",
-      height: 20,
-      width: 20,
-    },
     progressButtonWrapper: {
       margin: theme.spacing(1),
       position: "relative",
@@ -71,9 +66,6 @@ const useStyles = makeStyles((theme: Theme) =>
     column: {
       flexBasis: "33.33%",
     },
-    helper: {
-      borderLeft: `2px solid ${theme.palette.divider}`,
-    },
     link: {
       color: theme.palette.primary.main,
       textDecoration: "none",
@@ -88,7 +80,6 @@ const Roles = (): React.ReactElement => {
   const [roles, setRoles] = useState(rolesArray);
   const [removing, setRemoving] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
   const timer = React.useRef<number>();
 
   const onPermissionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,20 +89,16 @@ const Roles = (): React.ReactElement => {
   };
 
   const onRoleSave = (roleId: number) => {
-    setSuccess(false);
     setSaving(true);
     timer.current = window.setTimeout(() => {
-      setSuccess(true);
       setSaving(false);
     }, 3000);
   };
 
   const onRoleRemove = (roleId: number) => {
     const newRoles = roles.filter((role: any) => role.id !== roleId);
-    setSuccess(false);
     setRemoving(true);
     timer.current = window.setTimeout(() => {
-      setSuccess(true);
       setRemoving(false);
       setRoles(newRoles);
     }, 3000);
@@ -120,20 +107,16 @@ const Roles = (): React.ReactElement => {
   return (
     <div className="main-wrapper">
       <Container>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid container item alignItems="center" xs={12}>
-            <Grid item>
-              <Typography variant="h4">Roles</Typography>
-            </Grid>
-            <Grid item>
-              <Link to="/roles/add">
-                <IconButton color="inherit" aria-label="settings">
-                  <AddCircleIcon fontSize="large" />
-                </IconButton>
-              </Link>
-            </Grid>
+            <Typography variant="h4">Roles</Typography>
+            <Link to="/roles/add">
+              <IconButton color="inherit" aria-label="Add Role">
+                <AddCircleIcon fontSize="large" />
+              </IconButton>
+            </Link>
           </Grid>
-          <Grid container>
+          <Grid container item>
             <Grid item xs={12}>
               {roles.map((role) => (
                 <Accordion key={role.id}>

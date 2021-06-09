@@ -42,6 +42,12 @@ export default [
     component: lazy(() => import("../components/Roles")),
   },
   {
+    path: "/roles/add",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Roles/AddRole")),
+  },
+  {
     path: "/",
     exact: true,
     auth: true,
