@@ -1,11 +1,14 @@
 import React from "react";
-import { Container } from "@material-ui/core";
+import {Container} from "@material-ui/core";
+import CoWorkerForm from '../CoWorkerForm'
 
-const Dashboard = (): React.ReactElement => {
+
+const Dashboard = () : React.ReactElement => {
   return (
     <div className="main-wrapper">
       <Container>
-        <span>Dashboard</span>
+
+        <CoWorkerForm/>
       </Container>
     </div>
   );
