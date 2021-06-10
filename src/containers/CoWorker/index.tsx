@@ -23,6 +23,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 
+import profile from "../../assets/images/profile.jpg";
+import CoWorkerForm from "../../components/CoWorkerForm";
+
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
     padding: theme.spacing(3),
@@ -47,9 +50,16 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     alignItems: "center",
   },
-  expandIcon: {
-    position: "absolute",
-    left: -26,
+
+  accordionProfile: {
+    height: 36,
+  },
+  accordionCoWorker: {
+    display: "flex",
+    alignItems: "center",
+  },
+  paddingSmall: {
+    padding: theme.spacing(1),
   },
 }));
 
@@ -72,7 +82,7 @@ const CoWorker = (): React.ReactElement => {
 
   return (
     <Grid container className={classes.root}>
-      <Grid item className={classes.sideMenu}>
+      <Grid item className={classes.sideMenu} sm={4} lg={3}>
         <div className={classes.listTitle}>
           <Typography variant="h5">
             CO-WORKER
@@ -108,31 +118,26 @@ const CoWorker = (): React.ReactElement => {
           ))}
         </List>
       </Grid>
-      <Grid item className={classes.main} xs={8}>
+      <Grid item className={classes.main} sm={8} lg={9}>
         <Accordion>
           <AccordionSummary
             classes={{ content: classes.accordionSummary }}
             aria-controls="panel1c-content"
           >
-            <ExpandMoreIcon className={classes.expandIcon} />
-            <Typography>Co worker</Typography>
+            <div className={classes.accordionCoWorker}>
+              <ExpandMoreIcon />
+              <img
+                className={`${classes.accordionProfile} ${classes.paddingSmall}`}
+                src={profile}
+                alt="Co-worker"
+              />
+              <Typography>Co worker</Typography>
+            </div>
 
             <Button>Disable</Button>
           </AccordionSummary>
 
-          <FormGroup>
-            <FormLabel component="legend">Role</FormLabel>
-            <AccordionDetails />
-          </FormGroup>
-
-          <Divider />
-          <AccordionActions>
-            <div>
-              <Button variant="contained" size="small">
-                Remove
-              </Button>
-            </div>
-          </AccordionActions>
+          <CoWorkerForm />
         </Accordion>
       </Grid>
     </Grid>
