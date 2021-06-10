@@ -24,7 +24,7 @@ axios.interceptors.request.use(
 
     if (jwtToken) {
       // eslint-disable-next-line no-param-reassign
-      config.headers["X-Authorization"] = jwtToken;
+      config.headers.Authorization = `Bearer ${jwtToken}`;
     }
 
     if (!jwtToken && !config.headers[PUBLIC_REQUEST_KEY]) {
