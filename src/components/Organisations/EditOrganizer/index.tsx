@@ -72,7 +72,7 @@ const useStyle = makeStyles((theme) => ({
   },
 }))
 
-const Editmemeber = (): React.ReactElement => {
+const EditOrganizer = (): React.ReactElement => {
   const { id } : any = useParams();
   const classes = useStyle();
   return(
@@ -306,4 +306,4 @@ const Editmemeber = (): React.ReactElement => {
   )
 }
 
-export default Editmemeber;
+export default EditOrganizer;

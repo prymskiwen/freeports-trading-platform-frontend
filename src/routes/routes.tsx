@@ -24,10 +24,16 @@ export default [
     component: lazy(() => import("../components/Organisations")),
   },
   {
-    path: "/organisations/editmember/:id",
+    path: "/organisations/addOrganization",
     exact: true,
     auth: true,
-    component: lazy(() => import("../components/Organisations/Editmember")),
+    component: lazy(() => import("../components/Organisations/AddOrganizer")),
+  },
+  {
+    path: "/organisations/editOrganizer/:id",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Organisations/EditOrganizer")),
   },
   {
     path: "/nostro-accounts",
