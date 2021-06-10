@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import {
   Button,
@@ -12,13 +12,14 @@ import {
   FormLabel,
   Grid,
   makeStyles,
+  TextField,
   Theme,
   Typography,
 } from "@material-ui/core";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { permissionsArray, rolesArray } from "./data";
+import { useRole } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: -12,
     },
     column: {
-      flexBasis: "33.33%",
+      flexBasis: "20%",
     },
     link: {
       color: theme.palette.primary.main,
@@ -67,26 +68,86 @@ const useStyles = makeStyles((theme: Theme) =>
         textDecoration: "underline",
       },
     },
+    roleNameInput: {
+      width: "100%",
+      marginBottom: theme.spacing(2),
+    },
   })
 );
-const Roles = (): React.ReactElement => {
+
+interface RoleType {
+  name: string;
+  permissions: Array<string>;
+}
+interface PermissionType {
+  name: string;
+  permissions: Array<{ code: string; name: string }>;
+}
+
+const AddRole = (): React.ReactElement => {
   const classes = useStyles();
   const history = useHistory();
+  const { retrievePermissions, createNewRole } = useRole();
+  const [role, setRole] = useState<RoleType>({ name: "", permissions: [] });
+  const [permissions, setPermissions] = useState([] as any[]);
   const [loading, setLoading] = useState(false);
-  const timer = React.useRef<number>();
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let unmounted = false;
+
+    const init = async () => {
+      const permissionList = await retrievePermissions();
+
+      if (!unmounted) {
+        setPermissions(permissionList);
+      }
+    };
+
+    init();
+
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 
   const onPermissionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
 
-    console.log(name, checked);
+    const newRole = { ...role };
+
+    if (checked) newRole.permissions.push(name);
+    else {
+      for (let i = 0; i < newRole.permissions.length; i += 1) {
+        if (newRole.permissions[i] === name) {
+          newRole.permissions.splice(i, 1);
+          break;
+        }
+      }
+    }
+    console.log(newRole);
+
+    setRole(newRole);
   };
 
-  const onRoleCreate = () => {
+  const onRoleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    const newRole = { ...role };
+    newRole.name = value;
+
+    setRole(newRole);
+  };
+
+  const onRoleCreate = async () => {
     setLoading(true);
-    timer.current = window.setTimeout(() => {
-      setLoading(false);
-      history.push("/roles");
-    }, 3000);
+    await createNewRole(role)
+      .then((data: string) => {
+        if (data !== "") {
+          setLoading(false);
+          history.push("/roles");
+        }
+      })
+      .catch((err: any) => setError(err));
   };
 
   return (
@@ -97,12 +158,19 @@ const Roles = (): React.ReactElement => {
             <Typography variant="h4">Create new Organisation role</Typography>
           </Grid>
           <Grid container item xs={12}>
-            {permissionsArray.map((perm) => (
-              <Grid item xs={12}>
-                <FormGroup
-                  key={perm.value}
-                  className={classes.permissionContainer}
-                >
+            <Grid item xs={4}>
+              <TextField
+                className={classes.roleNameInput}
+                label="Role Name"
+                value={role.name}
+                onChange={onRoleNameChange}
+              />
+            </Grid>
+          </Grid>
+          <Grid container item xs={12}>
+            {permissions.map((perm: PermissionType) => (
+              <Grid item key={perm.name} xs={12}>
+                <FormGroup className={classes.permissionContainer}>
                   <FormLabel
                     component="legend"
                     className={classes.permissionName}
@@ -110,21 +178,26 @@ const Roles = (): React.ReactElement => {
                     {perm.name}
                   </FormLabel>
                   <Grid container>
-                    {perm.availabilities.map((avail) => (
-                      <Grid item xs={4}>
-                        <FormControlLabel
-                          className={classes.checkboxLabel}
-                          control={
-                            <Checkbox
-                              color="primary"
-                              name={avail.value}
-                              onChange={onPermissionChange}
-                            />
-                          }
-                          label={avail.title}
-                        />
-                      </Grid>
-                    ))}
+                    {perm.permissions.map(
+                      (avail: { name: string; code: string }) => (
+                        <Grid item key={avail.code} xs={2}>
+                          <FormControlLabel
+                            className={classes.checkboxLabel}
+                            control={
+                              <Checkbox
+                                color="primary"
+                                name={avail.code}
+                                checked={Boolean(
+                                  role.permissions.includes(avail.code)
+                                )}
+                                onChange={onPermissionChange}
+                              />
+                            }
+                            label={avail.name}
+                          />
+                        </Grid>
+                      )
+                    )}
                   </Grid>
                 </FormGroup>
               </Grid>
@@ -156,4 +229,4 @@ const Roles = (): React.ReactElement => {
   );
 };
 
-export default Roles;
+export default AddRole;

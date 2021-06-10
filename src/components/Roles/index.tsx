@@ -203,7 +203,10 @@ const Roles = (): React.ReactElement => {
                           >
                             {perm.permissions.map(
                               (avail: { name: string; code: string }) => (
-                                <div className={classes.column}>
+                                <div
+                                  key={avail.code}
+                                  className={classes.column}
+                                >
                                   <FormControlLabel
                                     className={classes.checkboxLabel}
                                     control={
