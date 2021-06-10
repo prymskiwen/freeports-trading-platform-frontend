@@ -8,8 +8,17 @@ import {  Container,
           List,
           ListItem,
           CardMedia,
+          Card,
+          Avatar,
+          Accordion,
+          Input,
+          InputAdornment,
+          AccordionSummary,
+          AccordionDetails,
 } from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { useParams } from "react-router";
+import { spawnSync } from "child_process";
 
 const Editmemeber = (): React.ReactElement => {
   const { id } : any = useParams();
@@ -76,12 +85,130 @@ const Editmemeber = (): React.ReactElement => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item>
-
+            <Grid item xs={12}>
+              <Card variant="outlined">
+                <Grid container xs={12}>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                      <span style={{ fontWeight: "bold" }}>Commission rates</span>
+                    </Grid>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                    <span style={{ fontWeight: "bold"}}>Clear Commission rates</span>
+                    </Grid>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                      <Input 
+                        endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                      />
+                    </Grid>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                      <Input 
+                        endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                      />
+                    </Grid>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                      <span style={{ fontWeight: "bold" }}>Active Users</span>
+                    </Grid>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                      <span style={{ fontWeight: "bold"}}>Disabled Users</span>
+                    </Grid>
+                    <Grid item xs={6} style={{ padding: 15 }}>
+                      <span style={{ fontWeight: "bold" }}>12</span>
+                    </Grid>
+                    <Grid item xs={6} style={{ paddingRight: 15 }}>
+                      <span style={{ fontWeight: "bold"}}>12</span>
+                    </Grid>
+                </Grid>
+              </Card>
+            </Grid>
+            <Grid container item justify="flex-end" xs={12}>
+              <Button variant="contained" color="secondary" >SAVE CHANGES</Button>
             </Grid>
           </Grid>
           <Grid item xs={6}>
-            <h2>Organization managers</h2>
+            <Grid container direction="row">
+              <h2>Organization managers</h2>
+            </Grid>
+            <Grid item xs={12}>
+              <List>
+                <ListItem>
+                  <Accordion>
+                    <AccordionSummary
+                      style={{flexDirection: "row-reverse"}}
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Grid container direction="row" alignItems="center" xs={12}>
+                        <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
+                          <Avatar alt="john" src="/assets/user4.png" />
+                          <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>John malkovic</span>
+                        </Grid>
+                        <Grid container justify="flex-end" xs={6}>
+                          <span>Delete permanently</span>
+                        </Grid>
+                      </Grid>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <span>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                        sit amet blandit leo lobortis eget.
+                      </span>
+                    </AccordionDetails>
+                  </Accordion>
+                </ListItem>
+                <ListItem>
+                  <Accordion>
+                    <AccordionSummary
+                      style={{flexDirection: "row-reverse"}}
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Grid container direction="row" alignItems="center" xs={12}>
+                        <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
+                          <Avatar alt="john" src="/assets/user5.png" />
+                          <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>Mary Olive</span>
+                        </Grid>
+                        <Grid container justify="flex-end" xs={6}>
+                          <span>Delete permanently</span>
+                        </Grid>
+                      </Grid>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <span>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                        sit amet blandit leo lobortis eget.
+                      </span>
+                    </AccordionDetails>
+                  </Accordion>
+                </ListItem>
+                <ListItem>
+                  <Accordion>
+                    <AccordionSummary
+                      style={{flexDirection: "row-reverse"}}
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Grid container direction="row" alignItems="center" xs={12}>
+                        <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
+                          <Avatar alt="john" src="/assets/user11.png" />
+                          <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>Helen McGal</span>
+                        </Grid>
+                        <Grid container justify="flex-end" xs={6}>
+                          <span>Delete permanently</span>
+                        </Grid>
+                      </Grid>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <span>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
+                        sit amet blandit leo lobortis eget.
+                      </span>
+                    </AccordionDetails>
+                  </Accordion>
+                </ListItem>
+              </List>
+            </Grid>
           </Grid>
         </Grid>
       </Container>
