@@ -10,6 +10,24 @@ interface PermissionType {
   permissions: Array<{ code: string; name: string }>;
 }
 
+const addNewRole = (
+  name: string,
+  permissions: Array<string>
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/organization/clearer/role`, {
+        name,
+        permissions,
+      })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
 const getClearerRoles = (): Promise<Array<RoleType>> => {
   return new Promise((resolve, reject) => {
     axios
@@ -35,4 +53,9 @@ const getClearerPermissions = (): Promise<Array<PermissionType>> => {
   });
 };
 
-export { getClearerRoles as default, getClearerRoles, getClearerPermissions };
+export {
+  getClearerRoles as default,
+  addNewRole,
+  getClearerRoles,
+  getClearerPermissions,
+};

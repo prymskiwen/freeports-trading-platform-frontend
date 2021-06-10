@@ -43,7 +43,7 @@ axios.interceptors.request.use(
   }
 );
 
-/* axios.interceptors.response.use(
+axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
@@ -51,6 +51,6 @@ axios.interceptors.request.use(
     }
     return Promise.reject(error);
   }
-); */
+);
 
 export default axios;
