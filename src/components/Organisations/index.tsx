@@ -54,7 +54,7 @@ const Organisations = (): React.ReactElement => {
               </IconButton>
             </Grid>
             <Grid item>
-            <Icon style={{ fontSize: 35 }} >search</Icon>
+              <Icon style={{ fontSize: 35 }} >search</Icon>
               <TextField />
             </Grid>
           </Grid>
