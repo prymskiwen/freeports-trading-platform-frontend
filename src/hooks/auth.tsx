@@ -87,4 +87,4 @@ function useAuth(): any {
   };
 }
 
-export { useAuth as default, useAuth };
+export default useAuth;

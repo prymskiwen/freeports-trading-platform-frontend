@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Accordion,
@@ -25,7 +25,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { permissionsArray, rolesArray } from "./data";
+import { useRole } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: -12,
     },
     column: {
-      flexBasis: "33.33%",
+      flexBasis: "20%",
     },
     link: {
       color: theme.palette.primary.main,
@@ -75,32 +75,83 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 );
+
+interface RoleType {
+  id: string;
+  name: string;
+  permissions: Array<string>;
+}
+interface PermissionType {
+  name: string;
+  permissions: Array<{ code: string; name: string }>;
+}
+
 const Roles = (): React.ReactElement => {
   const classes = useStyles();
-  const [roles, setRoles] = useState(rolesArray);
+  const { retrieveRoles, retrievePermissions } = useRole();
+  const [roles, setRoles] = useState([] as any[]);
+  const [permissions, setPermissions] = useState([] as any[]);
   const [removing, setRemoving] = useState(false);
   const [saving, setSaving] = useState(false);
   const timer = React.useRef<number>();
 
-  const onPermissionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    let unmounted = false;
+
+    const init = async () => {
+      const rolesList = await retrieveRoles();
+      const permissionList = await retrievePermissions();
+
+      if (!unmounted) {
+        setRoles(rolesList);
+        setPermissions(permissionList);
+      }
+    };
+
+    init();
+
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  const onPermissionChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    roleId: string
+  ) => {
     const { name, checked } = event.target;
 
-    console.log(name, checked);
+    const newRoles = roles.map((role: RoleType) => {
+      if (role.id === roleId) {
+        if (checked) role.permissions.push(name);
+        else {
+          for (let i = 0; i < role.permissions.length; i += 1) {
+            if (role.permissions[i] === name) {
+              role.permissions.splice(i, 1);
+              break;
+            }
+          }
+        }
+      }
+      return role;
+    });
+
+    setRoles(newRoles);
   };
 
-  const onRoleSave = (roleId: number) => {
+  const onRoleSave = (roleId: string) => {
     setSaving(true);
     timer.current = window.setTimeout(() => {
       setSaving(false);
     }, 3000);
   };
 
-  const onRoleRemove = (roleId: number) => {
-    const newRoles = roles.filter((role: any) => role.id !== roleId);
+  const onRoleRemove = (roleId: string) => {
+    // const newRoles = roles.filter((role: any) => role.id !== roleId);
     setRemoving(true);
     timer.current = window.setTimeout(() => {
       setRemoving(false);
-      setRoles(newRoles);
+      // setRoles(newRoles);
     }, 3000);
   };
 
@@ -116,93 +167,108 @@ const Roles = (): React.ReactElement => {
               </IconButton>
             </Link>
           </Grid>
-          <Grid container item>
-            <Grid item xs={12}>
-              {roles.map((role) => (
-                <Accordion key={role.id}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1c-content"
-                  >
-                    <div className={classes.column}>
-                      <Typography className={classes.roleName}>
-                        {role.roleName}
-                      </Typography>
-                    </div>
-                    <div className={classes.column}>
-                      <Typography className={classes.roleDescription} />
-                    </div>
-                  </AccordionSummary>
-                  {permissionsArray.map((perm) => (
-                    <FormGroup
-                      key={perm.value}
-                      className={classes.permissionContainer}
-                    >
-                      <FormLabel
-                        component="legend"
-                        className={classes.permissionName}
+          {roles.length > 0 ? (
+            <Grid container item>
+              <Grid item xs={12}>
+                {roles
+                  .filter((role: RoleType) => role.name !== "_default")
+                  .map((role: RoleType) => (
+                    <Accordion key={role.id}>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1c-content"
                       >
-                        {perm.name}
-                      </FormLabel>
-                      <AccordionDetails className={classes.permissionDetails}>
-                        {perm.availabilities.map((avail) => (
-                          <div className={classes.column}>
-                            <FormControlLabel
-                              className={classes.checkboxLabel}
-                              control={
-                                <Checkbox
-                                  color="primary"
-                                  name={avail.value}
-                                  onChange={onPermissionChange}
-                                />
-                              }
-                              label={avail.title}
+                        <div className={classes.column}>
+                          <Typography className={classes.roleName}>
+                            {role.name}
+                          </Typography>
+                        </div>
+                        <div className={classes.column}>
+                          <Typography className={classes.roleDescription} />
+                        </div>
+                      </AccordionSummary>
+                      {permissions.map((perm: PermissionType) => (
+                        <FormGroup
+                          key={perm.name}
+                          className={classes.permissionContainer}
+                        >
+                          <FormLabel
+                            component="legend"
+                            className={classes.permissionName}
+                          >
+                            {perm.name}
+                          </FormLabel>
+                          <AccordionDetails
+                            className={classes.permissionDetails}
+                          >
+                            {perm.permissions.map(
+                              (avail: { name: string; code: string }) => (
+                                <div className={classes.column}>
+                                  <FormControlLabel
+                                    className={classes.checkboxLabel}
+                                    control={
+                                      <Checkbox
+                                        color="primary"
+                                        name={avail.code}
+                                        checked={Boolean(
+                                          role.permissions.includes(avail.code)
+                                        )}
+                                        onChange={(e) =>
+                                          onPermissionChange(e, role.id)
+                                        }
+                                      />
+                                    }
+                                    label={avail.name}
+                                  />
+                                </div>
+                              )
+                            )}
+                          </AccordionDetails>
+                        </FormGroup>
+                      ))}
+                      <Divider />
+                      <AccordionActions>
+                        <div className={classes.progressButtonWrapper}>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            disabled={removing}
+                            onClick={() => onRoleRemove(role.id)}
+                          >
+                            Remove
+                          </Button>
+                          {removing && (
+                            <CircularProgress
+                              size={24}
+                              className={classes.progressButton}
                             />
-                          </div>
-                        ))}
-                      </AccordionDetails>
-                    </FormGroup>
+                          )}
+                        </div>
+                        <div className={classes.progressButtonWrapper}>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="primary"
+                            onClick={() => onRoleSave(role.id)}
+                            disabled={saving}
+                          >
+                            Save
+                          </Button>
+                          {saving && (
+                            <CircularProgress
+                              size={24}
+                              className={classes.progressButton}
+                            />
+                          )}
+                        </div>
+                      </AccordionActions>
+                    </Accordion>
                   ))}
-                  <Divider />
-                  <AccordionActions>
-                    <div className={classes.progressButtonWrapper}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled={role.numCoworkers > 0 || removing}
-                        onClick={() => onRoleRemove(role.id)}
-                      >
-                        Remove
-                      </Button>
-                      {removing && (
-                        <CircularProgress
-                          size={24}
-                          className={classes.progressButton}
-                        />
-                      )}
-                    </div>
-                    <div className={classes.progressButtonWrapper}>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        color="primary"
-                        onClick={() => onRoleSave(role.id)}
-                        disabled={saving}
-                      >
-                        Save
-                      </Button>
-                      {saving && (
-                        <CircularProgress
-                          size={24}
-                          className={classes.progressButton}
-                        />
-                      )}
-                    </div>
-                  </AccordionActions>
-                </Accordion>
-              ))}
+              </Grid>
             </Grid>
-          </Grid>
+          ) : (
+            <></>
+          )}
         </Grid>
       </Container>
     </div>
