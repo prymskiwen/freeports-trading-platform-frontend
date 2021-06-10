@@ -1,17 +1,8 @@
 import React from "react";
-import {Container} from "@material-ui/core";
-import CoWorkerForm from '../CoWorkerForm'
+import CoWorkerForm from "../CoWorkerForm";
 
-
-const Dashboard = () : React.ReactElement => {
-  return (
-    <div className="main-wrapper">
-      <Container>
-
-        <CoWorkerForm/>
-      </Container>
-    </div>
-  );
+const Dashboard = (): React.ReactElement => {
+  return <CoWorkerForm />;
 };
 
 export default Dashboard;
