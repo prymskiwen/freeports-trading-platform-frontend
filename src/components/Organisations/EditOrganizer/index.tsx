@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import {  Container,
           Grid,
@@ -21,8 +21,10 @@ import {  Container,
           Select,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ImageUploader from 'react-images-upload';
 import { useParams } from "react-router";
 import { spawnSync } from "child_process";
+import Organiser from "../Organiser";
 
 const useStyle = makeStyles((theme) => ({
   root: {
@@ -75,6 +77,24 @@ const useStyle = makeStyles((theme) => ({
 const EditOrganizer = (): React.ReactElement => {
   const { id } : any = useParams();
   const classes = useStyle();
+  const showingIcon = false;
+  const showingLogo = true;
+  const testname = "workinger";
+
+  const [LogoImage, setLogoImage] = useState();
+  const [Logofile, setLogofile] = useState();
+
+  const ondrop = (pic: any) => {
+    console.log(pic);
+    const reader = new FileReader();
+    reader.onload = (e: any)=>{
+      // console.log(e.target.result);
+      setLogoImage(e.target.result);
+    }
+    reader.readAsDataURL(pic[0]);
+    setLogofile(pic);
+  }
+
   return(
     <div className="main-wrapper">
       <Container >
@@ -123,17 +143,29 @@ const EditOrganizer = (): React.ReactElement => {
                 </ListItem>
               </List>
             </Grid>
-            <Grid item spacing={3} xs={12}>
-              <Grid xs={6}>
+            <Grid item xs={12}>
+              <Grid item xs={6}>
                 <span className={classes.logotext}>Logo</span>
-                <Grid container xs={12} justify="center">
+                <Grid item container xs={12} justify="center">
                   <CardMedia 
                     style={{ marginTop: 20 }}
                     component="img"
                     height="140"
-                    image="https://i.ytimg.com/vi/yaqe1qesQ8c/maxresdefault.jpg"
+                    image={LogoImage}
                   />
-                  <Button>Change Image</Button>
+                  <ImageUploader
+                    withIcon={showingIcon}
+                    withLabel={showingIcon}
+                    buttonText='Choose Image'
+                    onChange={(ChangeEvent) => ondrop(ChangeEvent)}
+                    buttonStyles={{
+                      width: "100%",
+                    }}
+                    fileContainerStyle={{
+                      margin: 0,
+                      padding: 0,
+                    }}
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -200,48 +232,7 @@ const EditOrganizer = (): React.ReactElement => {
                       </Grid>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Grid container xs={12}>
-                        <Grid item container alignItems="center" direction="row" xs={12}>
-                          <span style={{ fontSize: 18 }}>Status</span>
-                          <Select className={classes.selectStyle}>
-                            <MenuItem value="Active" selected>Active</MenuItem>
-                            <MenuItem value="Disactive">Disactive</MenuItem>
-                          </Select>
-                        </Grid>
-                        <Grid item container direction="row" xs={12}>
-                          <Grid item xs={6} style={{ paddingTop: 15 }}>
-                            <TextField label="First Name" variant="outlined" value="John"/>
-                          </Grid>
-                          <Grid item xs={6} style={{ paddingTop: 15 }}>
-                            <TextField label="Name" variant="outlined" value="malkovic"/>
-                          </Grid>
-                          <Grid item xs={6} style={{ paddingTop: 15 }}>
-                            <TextField label="Email" variant="outlined" value="john@gmail.com"/>
-                          </Grid>
-                          <Grid item xs={6} style={{ paddingTop: 15 }}>
-                            <TextField label="Phone" variant="outlined" value="+41 78 255 26 25"/>
-                          </Grid>
-                        </Grid>
-                        <Grid item container direction="row" xs={12}>
-                          <Grid item xs={4} style={{ paddingTop: 15 }}>
-                            <Button 
-                              className={classes.profilBtn}
-                            >
-                              <span 
-                                className={classes.profilImage}
-                                style={{
-                                  backgroundImage: `url(/assets/user4.png)`
-                                }}
-                              />
-                              <input type="file" hidden />
-                              <span className={classes.profiltext}>Change image</span>
-                            </Button>
-                          </Grid>
-                          <Grid item container xs={8} justify="flex-end" alignItems="flex-end" style={{ paddingTop: 15 }}>
-                            <Button variant="contained" color="secondary">save changes</Button>
-                          </Grid>
-                        </Grid>
-                      </Grid>
+                      <Organiser />
                     </AccordionDetails>
                   </Accordion>
                 </ListItem>
@@ -264,10 +255,7 @@ const EditOrganizer = (): React.ReactElement => {
                       </Grid>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <span>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                        sit amet blandit leo lobortis eget.
-                      </span>
+                      <Organiser />
                     </AccordionDetails>
                   </Accordion>
                 </ListItem>
@@ -279,21 +267,18 @@ const EditOrganizer = (): React.ReactElement => {
                       aria-controls="panel1a-content"
                       id="panel1a-header"
                     >
-                      <Grid container direction="row" alignItems="center" xs={12}>
+                      <Grid container item direction="row" alignItems="center" xs={12}>
                         <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
                           <Avatar alt="john" src="/assets/user11.png" />
                           <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>Helen McGal</span>
                         </Grid>
-                        <Grid container justify="flex-end" xs={6}>
+                        <Grid container item justify="flex-end" xs={6}>
                           <span>Delete permanently</span>
                         </Grid>
                       </Grid>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <span>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-                        sit amet blandit leo lobortis eget.
-                      </span>
+                      <Organiser />
                     </AccordionDetails>
                   </Accordion>
                 </ListItem>
