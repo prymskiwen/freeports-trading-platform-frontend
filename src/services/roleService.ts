@@ -28,6 +28,25 @@ const addNewRole = (
       });
   });
 };
+const modifyRole = (
+  id: string,
+  name: string,
+  permissions: Array<string>
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/organization/clearer/role/${id}`, {
+        name,
+        permissions,
+      })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
 const getClearerRoles = (): Promise<Array<RoleType>> => {
   return new Promise((resolve, reject) => {
     axios
@@ -56,6 +75,7 @@ const getClearerPermissions = (): Promise<Array<PermissionType>> => {
 export {
   getClearerRoles as default,
   addNewRole,
+  modifyRole,
   getClearerRoles,
   getClearerPermissions,
 };

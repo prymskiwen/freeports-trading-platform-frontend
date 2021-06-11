@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import {
@@ -12,14 +13,25 @@ import {
   FormLabel,
   Grid,
   makeStyles,
+  Snackbar,
   TextField,
   Theme,
   Typography,
 } from "@material-ui/core";
+import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { useRole } from "../../hooks";
+
+interface RoleType {
+  name: string;
+  permissions: Array<string>;
+}
+interface PermissionType {
+  name: string;
+  permissions: Array<{ code: string; name: string }>;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -75,14 +87,9 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-interface RoleType {
-  name: string;
-  permissions: Array<string>;
-}
-interface PermissionType {
-  name: string;
-  permissions: Array<{ code: string; name: string }>;
-}
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+};
 
 const AddRole = (): React.ReactElement => {
   const classes = useStyles();
@@ -91,7 +98,12 @@ const AddRole = (): React.ReactElement => {
   const [role, setRole] = useState<RoleType>({ name: "", permissions: [] });
   const [permissions, setPermissions] = useState([] as any[]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [submitResponse, setSubmitResponse] = useState({
+    type: "success",
+    message: "",
+  });
+  const [showAlert, setShowAlert] = useState(false);
+  const timer = React.useRef<number>();
 
   useEffect(() => {
     let unmounted = false;
@@ -140,14 +152,33 @@ const AddRole = (): React.ReactElement => {
 
   const onRoleCreate = async () => {
     setLoading(true);
+    setShowAlert(false);
     await createNewRole(role)
       .then((data: string) => {
         if (data !== "") {
+          setSubmitResponse({
+            type: "success",
+            message: "New role has been created successfully.",
+          });
+          setShowAlert(true);
           setLoading(false);
-          history.push("/roles");
+          timer.current = window.setTimeout(() => {
+            history.push("/roles");
+          }, 2000);
         }
       })
-      .catch((err: any) => setError(err));
+      .catch((err: any) => {
+        setLoading(false);
+        setSubmitResponse({
+          type: "error",
+          message: err.message,
+        });
+        setShowAlert(true);
+      });
+  };
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
   };
 
   return (
@@ -223,6 +254,19 @@ const AddRole = (): React.ReactElement => {
               )}
             </div>
           </Grid>
+          <Snackbar
+            autoHideDuration={2000}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            open={showAlert}
+            onClose={handleAlertClose}
+          >
+            <Alert
+              onClose={handleAlertClose}
+              severity={submitResponse.type === "success" ? "success" : "error"}
+            >
+              {submitResponse.message}
+            </Alert>
+          </Snackbar>
         </Grid>
       </Container>
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -17,15 +18,28 @@ import {
   Grid,
   IconButton,
   makeStyles,
+  Snackbar,
+  TextField,
   Theme,
   Typography,
 } from "@material-ui/core";
+import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { useRole } from "../../hooks";
+
+interface RoleType {
+  id: string;
+  name: string;
+  permissions: Array<string>;
+}
+interface PermissionType {
+  name: string;
+  permissions: Array<{ code: string; name: string }>;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,26 +87,29 @@ const useStyles = makeStyles((theme: Theme) =>
         textDecoration: "underline",
       },
     },
+    roleNameInput: {
+      width: "100%",
+      marginBottom: theme.spacing(2),
+    },
   })
 );
 
-interface RoleType {
-  id: string;
-  name: string;
-  permissions: Array<string>;
-}
-interface PermissionType {
-  name: string;
-  permissions: Array<{ code: string; name: string }>;
-}
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+};
 
 const Roles = (): React.ReactElement => {
   const classes = useStyles();
-  const { retrieveRoles, retrievePermissions } = useRole();
+  const { retrieveRoles, retrievePermissions, updateRole } = useRole();
   const [roles, setRoles] = useState([] as any[]);
   const [permissions, setPermissions] = useState([] as any[]);
   const [removing, setRemoving] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [submitResponse, setSubmitResponse] = useState({
+    type: "success",
+    message: "",
+  });
+  const [showAlert, setShowAlert] = useState(false);
   const timer = React.useRef<number>();
 
   useEffect(() => {
@@ -139,11 +156,47 @@ const Roles = (): React.ReactElement => {
     setRoles(newRoles);
   };
 
-  const onRoleSave = (roleId: string) => {
+  const onRoleNameChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    roleId: string
+  ) => {
+    const { value } = event.target;
+    const newRoles = roles.map((role: RoleType) => {
+      const newRole = { ...role };
+      if (newRole.id === roleId) {
+        newRole.name = value;
+      }
+      return newRole;
+    });
+    setRoles(newRoles);
+  };
+
+  const onRoleSave = async (roleId: string) => {
+    const newRole = roles.filter((role: RoleType) => role.id === roleId)[0];
+
     setSaving(true);
-    timer.current = window.setTimeout(() => {
-      setSaving(false);
-    }, 3000);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
+
+    await updateRole(roleId, newRole)
+      .then((data: string) => {
+        if (data !== "") {
+          setSaving(false);
+          setSubmitResponse({
+            type: "success",
+            message: "Role has been updated successfully.",
+          });
+          setShowAlert(true);
+        }
+      })
+      .catch((err: any) => {
+        setSaving(false);
+        setSubmitResponse({
+          type: "error",
+          message: err.message,
+        });
+        setShowAlert(true);
+      });
   };
 
   const onRoleRemove = (roleId: string) => {
@@ -153,6 +206,10 @@ const Roles = (): React.ReactElement => {
       setRemoving(false);
       // setRoles(newRoles);
     }, 3000);
+  };
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
   };
 
   return (
@@ -187,6 +244,18 @@ const Roles = (): React.ReactElement => {
                           <Typography className={classes.roleDescription} />
                         </div>
                       </AccordionSummary>
+                      <AccordionDetails>
+                        <Grid container item xs={12}>
+                          <Grid item xs={4}>
+                            <TextField
+                              className={classes.roleNameInput}
+                              label="Role Name"
+                              value={role.name}
+                              onChange={(e) => onRoleNameChange(e, role.id)}
+                            />
+                          </Grid>
+                        </Grid>
+                      </AccordionDetails>
                       {permissions.map((perm: PermissionType) => (
                         <FormGroup
                           key={perm.name}
@@ -235,7 +304,7 @@ const Roles = (): React.ReactElement => {
                           <Button
                             variant="contained"
                             size="small"
-                            disabled={removing}
+                            disabled={Boolean(true)}
                             onClick={() => onRoleRemove(role.id)}
                           >
                             Remove
@@ -272,6 +341,19 @@ const Roles = (): React.ReactElement => {
           ) : (
             <></>
           )}
+          <Snackbar
+            autoHideDuration={2000}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            open={showAlert}
+            onClose={handleAlertClose}
+          >
+            <Alert
+              onClose={handleAlertClose}
+              severity={submitResponse.type === "success" ? "success" : "error"}
+            >
+              {submitResponse.message}
+            </Alert>
+          </Snackbar>
         </Grid>
       </Container>
     </div>
