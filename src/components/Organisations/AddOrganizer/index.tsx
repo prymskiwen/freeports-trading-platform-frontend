@@ -3,6 +3,7 @@ import {  Container,
           Grid,
           OutlinedInput,
           InputAdornment,
+          IconButton,
           InputLabel,
           Input,
           FormControl,
@@ -57,7 +58,9 @@ const AddOrganizer = (): React.ReactElement => {
             </FormControl>
           </Grid>
           <Grid item container direction="row" xs={12} alignItems="center" style={{padding: 10}}>
-            <Icon style={{ fontSize: 35 }}>add_circle</Icon>
+            <IconButton>
+              <Icon style={{ fontSize: 35 }}>add_circle</Icon>
+            </IconButton>
             <span className={classes.marginL10}>Add IBAN</span>
           </Grid>
           <Grid item direction="row" xs={12} style={{padding: 10}}>

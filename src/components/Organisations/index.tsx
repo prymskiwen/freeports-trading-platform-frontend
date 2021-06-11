@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import {  Container,
           Grid,
           IconButton,
@@ -40,6 +42,12 @@ const column = [
 ]
 
 const Organisations = (): React.ReactElement => {
+  const history = useHistory();
+
+  const newOrganizer = () => {
+    history.push('/organisations/addOrganization');
+  }
+
   return (
     <div className="main-wrapper">
       <Container>
@@ -49,7 +57,7 @@ const Organisations = (): React.ReactElement => {
               <h2>Organisation</h2>
             </Grid>
             <Grid item>
-              <IconButton>
+              <IconButton onClick={newOrganizer}>
                 <Icon style={{ fontSize: 45 }} color="primary" >add_circle</Icon>
               </IconButton>
             </Grid>
