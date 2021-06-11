@@ -131,7 +131,7 @@ const CoWorker = (): React.ReactElement => {
                 src={profile}
                 alt="Co-worker"
               />
-              <Typography>Co worker</Typography>
+              <Typography>Kim Wexler (Legal officer)</Typography>
             </div>
 
             <Button>Disable</Button>

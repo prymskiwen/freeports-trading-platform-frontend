@@ -55,6 +55,17 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
   },
+  profileImageContainer: {
+    position: "relative",
+  },
+  profileImage: {
+    width: "100%",
+  },
+  changeImageBtn: {
+    position: "absolute",
+    bottom: 45,
+    left: 0,
+  },
 }));
 
 interface Role {
@@ -214,7 +225,7 @@ const CoWorkerForm = (): React.ReactElement => {
               <TextField
                 required
                 id="first-name"
-                label="Required"
+                label="Email"
                 defaultValue=""
                 variant="outlined"
                 className={classes.textInput}
@@ -222,15 +233,32 @@ const CoWorkerForm = (): React.ReactElement => {
               <TextField
                 required
                 id="last-name"
-                label="Required"
+                label="Phone"
+                defaultValue=""
+                variant="outlined"
+                className={classes.textInput}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                required
+                id="first-name"
+                label="Jub title"
                 defaultValue=""
                 variant="outlined"
                 className={classes.textInput}
               />
             </Grid>
           </Grid>
-          <Grid item xs={4}>
-            <img style={{ width: 200 }} src={profile} alt="Co-worker" />
+          <Grid item xs={3} className={classes.profileImageContainer}>
+            <img
+              src={profile}
+              alt="Co-worker"
+              className={classes.profileImage}
+            />
+            <Button fullWidth className={classes.changeImageBtn}>
+              Change image
+            </Button>
           </Grid>
         </Grid>
 
