@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import {  Container,
           Grid,
@@ -25,6 +25,14 @@ import ImageUploader from 'react-images-upload';
 import { useParams } from "react-router";
 import { spawnSync } from "child_process";
 import Organiser from "../Organiser";
+
+import { useOrganization } from "../../../hooks";
+
+interface ibantype {
+  currency: string;
+  iban: string;
+  account: string;
+}
 
 const useStyle = makeStyles((theme) => ({
   root: {
@@ -81,8 +89,36 @@ const EditOrganizer = (): React.ReactElement => {
   const showingLogo = true;
   const testname = "workinger";
 
+  const { getOrganizerdetail } = useOrganization();
+
   const [LogoImage, setLogoImage] = useState();
   const [Logofile, setLogofile] = useState();
+  const [organereddetail, setOrganereddetail] = useState({
+    id: "string",
+    name: "string",
+    commission: "string",
+    commissionclear: "string",   
+  })
+  const [iban, setIban] = useState([] as ibantype[])
+  useEffect(() => {
+    let mounted = false;
+    const init = async () => {
+      const detail = await getOrganizerdetail(id)
+      if(!mounted){
+        setOrganereddetail({
+          id: detail.id,
+          name: detail.name,
+          commission: detail.commission,
+          commissionclear: detail.commissionclear,
+        });
+        setIban(detail.clearing)
+      }
+    }
+    init();
+    return () => {
+      mounted = true;
+    }
+  }, []);
 
   const ondrop = (pic: any) => {
     console.log(pic);
@@ -94,14 +130,14 @@ const EditOrganizer = (): React.ReactElement => {
     reader.readAsDataURL(pic[0]);
     setLogofile(pic);
   }
-
+  
   return(
     <div className="main-wrapper">
       <Container >
-        <Grid container spacing={3}>
-          <Grid item container spacing={3} xs={6}>
+        <div style={{width:"100%", display: "flex"}}>
+          <Grid item spacing={2} xs={6}>
             <Grid container direction="row" >
-              <h2>Organization name { id }</h2>
+              <h2> { organereddetail.name }</h2>
               <IconButton>
                 <Icon style={{ fontSize: 35 }}>mode</Icon>
               </IconButton>
@@ -115,26 +151,11 @@ const EditOrganizer = (): React.ReactElement => {
               </List>
               <Divider />
               <List>
-                <ListItem>
+                {iban.map((ibanItem) => <ListItem>
                   <Icon color="error" >remove_circle</Icon>
                   <span className={classes.marginL10}>IBAN: </span>
-                  <span className={classes.boldspanMarginL}>CH56258462859862588</span>
-                </ListItem>
-                <ListItem>
-                  <Icon color="error" >remove_circle</Icon>
-                  <span className={classes.marginL10}>IBAN: </span>
-                  <span className={classes.boldspanMarginL}>CH56258462859862588</span>
-                </ListItem>
-                <ListItem>
-                  <Icon color="error" >remove_circle</Icon>
-                  <span className={classes.marginL10}>IBAN: </span>
-                  <span className={classes.boldspanMarginL}>CH56258462859862588</span>
-                </ListItem>
-                <ListItem>
-                  <Icon color="error" >remove_circle</Icon>
-                  <span className={classes.marginL10}>IBAN: </span>
-                  <span className={classes.boldspanMarginL}>CH56258462859862588</span>
-                </ListItem>
+                  <span className={classes.boldspanMarginL}>{ibanItem.iban}</span>
+                </ListItem>)}
               </List>
               <List>
                 <ListItem>
@@ -181,11 +202,13 @@ const EditOrganizer = (): React.ReactElement => {
                     <Grid item xs={6} style={{ padding: 15 }}>
                       <Input 
                         endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                        value={organereddetail.commission}
                       />
                     </Grid>
                     <Grid item xs={6} style={{ padding: 15 }}>
                       <Input 
                         endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                        value={organereddetail.commissionclear}
                       />
                     </Grid>
                     <Grid item xs={6} style={{ padding: 15 }}>
@@ -207,7 +230,7 @@ const EditOrganizer = (): React.ReactElement => {
               <Button variant="contained" color="secondary" >SAVE CHANGES</Button>
             </Grid>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item  xs={6}>
             <Grid container direction="row">
               <h2>Organization managers</h2>
             </Grid>
@@ -285,7 +308,7 @@ const EditOrganizer = (): React.ReactElement => {
               </List>
             </Grid>
           </Grid>
-        </Grid>
+        </div>
       </Container>
     </div>
   )

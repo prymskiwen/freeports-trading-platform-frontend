@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import {  Container,
@@ -7,39 +7,17 @@ import {  Container,
           Icon,
           TextField,
 } from "@material-ui/core";
-import MaterialTable from "material-table";
-import data from "./data"
+import MaterialTable, { MTableToolbar } from "material-table";
 
-const column = [
-  {
-    field: "organisation",
-    title: "Organisation",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "create_date",
-    title: "Create Date",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "active_users",
-    title: "Active Users",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "disable_users",
-    title: "Disable Users",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-]
+import { useOrganization } from "../../hooks"
+
+interface rowfield {
+  id: string,
+  organisation: string,
+  createdate: string,
+  activeusers: string,
+  disableusers: string,
+}
 
 const Organisations = (): React.ReactElement => {
   const history = useHistory();
@@ -47,6 +25,61 @@ const Organisations = (): React.ReactElement => {
   const newOrganizer = () => {
     history.push('/organisations/addOrganization');
   }
+
+  const { organizers } = useOrganization();
+  
+  const [state, setState] = useState({
+    
+    column : [
+      {
+        field: "name",
+        title: "Organisation",
+        cellStyle: {
+          width: "25%",
+        },
+      },
+      {
+        field: "createdate",
+        title: "Create Date",
+        cellStyle: {
+          width: "25%",
+        },
+      },
+      {
+        field: "activeusers",
+        title: "Active Users",
+        cellStyle: {
+          width: "25%",
+        },
+      },
+      {
+        field: "disableusers",
+        title: "Disable Users",
+        cellStyle: {
+          width: "25%",
+        },
+      },
+    ]
+  })
+
+  const [datas, setDatas] = useState([] as any[]);
+
+  useEffect(() => {
+    let unmounted = false;
+    const init = async () => {
+      const organizerList = await organizers();
+      
+      if(!unmounted) {
+        setDatas(organizerList);
+      }
+    };
+    init()
+
+    return () => {
+      unmounted = true;
+    }
+  }, []);
+
 
   return (
     <div className="main-wrapper">
@@ -69,13 +102,26 @@ const Organisations = (): React.ReactElement => {
           <Grid container>
             <Grid item xs={12}>
               <MaterialTable
-              columns={column}
-              data={data}
+              columns={state.column}
+              data={datas}
               options={{
                 toolbar: false,
                 search: false,
                 pageSize: 10,
               }}
+              actions={[
+                {
+                  icon: 'edit',
+                  tooltip: 'edit',
+                  onClick: ((event, item:any)=>{
+                    console.log(item);
+                    if (item && item.name) {
+                      console.log(item.name);
+                      history.push(`/organisations/editOrganizer/${item.id}`)
+                    }
+                  }),
+                },
+              ]}
               />
             </Grid>
           </Grid>
