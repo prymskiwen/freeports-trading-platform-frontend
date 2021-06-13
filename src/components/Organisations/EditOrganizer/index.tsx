@@ -33,7 +33,11 @@ interface ibantype {
   iban: string;
   account: string;
 }
-
+interface managerType {
+  id: string;
+  nickname: string;
+  email: string;
+}
 const useStyle = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -43,6 +47,11 @@ const useStyle = makeStyles((theme) => ({
   },
   marginL10: {
     marginLeft: 10,
+  },
+  managerName: {
+    fontWeight: "bold",
+    fontSize: 20,
+    marginLeft: 15
   },
   logotext: {
     fontSize: 20,
@@ -89,7 +98,7 @@ const EditOrganizer = (): React.ReactElement => {
   const showingLogo = true;
   const testname = "workinger";
 
-  const { getOrganizerdetail } = useOrganization();
+  const { getOrganizerdetail, getManagers } = useOrganization();
 
   const [LogoImage, setLogoImage] = useState();
   const [Logofile, setLogofile] = useState();
@@ -99,11 +108,14 @@ const EditOrganizer = (): React.ReactElement => {
     commission: "string",
     commissionclear: "string",   
   })
+  const [managers, setManagers] = useState([] as managerType[]);
   const [iban, setIban] = useState([] as ibantype[])
   useEffect(() => {
     let mounted = false;
     const init = async () => {
-      const detail = await getOrganizerdetail(id)
+      const detail = await getOrganizerdetail(id);
+      const managerList = await getManagers(id);
+      
       if(!mounted){
         setOrganereddetail({
           id: detail.id,
@@ -111,7 +123,8 @@ const EditOrganizer = (): React.ReactElement => {
           commission: detail.commission,
           commissionclear: detail.commissionclear,
         });
-        setIban(detail.clearing)
+        setIban(detail.clearing);
+        setManagers(managerList);
       }
     }
     init();
@@ -135,7 +148,7 @@ const EditOrganizer = (): React.ReactElement => {
     <div className="main-wrapper">
       <Container >
         <div style={{width:"100%", display: "flex"}}>
-          <Grid item spacing={2} xs={6}>
+          <Grid item xs={6}>
             <Grid container direction="row" >
               <h2> { organereddetail.name }</h2>
               <IconButton>
@@ -226,17 +239,17 @@ const EditOrganizer = (): React.ReactElement => {
                 </Grid>
               </Card>
             </Grid>
-            <Grid container item justify="flex-end" xs={12}>
+            <Grid container item justify="flex-end" xs={12} style={{marginTop: 5}}>
               <Button variant="contained" color="secondary" >SAVE CHANGES</Button>
             </Grid>
           </Grid>
-          <Grid item  xs={6}>
+          <Grid item xs={6}>
             <Grid container direction="row">
               <h2>Organization managers</h2>
             </Grid>
             <Grid item xs={12}>
               <List>
-                <ListItem>
+                {managers.map((managerItem) => <ListItem>
                   <Accordion style={{width: "100%"}}>
                     <AccordionSummary
                       style={{flexDirection: "row-reverse"}}
@@ -247,7 +260,7 @@ const EditOrganizer = (): React.ReactElement => {
                       <Grid container direction="row" alignItems="center" xs={12}>
                         <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
                           <Avatar alt="john" src="/assets/user4.png" />
-                          <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>John malkovic</span>
+                          <span className={classes.managerName} >{managerItem.nickname}</span>
                         </Grid>
                         <Grid container justify="flex-end" xs={6}>
                           <span>Delete permanently</span>
@@ -255,56 +268,11 @@ const EditOrganizer = (): React.ReactElement => {
                       </Grid>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Organiser />
+                      <Organiser organizerid={id}  managerid={managerItem.id} />
                     </AccordionDetails>
                   </Accordion>
-                </ListItem>
-                <ListItem>
-                  <Accordion style={{width: "100%"}}>
-                    <AccordionSummary
-                      style={{flexDirection: "row-reverse"}}
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Grid container direction="row" alignItems="center" xs={12}>
-                        <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
-                          <Avatar alt="john" src="/assets/user5.png" />
-                          <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>Mary Olive</span>
-                        </Grid>
-                        <Grid container justify="flex-end" xs={6}>
-                          <span>Delete permanently</span>
-                        </Grid>
-                      </Grid>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Organiser />
-                    </AccordionDetails>
-                  </Accordion>
-                </ListItem>
-                <ListItem>
-                  <Accordion style={{width: "100%"}}>
-                    <AccordionSummary
-                      style={{flexDirection: "row-reverse"}}
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Grid container item direction="row" alignItems="center" xs={12}>
-                        <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
-                          <Avatar alt="john" src="/assets/user11.png" />
-                          <span style={{ fontWeight: "bold", fontSize: 20, marginLeft: 15 }}>Helen McGal</span>
-                        </Grid>
-                        <Grid container item justify="flex-end" xs={6}>
-                          <span>Delete permanently</span>
-                        </Grid>
-                      </Grid>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Organiser />
-                    </AccordionDetails>
-                  </Accordion>
-                </ListItem>
+                </ListItem>)}
+                
               </List>
             </Grid>
           </Grid>

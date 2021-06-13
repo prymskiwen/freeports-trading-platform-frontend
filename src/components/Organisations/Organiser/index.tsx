@@ -1,6 +1,8 @@
-import React from "react"
+import React, { useEffect, useState} from "react"
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, Grid, Button, Select, MenuItem, TextField } from "@material-ui/core"
+import { Container, Grid, Button, Select, MenuItem, TextField, FormControl } from "@material-ui/core"
+
+import { useOrganization } from "../../../hooks";
 
 const useStyle = makeStyles((theme) => ({
   root: {
@@ -40,13 +42,44 @@ const useStyle = makeStyles((theme) => ({
   },
 }))
 
+interface managerType {
+  id: string;
+  nickname: string;
+  email: string;
+}
 
-const Organiser = (): React.ReactElement => {
+const Organiser = (props: any): React.ReactElement => {
   const classes = useStyle();
+  const { getOrganizedManager } = useOrganization();
+  const [manager, setManager] = useState({
+    id: 'string',
+    nickname: 'string',
+    email: 'string',
+  });
+  
+  useEffect(() => {
+    let mounted = false;
+    const init = async () => {
+      const managerdata = await getOrganizedManager(props.organizerid, props.managerid);
+      setManager({
+        id: managerdata.id,
+        nickname: managerdata.nickname,
+        email: managerdata.email,
+      })
+    }
+
+    init()
+
+    return () => {
+      mounted = true;
+    }
+
+  }, [props])
+
   return (
     <div className="main-wrapper">
       <Container>
-        <Grid container xs={12}>
+        <Grid container spacing={1} xs={12}>
           <Grid item container alignItems="center" direction="row" xs={12}>
             <span style={{ fontSize: 18 }}>Status</span>
             <Select className={classes.selectStyle}>
@@ -54,18 +87,21 @@ const Organiser = (): React.ReactElement => {
               <MenuItem value="Disactive">Disactive</MenuItem>
             </Select>
           </Grid>
-          <Grid item container direction="row" xs={12}>
-            <Grid item xs={6} style={{ paddingTop: 15 }}>
-              <TextField label="First Name" variant="outlined" value="John"/>
+          <Grid item container direction="row" spacing={2} xs={12}>
+            <Grid item xs={12} style={{ paddingTop: 15 }}>
+              <FormControl fullWidth>
+                <TextField label="Nick Name" variant="outlined" value={manager.nickname}/>
+              </FormControl>
             </Grid>
             <Grid item xs={6} style={{ paddingTop: 15 }}>
-              <TextField label="Name" variant="outlined" value="malkovic"/>
+              <FormControl fullWidth>
+                <TextField label="Email" variant="outlined" value={manager.email}/>
+              </FormControl>
             </Grid>
             <Grid item xs={6} style={{ paddingTop: 15 }}>
-              <TextField label="Email" variant="outlined" value="john@gmail.com"/>
-            </Grid>
-            <Grid item xs={6} style={{ paddingTop: 15 }}>
-              <TextField label="Phone" variant="outlined" value="+41 78 255 26 25"/>
+              <FormControl fullWidth>
+                <TextField label="Phone" variant="outlined" value="+41 78 255 26 25"/>
+              </FormControl>
             </Grid>
           </Grid>
           <Grid item container direction="row" xs={12}>

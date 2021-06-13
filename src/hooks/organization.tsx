@@ -1,6 +1,8 @@
 import { 
   getOrganizations,
-  getOrganizationDetail
+  getOrganizationDetail,
+  getOrganisationManagers,
+  getOrganizerManager,
 } from "../services/organizationService";
 
 function useOrganization(): any {
@@ -24,7 +26,30 @@ function useOrganization(): any {
       });
     return organizationDetail;
   }
-  return {organizers, getOrganizerdetail};
+
+  const getManagers = async (id: string) => {
+    const managers = await getOrganisationManagers(id)
+      .then((data) => {
+        return data.content;
+      })
+      .catch((err) => {
+        console.log(err.message);
+      })
+    return managers;
+  }
+
+  const getOrganizedManager = async (organizedId: string, managerId: string) => {
+    const manager = await getOrganizerManager(organizedId, managerId)
+    .then((data) =>{
+      return data;
+    })
+    .catch((err) => {
+      console.log(err.message);
+    })
+    return manager;
+  }
+
+  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager};
 }
 
 export default useOrganization;

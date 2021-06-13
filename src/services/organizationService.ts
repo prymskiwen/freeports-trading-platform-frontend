@@ -24,10 +24,38 @@ const getOrganizationDetail = (id: string): Promise<any> => {
         return reject(err.response.data);
       });
   });
-}
+};
+
+const getOrganisationManagers = (id: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${id}/manager`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getOrganizerManager = (organizeid: string, managerid: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizeid}/manager/${managerid}`)
+      .then((res) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
 
 export {
   getOrganizations as default,
   getOrganizations,
   getOrganizationDetail,
+  getOrganisationManagers,
+  getOrganizerManager,
 }
