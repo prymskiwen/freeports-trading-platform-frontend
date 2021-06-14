@@ -4,6 +4,7 @@ import {
   getOrganisationManagers,
   getOrganizerManager,
   addOrganizer,
+  addAccount,
 } from "../services/organizationService";
 
 function useOrganization(): any {
@@ -70,7 +71,25 @@ function useOrganization(): any {
     return newOrganization;
   }
 
-  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization};
+  const additionAccount = async (
+    organizerId: string,
+    name: string,
+    currency: string,
+    type: string,
+    iban: string,
+    publicAddress: string,
+    vaultWalletId: string,
+  ) => {
+    const newAddAccount = await addAccount(organizerId, name, currency, type, iban, publicAddress, vaultWalletId)
+      .then((data) => {
+        return data;
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    return newAddAccount;
+  }
+
+  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization, additionAccount};
 }
 
 export default useOrganization;

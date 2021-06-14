@@ -83,6 +83,29 @@ const addOrganizer = (
   })
 }
 
+const addAccount = (
+  organizerId: string,
+  name: string,
+  currency: string,
+  type: string,
+  iban: string,
+  publicAddress: string,
+  vaultWalletId: string,
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/organization/${organizerId}/account`, {
+        name, currency, type, iban, publicAddress, vaultWalletId
+      })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      })
+  })
+}
+
 export {
   getOrganizations as default,
   getOrganizations,
@@ -90,4 +113,5 @@ export {
   getOrganisationManagers,
   getOrganizerManager,
   addOrganizer,
+  addAccount,
 }

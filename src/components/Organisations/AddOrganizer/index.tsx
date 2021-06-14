@@ -10,11 +10,18 @@ import {  Container,
           FormControl,
           MenuItem,
           Select,
+          List,
+          ListItem,
           Button,
           Icon,
+          Dialog,
+          DialogTitle,
+          DialogContent,
+          DialogActions,
           makeStyles,
 } from "@material-ui/core"
 import ImageUploader from 'react-images-upload';
+import IBAN from 'iban';
 import { useHistory } from "react-router";
 import { useOrganization } from "../../../hooks";
 
@@ -39,11 +46,23 @@ interface additionOrganizerType {
   logofile: string;
 }
 
+interface accountType {
+  name: string;
+  currency: string;
+  type: string;
+  iban: string;
+  publicAddress: string;
+  vaultWalletId: string;
+}
+
 const AddOrganizer = (): React.ReactElement => {
   const history = useHistory();
   const classes = useStyles();
   const showingIcon = false;
   const showingLogo = true;
+  const fullwidthable = true;
+  const mdWidth = "md";
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [organizerData, setOrganizerData] = useState<additionOrganizerType>({
     name: "",
     street1: "",
@@ -55,8 +74,18 @@ const AddOrganizer = (): React.ReactElement => {
     clearer: "",
     logofile: "",
   });
+  const [addAccount, setAddAccount] = useState<accountType>({
+    name: "",
+    currency: "",
+    type: "",
+    iban: "",
+    publicAddress: "",
+    vaultWalletId: "",
+  })
 
-  const { addOrganization } = useOrganization();
+  const [additionAccounts, setAdditionAccounts] = useState([] as accountType[]);
+
+  const { addOrganization, additionAccount } = useOrganization();
 
   useEffect(() => {
     console.log("input state is", TextField);
@@ -67,7 +96,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.street1 = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadlestreettwo = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -75,7 +103,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.street2 = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadlezip = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -83,7 +110,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.zip = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadlecity = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -91,7 +117,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.city = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadlecountry = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -99,7 +124,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.country = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadlename = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -107,7 +131,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.name = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadlecommission = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -115,7 +138,6 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.commission = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
 
   const onhadleclearer = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -123,30 +145,120 @@ const AddOrganizer = (): React.ReactElement => {
     const neworganizerData = { ...organizerData } ;
     neworganizerData.clearer = value;
     setOrganizerData(neworganizerData);
-    console.log(organizerData);
   }
+
   const onPicker = (pic: any) => {
-    console.log(pic);
     const reader = new FileReader();
     reader.onload = (e: any)=>{
-      // console.log(e.target.result);
       const neworganizerData = { ...organizerData } ;
       neworganizerData.logofile = e.target.result;
       setOrganizerData(neworganizerData);
-      console.log(organizerData);
     }
     reader.readAsDataURL(pic[0]);
   }
+
+  const onHandledialog = () => {
+    setDialogOpen(true);
+  }
+
+  const onhandleAccountname = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = event.target;
+    const newAccountData = { ...addAccount }
+    newAccountData.name = value;
+    setAddAccount(newAccountData);
+  }
+  
+  const onhandleAccountcurrency = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = event.target;
+    const newAccountData = { ...addAccount }
+    newAccountData.currency = value;
+    setAddAccount(newAccountData);
+  }
+
+  const onhandleAccountType = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = event.target;
+    const newAccountData = { ...addAccount }
+    newAccountData.type = value;
+    setAddAccount(newAccountData);
+  }
+
+  const onhandleAccountIban = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = event.target;
+    const newAccountData = { ...addAccount }
+    newAccountData.iban = value;
+    setAddAccount(newAccountData);
+  }
+
+  const onhandleAccountpkaddress = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = event.target;
+    const newAccountData = { ...addAccount }
+    newAccountData.publicAddress = value;
+    setAddAccount(newAccountData);
+  }
+
+  const onhandleAccountWallet = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = event.target;
+    const newAccountData = { ...addAccount }
+    newAccountData.vaultWalletId = value;
+    setAddAccount(newAccountData);
+  }
+
+  const onhandleAdditionAccounts = () => {
+    if(addAccount.name === "" || addAccount.iban === "" || !IBAN.isValid(addAccount.iban) || addAccount.currency === ""){
+      if(!IBAN.isValid(addAccount.iban)){
+        alert('wrong IBAN type');
+      }else{
+        alert('Please put all fields');
+      }
+    }else{
+      const newAdditionAccounts = additionAccounts;
+      newAdditionAccounts.push({
+        name: addAccount.name,
+        currency: addAccount.currency,
+        type: addAccount.type,
+        iban: addAccount.iban,
+        publicAddress: addAccount.publicAddress,
+        vaultWalletId: addAccount.vaultWalletId,
+      });
+      setAdditionAccounts(newAdditionAccounts);
+      setAddAccount({
+        name: "",
+        currency: "",
+        type: "",
+        iban: "",
+        publicAddress: "",
+        vaultWalletId: "",
+      });
+      setDialogOpen(false);
+    }
+  }
+
   const onAdditionfunc = async () => {
     if(organizerData.name === "" || organizerData.commission === "" || organizerData.clearer === "" || organizerData.logofile === ""){
       alert('this is my addition function');
     }else{
       await addOrganization(organizerData.name, organizerData.street1, organizerData.street2, organizerData.zip, organizerData.city, organizerData.country, organizerData.logofile, organizerData.commission, organizerData.clearer)
         .then((data: any) => {
-          console.log(data);
-          history.push('/organisations');
-          // if(data !== "") {
-          // }
+          // additionAccount
+          const responseId = data.id;
+          if(additionAccounts.length > 0)
+          {
+            additionAccounts.map(async (accountItem, key) => {
+              await additionAccount(responseId, accountItem.name, accountItem.currency, accountItem.type, accountItem.iban, accountItem.publicAddress, accountItem.vaultWalletId)
+                .then((res: any) => {
+                  if(key === (additionAccounts.length - 1)){
+                    history.push('/organisations');
+                  }
+                }).catch((err: any) => {
+                  console.log(err)
+                  if(key === (additionAccounts.length - 1)){
+                    history.push('/organisations');
+                  }
+                })
+            })
+          }else{
+            history.push('/organisations');
+          }
         }).catch((err: any) => {
           console.log(err);
         })
@@ -157,11 +269,11 @@ const AddOrganizer = (): React.ReactElement => {
   return(
     <div className="main-wrapper">
       <Container>
-        <Grid container spacing={1} xs={6}>
-          <Grid item direction="row" xs={12}>
+        <Grid container item spacing={1} xs={6}>
+          <Grid item xs={12}>
             <h2>CREAETE NEW ORGANISATION</h2>
           </Grid>
-          <Grid item direction="row" xs={12}>
+          <Grid item xs={12}>
             <FormControl fullWidth className={classes.margin} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-amount">Orgainisation name</InputLabel>
               <OutlinedInput
@@ -171,7 +283,7 @@ const AddOrganizer = (): React.ReactElement => {
               />
             </FormControl>
           </Grid>
-          <Grid item direction="row" xs={12}>
+          <Grid item xs={12}>
             <FormControl fullWidth className={classes.margin} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-amount">Street 1</InputLabel>
               <OutlinedInput
@@ -181,7 +293,7 @@ const AddOrganizer = (): React.ReactElement => {
               />
             </FormControl>
           </Grid>
-          <Grid item direction="row" xs={12}>
+          <Grid item xs={12}>
             <FormControl fullWidth className={classes.margin} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-amount">Street 2</InputLabel>
               <OutlinedInput
@@ -191,7 +303,7 @@ const AddOrganizer = (): React.ReactElement => {
               />
             </FormControl>
           </Grid>
-          <Grid item direction="row" xs={6}>
+          <Grid item xs={6}>
             <FormControl fullWidth className={classes.margin} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-amount">zip</InputLabel>
               <OutlinedInput
@@ -201,7 +313,7 @@ const AddOrganizer = (): React.ReactElement => {
               />
             </FormControl>
           </Grid>
-          <Grid item direction="row" xs={6}>
+          <Grid item xs={6}>
             <FormControl fullWidth className={classes.margin} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-amount">City</InputLabel>
               <OutlinedInput
@@ -211,7 +323,7 @@ const AddOrganizer = (): React.ReactElement => {
               />
             </FormControl>
           </Grid>
-          <Grid item direction="row" xs={12}>
+          <Grid item xs={12}>
             <FormControl fullWidth className={classes.margin} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-amount">Country</InputLabel>
               <OutlinedInput
@@ -221,29 +333,23 @@ const AddOrganizer = (): React.ReactElement => {
               />
             </FormControl>
           </Grid>
-          <Grid item direction="row" xs={12}>
-            <FormControl fullWidth className={classes.margin}>
-              <InputLabel id="demo-controlled-open-select-label">IBAN</InputLabel>
-              <Select
-                labelId="demo-controlled-open-select-label"
-                id="demo-controlled-open-select"
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
-              </Select>
-            </FormControl>
+          <Grid item xs={12}>
+            <span style={{ fontWeight: "bold" }}>Nostro Accounts</span>
+            <List>
+              {additionAccounts.map((accountItem) => <ListItem>
+                  <Icon color="error" >remove_circle</Icon>
+                  <span style={{marginLeft: 10,}}>IBAN: </span>
+                  <span style={{fontWeight: "bold", marginLeft: 25}}>{accountItem.iban}</span>
+              </ListItem>)}
+            </List>
           </Grid>
           <Grid item container direction="row" xs={12} alignItems="center" style={{padding: 10}}>
-            <IconButton>
+            <IconButton onClick={onHandledialog}>
               <Icon style={{ fontSize: 35 }}>add_circle</Icon>
             </IconButton>
-            <span className={classes.marginL10}>Add IBAN</span>
+            <span className={classes.marginL10}>Add Nostro account</span>
           </Grid>
-          <Grid item direction="row" xs={12} style={{padding: 10}}>
+          <Grid item xs={12} style={{padding: 10}}>
             <span style={{fontWeight: "bold"}}>Add Organisation logo</span>
             <FormControl fullWidth style={{marginTop: 5}}>
               <ImageUploader
@@ -296,6 +402,84 @@ const AddOrganizer = (): React.ReactElement => {
           </Grid>
         </Grid>
       </Container>
+      {/* account dialog */}
+      <Dialog open={dialogOpen} fullWidth={fullwidthable} maxWidth={mdWidth} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Add Nostro accounts</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={1}>
+            <Grid item xs={12}>
+              <FormControl fullWidth className={classes.margin} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-amount">Name</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-amount"
+                  labelWidth={60}
+                  onChange={onhandleAccountname}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item container direction="row" xs={12}>
+              <Grid item xs={6}>
+                <FormControl className={classes.margin} variant="outlined">
+                  <InputLabel htmlFor="outlined-adornment-amount">Currency</InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-amount"
+                    labelWidth={60}
+                    onChange={onhandleAccountcurrency}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl className={classes.margin} variant="outlined">
+                  <InputLabel htmlFor="outlined-adornment-amount">Type</InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-amount"
+                    labelWidth={60}
+                    onChange={onhandleAccountType}
+                  />
+                </FormControl>                
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth className={classes.margin} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-amount">IBAN</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-amount"
+                  labelWidth={60}
+                  onChange={onhandleAccountIban}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth className={classes.margin} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-amount">Public Address</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-amount"
+                  labelWidth={60}
+                  onChange={onhandleAccountpkaddress}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth className={classes.margin} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-amount">Wallet Id</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-amount"
+                  labelWidth={60}
+                  onChange={onhandleAccountWallet}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained"
+            color="secondary"
+            onClick={onhandleAdditionAccounts}
+            >
+              Add Account
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

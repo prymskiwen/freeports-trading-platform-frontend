@@ -12,6 +12,7 @@
     "@types/react-router": "^5.1.15",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "iban": "0.0.14",
     "lockr": "^0.8.5",
     "material-table": "^1.69.3",
     "mobx": "^6.3.2",
@@ -49,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@types/iban": "0.0.32",
     "@types/jest": "^26.0.23",
     "@types/lockr": "^0.8.6",
     "@types/node": "^12.20.13",
