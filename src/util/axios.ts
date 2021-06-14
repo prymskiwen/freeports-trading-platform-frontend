@@ -48,7 +48,10 @@ axios.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       store.dispatch(authLogout());
+    } else if (error.response.status === 403) {
+      // store.dispatch(setError(error.response.data));
     }
+
     return Promise.reject(error);
   }
 );

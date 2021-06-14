@@ -100,7 +100,8 @@ const Alert = (props: AlertProps) => {
 
 const Roles = (): React.ReactElement => {
   const classes = useStyles();
-  const { retrieveRoles, retrievePermissions, updateRole } = useRole();
+  const { retrieveRoles, retrievePermissions, updateRole, removeRole } =
+    useRole();
   const [roles, setRoles] = useState([] as any[]);
   const [permissions, setPermissions] = useState([] as any[]);
   const [removing, setRemoving] = useState(false);
@@ -199,13 +200,33 @@ const Roles = (): React.ReactElement => {
       });
   };
 
-  const onRoleRemove = (roleId: string) => {
+  const onRoleRemove = async (roleId: string) => {
     // const newRoles = roles.filter((role: any) => role.id !== roleId);
     setRemoving(true);
-    timer.current = window.setTimeout(() => {
-      setRemoving(false);
-      // setRoles(newRoles);
-    }, 3000);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
+    await removeRole(roleId)
+      .then((data: string) => {
+        if (data !== "") {
+          setRemoving(false);
+          setSubmitResponse({
+            type: "success",
+            message: "Role has been removed successfully.",
+          });
+          setShowAlert(true);
+
+          const newRoles = roles.filter((role) => role.id !== roleId);
+          setRoles(newRoles);
+        }
+      })
+      .catch((err: any) => {
+        setSaving(false);
+        setSubmitResponse({
+          type: "error",
+          message: err.message,
+        });
+        setShowAlert(true);
+      });
   };
 
   const handleAlertClose = () => {
@@ -304,7 +325,7 @@ const Roles = (): React.ReactElement => {
                           <Button
                             variant="contained"
                             size="small"
-                            disabled={Boolean(true)}
+                            disabled={removing}
                             onClick={() => onRoleRemove(role.id)}
                           >
                             Remove

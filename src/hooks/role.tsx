@@ -2,6 +2,7 @@ import {
   getClearerRoles,
   addNewRole,
   modifyRole,
+  deleteRole,
   getClearerPermissions,
 } from "../services/roleService";
 
@@ -33,6 +34,17 @@ function useRole(): any {
 
     return newRoleId;
   };
+  const removeRole = async (id: string) => {
+    const oldRoleId = await deleteRole(id)
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+
+    return oldRoleId;
+  };
   const retrieveRoles = async () => {
     const roles = await getClearerRoles()
       .then((data) => {
@@ -59,6 +71,7 @@ function useRole(): any {
   return {
     createNewRole,
     updateRole,
+    removeRole,
     retrieveRoles,
     retrievePermissions,
   };
