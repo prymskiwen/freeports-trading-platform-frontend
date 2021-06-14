@@ -107,6 +107,7 @@ const EditOrganizer = (): React.ReactElement => {
     name: "string",
     commission: "string",
     commissionclear: "string",   
+    logofile: "string",
   })
   const [managers, setManagers] = useState([] as managerType[]);
   const [iban, setIban] = useState([] as ibantype[])
@@ -115,11 +116,12 @@ const EditOrganizer = (): React.ReactElement => {
     const init = async () => {
       const detail = await getOrganizerdetail(id);
       const managerList = await getManagers(id);
-      
+      console.log(detail)
       if(!mounted){
         setOrganereddetail({
           id: detail.id,
           name: detail.name,
+          logofile: detail.logofile,
           commission: detail.commission,
           commissionclear: detail.commissionclear,
         });
@@ -137,11 +139,14 @@ const EditOrganizer = (): React.ReactElement => {
     console.log(pic);
     const reader = new FileReader();
     reader.onload = (e: any)=>{
-      // console.log(e.target.result);
-      setLogoImage(e.target.result);
+      console.log(e.target.result);
+      // setLogoImage(e.target.result);
+      const newOrganereddetail = { ...organereddetail } ;
+      newOrganereddetail.logofile = e.target.result;
+      setOrganereddetail(newOrganereddetail);
     }
     reader.readAsDataURL(pic[0]);
-    setLogofile(pic);
+    // setLogofile(pic);
   }
   
   return(
@@ -185,7 +190,7 @@ const EditOrganizer = (): React.ReactElement => {
                     style={{ marginTop: 20 }}
                     component="img"
                     height="140"
-                    image={LogoImage}
+                    image={organereddetail.logofile}
                   />
                   <ImageUploader
                     withIcon={showingIcon}

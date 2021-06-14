@@ -3,6 +3,7 @@ import {
   getOrganizationDetail,
   getOrganisationManagers,
   getOrganizerManager,
+  addOrganizer,
 } from "../services/organizationService";
 
 function useOrganization(): any {
@@ -49,7 +50,27 @@ function useOrganization(): any {
     return manager;
   }
 
-  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager};
+  const addOrganization = async (
+    name: string,
+    street: string,
+    street1: string,
+    zip: string,
+    city: string,
+    country: string,
+    logofile: string,
+    сommission: string,
+    clearer: string,
+  ) => {
+    const newOrganization = await addOrganizer(name, street, street1, zip, city, country, logofile, сommission, clearer)
+      .then((data) => {
+        return data;
+      }).catch((err) => {
+        console.log(err.message);
+      });
+    return newOrganization;
+  }
+
+  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization};
 }
 
 export default useOrganization;

@@ -52,10 +52,42 @@ const getOrganizerManager = (organizeid: string, managerid: string): Promise<any
   });
 };
 
+const addOrganizer = (
+  name: string,
+  street: string,
+  street1: string,
+  zip: string,
+  city: string,
+  country: string,
+  logofile: string,
+  сommission: string,
+  clearer: string,
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/organization`, {
+        name,
+        street,
+        street1,
+        zip,
+        city,
+        country,
+        logofile,
+        сommission,
+        clearer,
+      }).then((res: any) => {
+        return resolve(res.data);
+      }).catch((err) => {
+        return reject(err.response.data);
+      })
+  })
+}
+
 export {
   getOrganizations as default,
   getOrganizations,
   getOrganizationDetail,
   getOrganisationManagers,
   getOrganizerManager,
+  addOrganizer,
 }
