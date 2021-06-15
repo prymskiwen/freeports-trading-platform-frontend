@@ -1,6 +1,7 @@
 import React, { useEffect, useState} from "react"
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, Grid, Button, Select, MenuItem, TextField, FormControl } from "@material-ui/core"
+import { Container, Grid, Button, Select, MenuItem, TextField, FormControl, CardMedia } from "@material-ui/core"
+import ImageUploader from 'react-images-upload';
 
 import { useOrganization } from "../../../hooks";
 
@@ -50,6 +51,7 @@ interface managerType {
 
 const Organiser = (props: any): React.ReactElement => {
   const classes = useStyle();
+  const showingIcon = false;
   const { getOrganizedManager } = useOrganization();
   const [manager, setManager] = useState({
     id: 'string',
@@ -106,18 +108,30 @@ const Organiser = (props: any): React.ReactElement => {
           </Grid>
           <Grid item container direction="row" xs={12}>
             <Grid item xs={4} style={{ paddingTop: 15 }}>
-              <Button 
-                className={classes.profilBtn}
-              >
-                <span 
-                  className={classes.profilImage}
-                  style={{
-                    backgroundImage: `url(/assets/user4.png)`
-                  }}
-                />
-                <input type="file" hidden />
-                <span className={classes.profiltext}>Change image</span>
-              </Button>
+              <CardMedia 
+                style={{ marginTop: 20 }}
+                component="img"
+                height="140"
+                image="/assets/user4.png"
+              />
+              <ImageUploader
+                withIcon={showingIcon}
+                withLabel={showingIcon}
+                buttonText='Choose Image'
+                buttonStyles={{
+                  width: "100%",
+                  margin: 0,
+                  background: "#fff0",
+                  color: "#000",
+                }}
+                fileContainerStyle={{
+                  margin: 0,
+                  padding: 0,
+                  marginTop: "-25px",
+                  background: "#fff9",
+                  borderRadius: 0,
+                }}
+              />
             </Grid>
             <Grid item container xs={8} justify="flex-end" alignItems="flex-end" style={{ paddingTop: 15 }}>
               <Button variant="contained" color="secondary">save changes</Button>

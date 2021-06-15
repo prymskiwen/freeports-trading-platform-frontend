@@ -54,7 +54,7 @@ const Organisations = (): React.ReactElement => {
         },
       },
       {
-        field: "discativeUser",
+        field: "disactiveUser",
         title: "Disable Users",
         cellStyle: {
           width: "25%",

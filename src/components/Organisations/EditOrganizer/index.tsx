@@ -22,7 +22,7 @@ import {  Container,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ImageUploader from 'react-images-upload';
-import { useParams } from "react-router";
+import { useParams, useHistory } from "react-router";
 import { spawnSync } from "child_process";
 import Organiser from "../Organiser";
 
@@ -93,22 +93,25 @@ const useStyle = makeStyles((theme) => ({
 
 const EditOrganizer = (): React.ReactElement => {
   const { id } : any = useParams();
+  const history = useHistory();
   const classes = useStyle();
   const showingIcon = false;
   const showingLogo = true;
   const testname = "workinger";
 
-  const { getOrganizerdetail, getManagers } = useOrganization();
-
+  const { getOrganizerdetail, getManagers,  updateOrganization} = useOrganization();
+  const [isEditable, setIsEditable] = useState(false);
   const [LogoImage, setLogoImage] = useState();
   const [Logofile, setLogofile] = useState();
-  const [organereddetail, setOrganereddetail] = useState({
+  const [organizereddetail, setOrganizereddetail] = useState({
     id: "string",
     name: "string",
     createtime: "string",
     commission: "string",
     commissionclear: "string",   
     logofile: "string",
+    activeuser: "string",
+    disacitveUser: "string",
   })
   const [managers, setManagers] = useState([] as managerType[]);
   const [iban, setIban] = useState([] as ibantype[])
@@ -120,13 +123,15 @@ const EditOrganizer = (): React.ReactElement => {
       console.log(detail)
       if(!mounted){
 
-        setOrganereddetail({
+        setOrganizereddetail({
           id: detail.id,
           name: detail.name,
           createtime: new Date(detail.createtime).toDateString() ,
           logofile: detail.logofile,
           commission: detail.commission,
           commissionclear: detail.commissionclear,
+          activeuser: detail.acitveUser,
+          disacitveUser: detail.discativeUser,
         });
         setIban(detail.clearing);
         setManagers(managerList);
@@ -144,34 +149,81 @@ const EditOrganizer = (): React.ReactElement => {
     reader.onload = (e: any)=>{
       console.log(e.target.result);
       // setLogoImage(e.target.result);
-      const newOrganereddetail = { ...organereddetail } ;
-      newOrganereddetail.logofile = e.target.result;
-      setOrganereddetail(newOrganereddetail);
+      const newOrganizereddetail = { ...organizereddetail } ;
+      newOrganizereddetail.logofile = e.target.result;
+      setOrganizereddetail(newOrganizereddetail);
     }
     reader.readAsDataURL(pic[0]);
     // setLogofile(pic);
   }
 
+  const onHandlename = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    const newOrganizereddetail = { ...organizereddetail };
+    newOrganizereddetail.name = value;
+    setOrganizereddetail(newOrganizereddetail);
+  }
+
+  const onHandleclearer = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    const newOrganizereddetail = { ...organizereddetail };
+    newOrganizereddetail.commissionclear = value;
+    setOrganizereddetail(newOrganizereddetail);
+  }
+
+  const onHandlecommission = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    const newOrganizereddetail = { ...organizereddetail };
+    newOrganizereddetail.commission = value;
+    setOrganizereddetail(newOrganizereddetail);
+  }
+
   const onhandledialog = () => {
     alert('this is m wo');
+    console.log(organizereddetail);
+  }
+
+  const onStartEdit = () => {
+    if(isEditable){
+      setIsEditable(false);  
+    }else{
+      setIsEditable(true);
+    }
   }
   
+  const onHandleUpdate = async () => {
+    await updateOrganization(id, organizereddetail.createtime, organizereddetail.name, organizereddetail.logofile, organizereddetail.commission, organizereddetail.commissionclear)
+      .then((data: any) => {
+        const responseId = data.id;
+        console.log(responseId);
+        history.push('/organisations');
+      }).catch((err: any) => {
+        console.log(err);
+      })
+  }
+
   return(
     <div className="main-wrapper">
       <Container >
         <div style={{width:"100%", display: "flex"}}>
           <Grid item xs={6}>
             <Grid container direction="row" >
-              <h2> { organereddetail.name }</h2>
-              <IconButton>
-                <Icon style={{ fontSize: 35 }}>mode</Icon>
+              {isEditable ? 
+                (<Input type="text" value={organizereddetail.name} onChange={onHandlename} style={{fontSize: 25, fontWeight: "bold"}} />)
+              :   (<h2> { organizereddetail.name }</h2>)}
+
+              <IconButton onClick={onStartEdit}>
+              {isEditable ? 
+                (<Icon style={{ fontSize: 35 }}>save</Icon>):(<Icon style={{ fontSize: 35 }}>mode</Icon>)
+              }
               </IconButton>
+              
             </Grid>
             <Grid item xs={12}>
               <List>
                 <ListItem>
                   <span>Creation Date:</span> 
-                  <span className={classes.boldspanMarginL}>{organereddetail.createtime}</span>
+                  <span className={classes.boldspanMarginL}>{organizereddetail.createtime}</span>
                 </ListItem>
               </List>
               <Divider />
@@ -197,7 +249,7 @@ const EditOrganizer = (): React.ReactElement => {
                     style={{ marginTop: 20 }}
                     component="img"
                     height="140"
-                    image={organereddetail.logofile}
+                    image={organizereddetail.logofile}
                   />
                   <ImageUploader
                     withIcon={showingIcon}
@@ -227,13 +279,15 @@ const EditOrganizer = (): React.ReactElement => {
                     <Grid item xs={6} style={{ padding: 15 }}>
                       <Input 
                         endAdornment={<InputAdornment position="end">%</InputAdornment>}
-                        value={organereddetail.commission}
+                        value={organizereddetail.commission}
+                        onChange={onHandlecommission}
                       />
                     </Grid>
                     <Grid item xs={6} style={{ padding: 15 }}>
                       <Input 
                         endAdornment={<InputAdornment position="end">%</InputAdornment>}
-                        value={organereddetail.commissionclear}
+                        value={organizereddetail.commissionclear}
+                        onChange={onHandleclearer}
                       />
                     </Grid>
                     <Grid item xs={6} style={{ padding: 15 }}>
@@ -243,16 +297,16 @@ const EditOrganizer = (): React.ReactElement => {
                       <span style={{ fontWeight: "bold"}}>Disabled Users</span>
                     </Grid>
                     <Grid item xs={6} style={{ padding: 15 }}>
-                      <span style={{ fontWeight: "bold" }}>12</span>
+                      <span style={{ fontWeight: "bold" }}>{organizereddetail.activeuser}</span>
                     </Grid>
                     <Grid item xs={6} style={{ padding: 15 }}>
-                      <span style={{ fontWeight: "bold"}}>12</span>
+                      <span style={{ fontWeight: "bold"}}>{organizereddetail.disacitveUser}</span>
                     </Grid>
                 </Grid>
               </Card>
             </Grid>
             <Grid container item justify="flex-end" xs={12} style={{marginTop: 5}}>
-              <Button variant="contained" color="secondary" >SAVE CHANGES</Button>
+              <Button variant="contained" color="secondary" onClick={onHandleUpdate}>SAVE CHANGES</Button>
             </Grid>
           </Grid>
           <Grid item xs={6}>

@@ -85,6 +85,30 @@ const addOrganizer = (
   })
 }
 
+const updateOrganizer = (
+  organization: string,
+  createtime: Date,
+  name: string,
+  logofile: string,
+  сommission: string,
+  clearer: string,
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/organization/${organization}`, {
+        name,
+        createtime,
+        logofile,
+        сommission,
+        clearer,
+      }).then((res: any) => {
+        return resolve(res.data);
+      }).catch((err) => {
+        return reject(err.repsonse);
+      })
+  })
+}
+
 const addAccount = (
   organizerId: string,
   name: string,
@@ -116,4 +140,5 @@ export {
   getOrganizerManager,
   addOrganizer,
   addAccount,
+  updateOrganizer,
 }
