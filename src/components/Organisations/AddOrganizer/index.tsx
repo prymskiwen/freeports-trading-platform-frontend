@@ -20,6 +20,7 @@ import {  Container,
           DialogActions,
           makeStyles,
 } from "@material-ui/core"
+import { Autocomplete } from '@material-ui/lab';
 import ImageUploader from 'react-images-upload';
 import IBAN from 'iban';
 import { useHistory } from "react-router";
@@ -60,9 +61,6 @@ const AddOrganizer = (): React.ReactElement => {
   const classes = useStyles();
   const showingIcon = false;
   const showingLogo = true;
-  const fullwidthable = true;
-  const mdWidth = "md";
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [organizerData, setOrganizerData] = useState<additionOrganizerType>({
     name: "",
     street1: "",
@@ -74,22 +72,27 @@ const AddOrganizer = (): React.ReactElement => {
     clearer: "",
     logofile: "",
   });
-  const [addAccount, setAddAccount] = useState<accountType>({
-    name: "",
-    currency: "",
-    type: "",
-    iban: "",
-    publicAddress: "",
-    vaultWalletId: "",
-  })
+  
+  const [accounts, setAccounts] = useState([
+    {
+      name: 'account1',
+      iban: 'vs25226632566'
+    },
+    {
+      name: 'account2',
+      iban: 'vs25226631235'
+    },
+    {
+      name: 'account3',
+      iban: 'vs25226636528'
+    },
+    {
+      name: 'account4',
+      iban: 'vs25226648951'
+    }
+  ])
 
-  const [additionAccounts, setAdditionAccounts] = useState([] as accountType[]);
-
-  const { addOrganization, additionAccount } = useOrganization();
-
-  useEffect(() => {
-    console.log("input state is", TextField);
-  }, [TextField])
+  const { addOrganization } = useOrganization();
 
   const onhadlestreet = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { value } = event.target;
@@ -157,82 +160,6 @@ const AddOrganizer = (): React.ReactElement => {
     reader.readAsDataURL(pic[0]);
   }
 
-  const onHandledialog = () => {
-    setDialogOpen(true);
-  }
-
-  const onhandleAccountname = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    const newAccountData = { ...addAccount }
-    newAccountData.name = value;
-    setAddAccount(newAccountData);
-  }
-  
-  const onhandleAccountcurrency = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    const newAccountData = { ...addAccount }
-    newAccountData.currency = value;
-    setAddAccount(newAccountData);
-  }
-
-  const onhandleAccountType = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    const newAccountData = { ...addAccount }
-    newAccountData.type = value;
-    setAddAccount(newAccountData);
-  }
-
-  const onhandleAccountIban = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    const newAccountData = { ...addAccount }
-    newAccountData.iban = value;
-    setAddAccount(newAccountData);
-  }
-
-  const onhandleAccountpkaddress = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    const newAccountData = { ...addAccount }
-    newAccountData.publicAddress = value;
-    setAddAccount(newAccountData);
-  }
-
-  const onhandleAccountWallet = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {value} = event.target;
-    const newAccountData = { ...addAccount }
-    newAccountData.vaultWalletId = value;
-    setAddAccount(newAccountData);
-  }
-
-  const onhandleAdditionAccounts = () => {
-    if(addAccount.name === "" || addAccount.iban === "" || !IBAN.isValid(addAccount.iban) || addAccount.currency === ""){
-      if(!IBAN.isValid(addAccount.iban)){
-        alert('wrong IBAN type');
-      }else{
-        alert('Please put all fields');
-      }
-    }else{
-      const newAdditionAccounts = additionAccounts;
-      newAdditionAccounts.push({
-        name: addAccount.name,
-        currency: addAccount.currency,
-        type: addAccount.type,
-        iban: addAccount.iban,
-        publicAddress: addAccount.publicAddress,
-        vaultWalletId: addAccount.vaultWalletId,
-      });
-      setAdditionAccounts(newAdditionAccounts);
-      setAddAccount({
-        name: "",
-        currency: "",
-        type: "",
-        iban: "",
-        publicAddress: "",
-        vaultWalletId: "",
-      });
-      setDialogOpen(false);
-    }
-  }
-
   const onAdditionfunc = async () => {
     if(organizerData.name === "" || organizerData.commission === "" || organizerData.clearer === "" || organizerData.logofile === ""){
       alert('this is my addition function');
@@ -240,32 +167,15 @@ const AddOrganizer = (): React.ReactElement => {
       const nowTime = new Date()
       await addOrganization(organizerData.name, organizerData.street1, organizerData.street2, organizerData.zip, organizerData.city, organizerData.country, organizerData.logofile, nowTime.getTime(), organizerData.commission, organizerData.clearer)
         .then((data: any) => {
-          // additionAccount
           const responseId = data.id;
-          if(additionAccounts.length > 0)
-          {
-            additionAccounts.map(async (accountItem, key) => {
-              await additionAccount(responseId, accountItem.name, accountItem.currency, accountItem.type, accountItem.iban, accountItem.publicAddress, accountItem.vaultWalletId)
-                .then((res: any) => {
-                  if(key === (additionAccounts.length - 1)){
-                    history.push('/organisations');
-                  }
-                }).catch((err: any) => {
-                  console.log(err)
-                  if(key === (additionAccounts.length - 1)){
-                    history.push('/organisations');
-                  }
-                })
-            })
-          }else{
+            console.log(responseId)
             history.push('/organisations');
-          }
         }).catch((err: any) => {
           console.log(err);
         })
     }
   }
-
+  
 
   return(
     <div className="main-wrapper">
@@ -335,20 +245,24 @@ const AddOrganizer = (): React.ReactElement => {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
+
             <span style={{ fontWeight: "bold" }}>Nostro Accounts</span>
-            <List>
+            
+            <FormControl fullWidth>
+              <Select>
+                <MenuItem>Then</MenuItem>
+                <MenuItem>Then</MenuItem>
+                <MenuItem>Then</MenuItem>
+                <MenuItem>Then</MenuItem>
+              </Select>
+            </FormControl>
+            {/* <List>
               {additionAccounts.map((accountItem) => <ListItem>
                   <Icon color="error" >remove_circle</Icon>
                   <span style={{marginLeft: 10,}}>IBAN: </span>
                   <span style={{fontWeight: "bold", marginLeft: 25}}>{accountItem.iban}</span>
               </ListItem>)}
-            </List>
-          </Grid>
-          <Grid item container direction="row" xs={12} alignItems="center" style={{padding: 10}}>
-            <IconButton onClick={onHandledialog}>
-              <Icon style={{ fontSize: 35 }}>add_circle</Icon>
-            </IconButton>
-            <span className={classes.marginL10}>Add Nostro account</span>
+            </List> */}
           </Grid>
           <Grid item xs={12} style={{padding: 10}}>
             <span style={{fontWeight: "bold"}}>Add Organisation logo</span>
@@ -374,22 +288,33 @@ const AddOrganizer = (): React.ReactElement => {
           </Grid>
           <Grid item container direction="row" justify="flex-start" spacing={3} xs={12} style={{padding: 10}}>
             <Grid item xs={6}>
-              <FormControl fullWidth style={{marginTop: 5}}>
-                <span style={{fontWeight: "bold"}}>Set commission rate</span>
-                <Input 
+              <FormControl fullWidth className={classes.margin} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-amount">Set commission rate</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-amount"
+                  labelWidth={250}
                   endAdornment={<InputAdornment position="end">%</InputAdornment>}
                   onChange={onhadlecommission}
                 />
               </FormControl>
             </Grid>
             <Grid item xs={6}>
-              <FormControl fullWidth style={{marginTop: 5}}>
+              <FormControl fullWidth className={classes.margin} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-amount">Set clearer commission rate</InputLabel>
+                <OutlinedInput
+                  id="outlined-adornment-amount"
+                  labelWidth={250}
+                  endAdornment={<InputAdornment position="end">%</InputAdornment>}
+                  onChange={onhadleclearer}
+                />
+              </FormControl>
+              {/* <FormControl fullWidth style={{marginTop: 5}}>
                 <span style={{fontWeight: "bold"}}>Set clearer commission rate</span>
                 <Input 
                   endAdornment={<InputAdornment position="end">%</InputAdornment>}
                   onChange={onhadleclearer}
                 />
-              </FormControl>
+              </FormControl> */}
             </Grid>
           </Grid>
           <Grid item container justify="flex-end" xs={12} style={{padding: 10}}>
@@ -403,84 +328,6 @@ const AddOrganizer = (): React.ReactElement => {
           </Grid>
         </Grid>
       </Container>
-      {/* account dialog */}
-      <Dialog open={dialogOpen} fullWidth={fullwidthable} maxWidth={mdWidth} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Add Nostro accounts</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
-              <FormControl fullWidth className={classes.margin} variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-amount">Name</InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-amount"
-                  labelWidth={60}
-                  onChange={onhandleAccountname}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item container direction="row" xs={12}>
-              <Grid item xs={6}>
-                <FormControl className={classes.margin} variant="outlined">
-                  <InputLabel htmlFor="outlined-adornment-amount">Currency</InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-amount"
-                    labelWidth={60}
-                    onChange={onhandleAccountcurrency}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl className={classes.margin} variant="outlined">
-                  <InputLabel htmlFor="outlined-adornment-amount">Type</InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-amount"
-                    labelWidth={60}
-                    onChange={onhandleAccountType}
-                  />
-                </FormControl>                
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth className={classes.margin} variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-amount">IBAN</InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-amount"
-                  labelWidth={60}
-                  onChange={onhandleAccountIban}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth className={classes.margin} variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-amount">Public Address</InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-amount"
-                  labelWidth={60}
-                  onChange={onhandleAccountpkaddress}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth className={classes.margin} variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-amount">Wallet Id</InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-amount"
-                  labelWidth={60}
-                  onChange={onhandleAccountWallet}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained"
-            color="secondary"
-            onClick={onhandleAdditionAccounts}
-            >
-              Add Account
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

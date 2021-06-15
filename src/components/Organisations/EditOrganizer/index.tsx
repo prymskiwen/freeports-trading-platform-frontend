@@ -151,6 +151,10 @@ const EditOrganizer = (): React.ReactElement => {
     reader.readAsDataURL(pic[0]);
     // setLogofile(pic);
   }
+
+  const onhandledialog = () => {
+    alert('this is m wo');
+  }
   
   return(
     <div className="main-wrapper">
@@ -179,7 +183,7 @@ const EditOrganizer = (): React.ReactElement => {
                 </ListItem>)}
               </List>
               <List>
-                <ListItem>
+                <ListItem onClick={onhandledialog}>
                   <Icon style={{ fontSize: 35 }}>add_circle</Icon>
                   <span className={classes.marginL10}>Add IBAN</span>
                 </ListItem>
