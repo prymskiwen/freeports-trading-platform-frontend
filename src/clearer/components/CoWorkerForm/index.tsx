@@ -8,8 +8,6 @@ import {
   Divider,
   Button,
 } from "@material-ui/core";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import SearchIcon from "@material-ui/icons/Search";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
@@ -17,7 +15,7 @@ import FormControl from "@material-ui/core/FormControl";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import { v4 as uuidv4 } from "uuid";
-import profile from "../../assets/images/profile.jpg";
+import profile from "../../../assets/images/profile.jpg";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {

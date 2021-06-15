@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import useAuth from "../../../hooks";
+import useAuth from "../../../../hooks";
 
 const Copyright = (): React.ReactElement => {
   return (

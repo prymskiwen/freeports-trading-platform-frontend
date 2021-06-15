@@ -1,12 +1,20 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 
-import App from "./App";
 import store from "./store";
 import authActions from "./store/auth/actions";
 import reportWebVitals from "./reportWebVitals";
 
 import "./index.css";
+
+const App = React.lazy(
+  () =>
+    import(
+      process.env.REACT_APP_INTERFACE === "CLEARER"
+        ? "./clearer/App"
+        : "./organization/App"
+    )
+);
 
 const { authCheck } = authActions;
 
@@ -14,7 +22,9 @@ store.dispatch(authCheck());
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Suspense fallback={<div>Loading...</div>}>
+      <App />
+    </Suspense>
   </React.StrictMode>,
   document.getElementById("root")
 );

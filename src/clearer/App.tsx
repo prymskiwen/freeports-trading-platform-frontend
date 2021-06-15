@@ -4,8 +4,8 @@ import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import purple from "@material-ui/core/colors/purple";
 import green from "@material-ui/core/colors/green";
 
-import Routes from "./routes";
-import store from "./store";
+import Routes from "../routes";
+import store from "../store";
 
 import "./App.css";
 import "./Custom.css";

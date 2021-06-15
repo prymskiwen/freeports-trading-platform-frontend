@@ -9,7 +9,7 @@ import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
 import routes from "./routes";
 import PrivateRoute from "./private";
 import PublicRoute from "./public";
-import Header from "../components/Header";
+import Header from "../clearer/components/Header";
 
 const Routes = (): React.ReactElement => {
   const { error } = useSelector(

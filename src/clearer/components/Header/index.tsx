@@ -23,8 +23,8 @@ import {
 } from "@material-ui/icons";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SendIcon from "@material-ui/icons/Send";
-
-import useAuth from "../../hooks";
+import GroupIcon from "@material-ui/icons/Group";
+import useAuth from "../../../hooks";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
@@ -51,9 +51,9 @@ const Header = (): React.ReactElement => {
   const { isAuthenticated, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const goToRoles = () => {
+  const redirect = (path: string) => {
     setAnchorEl(null);
-    history.push("/roles");
+    history.push(path);
   };
 
   const handleSettingsMenuClick = (
@@ -112,11 +112,17 @@ const Header = (): React.ReactElement => {
                 open={Boolean(anchorEl)}
                 onClose={handleSettingsMenuClose}
               >
-                <MenuItem onClick={goToRoles}>
+                <MenuItem onClick={() => redirect("/roles")}>
                   <ListItemIcon>
                     <SendIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText primary="Roles" />
+                </MenuItem>
+                <MenuItem onClick={() => redirect("/co-worker")}>
+                  <GroupIcon>
+                    <SendIcon fontSize="small" />
+                  </GroupIcon>
+                  <ListItemText primary="Co-workers" />
                 </MenuItem>
                 <MenuItem onClick={signOut}>
                   <ListItemIcon>

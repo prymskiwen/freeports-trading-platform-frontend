@@ -8,13 +8,7 @@ import {
   AccordionSummary,
   IconButton,
   Typography,
-  FormGroup,
-  FormLabel,
-  AccordionDetails,
-  Divider,
-  AccordionActions,
   Button,
-  Container,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -23,7 +17,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 
-import profile from "../../assets/images/profile.jpg";
+import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
 
 const useStyles = makeStyles((theme) => ({
