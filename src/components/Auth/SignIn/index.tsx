@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const SignIn = (): React.ReactElement => {
-  const { authStep, error, signIn, loading } = useAuth();
+  const { authStep, signIn, loading, error } = useAuth();
   const classes = useStyles();
   const [formInput, setFormInput] = useState({
     email: "",
@@ -76,8 +76,8 @@ const SignIn = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    if (error !== "") {
-      setErrorMessage(error);
+    if (error.errorType !== "") {
+      setErrorMessage(error.message);
     }
   }, [error]);
 

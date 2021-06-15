@@ -1,6 +1,7 @@
-
-import authActions from './auth/actions'
+import globalActions from "./global/actions";
+import authActions from "./auth/actions";
 
 export default {
-  ...authActions
-}
+  ...globalActions,
+  ...authActions,
+};
