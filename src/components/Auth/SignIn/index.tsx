@@ -14,11 +14,8 @@ import {
   Typography,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import * as dotenv from "dotenv";
 
 import useAuth from "../../../hooks";
-
-dotenv.config();
 
 const Copyright = (): React.ReactElement => {
   return (

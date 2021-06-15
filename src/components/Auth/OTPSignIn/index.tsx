@@ -10,11 +10,8 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import * as dotenv from "dotenv";
 
 import useAuth from "../../../hooks";
-
-dotenv.config();
 
 const Copyright = (): React.ReactElement => {
   return (
