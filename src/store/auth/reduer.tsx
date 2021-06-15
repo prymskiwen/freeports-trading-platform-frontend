@@ -6,9 +6,10 @@ import {
   AUTH_CHECK,
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
+  AUTH_LOGIN_FAILED,
   AUTH_OTP_CHECK,
   AUTH_OTP_CHECK_SUCCESS,
-  AUTH_ERROR,
+  AUTH_OTP_CHECK_FAILED,
   AUTH_LOGOUT,
   AUTH_REFRESH_TOKEN,
 } from "./action-types";
@@ -18,7 +19,6 @@ const initialState = {
   isAuthenticated: false,
   isOTPDefined: false,
   loading: false,
-  error: "",
 };
 interface LoginUserResponseType {
   id: string;
@@ -116,7 +116,6 @@ const reducer = (
       return {
         ...state,
         loading: true,
-        error: "",
       };
     case AUTH_LOGIN_SUCCESS:
       setIdentity(payload);
@@ -124,12 +123,16 @@ const reducer = (
         ...login(state, payload),
         loading: false,
       };
+    case AUTH_LOGIN_FAILED:
+      return {
+        ...state,
+        loading: false,
+      };
     case AUTH_OTP_CHECK:
       addTokenToHeader();
       return {
         ...state,
         loading: true,
-        error: "",
       };
     case AUTH_OTP_CHECK_SUCCESS:
       setIdentity(payload);
@@ -137,10 +140,9 @@ const reducer = (
         ...checkOTP(state, payload),
         loading: false,
       };
-    case AUTH_ERROR:
+    case AUTH_OTP_CHECK_FAILED:
       return {
         ...state,
-        error: payload,
         loading: false,
       };
     case AUTH_REFRESH_TOKEN:
