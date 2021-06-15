@@ -105,6 +105,7 @@ const EditOrganizer = (): React.ReactElement => {
   const [organereddetail, setOrganereddetail] = useState({
     id: "string",
     name: "string",
+    createtime: "string",
     commission: "string",
     commissionclear: "string",   
     logofile: "string",
@@ -118,9 +119,11 @@ const EditOrganizer = (): React.ReactElement => {
       const managerList = await getManagers(id);
       console.log(detail)
       if(!mounted){
+
         setOrganereddetail({
           id: detail.id,
           name: detail.name,
+          createtime: new Date(detail.createtime).toDateString() ,
           logofile: detail.logofile,
           commission: detail.commission,
           commissionclear: detail.commissionclear,
@@ -164,7 +167,7 @@ const EditOrganizer = (): React.ReactElement => {
               <List>
                 <ListItem>
                   <span>Creation Date:</span> 
-                  <span className={classes.boldspanMarginL}>24.02.2021</span>
+                  <span className={classes.boldspanMarginL}>{organereddetail.createtime}</span>
                 </ListItem>
               </List>
               <Divider />
