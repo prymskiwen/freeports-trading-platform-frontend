@@ -31,12 +31,16 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start:clearer": "copyfiles -f env/clearer/.* ./ && react-scripts start",
-    "start:organization": "copyfiles -f env/organization/.* ./ &&  react-scripts start",
-    "build:clearer": "copyfiles -f env/clearer/.* ./ &&  react-scripts build && mv build clearer-build",
-    "build:organization": "copyfiles -f env/organization/.* ./ && react-scripts build && mv build organization-build",
+    "start:clearer": "yarn run copy:clearer:env && react-scripts start",
+    "start:organization": "yarn run copy:organization:env ./ &&  react-scripts start",
+    "build:clearer": "yarn run copy:clearer:env &&  react-scripts build && mv build clearer-build",
+    "build:organization": "yarn run copy:organization:env ./ && react-scripts build && mv build organization-build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test:clearer": "yarn run copy:clearer:env && react-scripts test",
+    "test:organization": "yarn run copy:organization:env && react-scripts test",
+    "eject": "react-scripts eject",
+    "copy:clearer:env": "copyfiles -f env/clearer/.* ./",
+    "copy:organization:env": "copyfiles -f env/organization/.*"
   },
   "browserslist": {
     "production": [
