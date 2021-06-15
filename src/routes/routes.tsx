@@ -69,6 +69,6 @@ export default [
     path: "/co-worker",
     exact: true,
     auth: true,
-    component: lazy(() => import("../containers/CoWorker")),
+    component: lazy(() => import("../components/CoWorker")),
   },
 ];

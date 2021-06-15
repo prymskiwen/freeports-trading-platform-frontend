@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
-import {  Container,
-          Grid,
-          IconButton,
-          Icon,
-          TextField,
+import {
+  Container,
+  Grid,
+  IconButton,
+  Icon,
+  TextField,
 } from "@material-ui/core";
 import MaterialTable from "material-table";
-import data from "./data"
+import data from "./data";
 
 const column = [
   {
@@ -39,47 +40,56 @@ const column = [
       width: "20%",
     },
   },
-]
+];
 
 const Organisations = (): React.ReactElement => {
   const history = useHistory();
 
   const newOrganizer = () => {
-    history.push('/organisations/addOrganization');
-  }
+    history.push("/organisations/addOrganization");
+  };
 
   return (
     <div className="main-wrapper">
       <Container>
         <Grid container spacing={3} xs={12}>
-          <Grid container item justify="flex-start" alignItems="center" spacing={5} xs={12}>
+          <Grid
+            container
+            item
+            justify="flex-start"
+            alignItems="center"
+            spacing={5}
+            xs={12}
+          >
             <Grid item>
               <h2>Organisation</h2>
             </Grid>
             <Grid item>
               <IconButton onClick={newOrganizer}>
-                <Icon style={{ fontSize: 45 }} color="primary" >add_circle</Icon>
+                <Icon style={{ fontSize: 45 }} color="primary">
+                  add_circle
+                </Icon>
               </IconButton>
             </Grid>
             <Grid item>
-              <Icon style={{ fontSize: 35 }} >search</Icon>
+              <Icon style={{ fontSize: 35 }}>search</Icon>
               <TextField />
             </Grid>
           </Grid>
           <Grid container>
             <Grid item xs={12}>
               <MaterialTable
-              columns={column}
-              data={data}
-              options={{
-                toolbar: false,
-                search: false,
-                pageSize: 10,
-              }}
+                columns={column}
+                data={data}
+                options={{
+                  toolbar: false,
+                  search: false,
+                  pageSize: 10,
+                }}
               />
             </Grid>
           </Grid>
-        </Grid> 
+        </Grid>
       </Container>
     </div>
   );
