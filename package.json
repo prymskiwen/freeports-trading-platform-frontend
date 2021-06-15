@@ -31,21 +31,18 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start:clearer": "copyfiles -f env/clearer/.* ./ && react-scripts start",
+    "start:organization": "copyfiles -f env/organization/.* ./ &&  react-scripts start",
+    "build:clearer": "copyfiles -f env/clearer/.* ./ &&  react-scripts build && mv build clearer-build",
+    "build:organization": "copyfiles -f env/organization/.* ./ && react-scripts build && mv build organization-build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      ">0.2%", "not dead", "not op_mini all"
     ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
@@ -60,7 +57,8 @@
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
-    "dotenv": "^10.0.0",
+    "copyfiles": "^2.4.1",
+    "dotenv-cli": "^4.0.0",
     "eslint": "^7.27.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.3.0",
