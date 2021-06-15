@@ -111,6 +111,16 @@ const Header = (): React.ReactElement => {
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleSettingsMenuClose}
+                elevation={0}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                getContentAnchorEl={null}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
               >
                 <MenuItem onClick={() => redirect("/roles")}>
                   <ListItemIcon>
@@ -119,9 +129,10 @@ const Header = (): React.ReactElement => {
                   <ListItemText primary="Roles" />
                 </MenuItem>
                 <MenuItem onClick={() => redirect("/co-worker")}>
-                  <GroupIcon>
-                    <SendIcon fontSize="small" />
-                  </GroupIcon>
+                  <ListItemIcon>
+                    <GroupIcon fontSize="small" />
+                  </ListItemIcon>
+
                   <ListItemText primary="Co-workers" />
                 </MenuItem>
                 <MenuItem onClick={signOut}>
