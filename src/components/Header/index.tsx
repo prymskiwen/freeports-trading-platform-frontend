@@ -31,7 +31,6 @@ const navLinks = [
   { title: `Organisations`, path: `/organisations`, hasChildren: false },
   { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
   { title: `Tracking`, path: `/tracking`, hasChildren: true },
-  { title: `Co-worker`, path: `/co-worker`, hasChildren: true },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {
