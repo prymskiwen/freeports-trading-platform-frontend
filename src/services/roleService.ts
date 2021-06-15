@@ -47,6 +47,18 @@ const modifyRole = (
       });
   });
 };
+const deleteRole = (id: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(`/organization/clearer/role/${id}`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
 const getClearerRoles = (): Promise<Array<RoleType>> => {
   return new Promise((resolve, reject) => {
     axios
@@ -76,6 +88,7 @@ export {
   getClearerRoles as default,
   addNewRole,
   modifyRole,
+  deleteRole,
   getClearerRoles,
   getClearerPermissions,
 };
