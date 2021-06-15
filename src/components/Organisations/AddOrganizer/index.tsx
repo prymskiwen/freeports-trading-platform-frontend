@@ -237,7 +237,8 @@ const AddOrganizer = (): React.ReactElement => {
     if(organizerData.name === "" || organizerData.commission === "" || organizerData.clearer === "" || organizerData.logofile === ""){
       alert('this is my addition function');
     }else{
-      await addOrganization(organizerData.name, organizerData.street1, organizerData.street2, organizerData.zip, organizerData.city, organizerData.country, organizerData.logofile, organizerData.commission, organizerData.clearer)
+      const nowTime = new Date()
+      await addOrganization(organizerData.name, organizerData.street1, organizerData.street2, organizerData.zip, organizerData.city, organizerData.country, organizerData.logofile, nowTime.getTime(), organizerData.commission, organizerData.clearer)
         .then((data: any) => {
           // additionAccount
           const responseId = data.id;

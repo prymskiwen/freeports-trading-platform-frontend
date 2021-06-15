@@ -60,6 +60,7 @@ const addOrganizer = (
   city: string,
   country: string,
   logofile: string,
+  createtime: Date,
   сommission: string,
   clearer: string,
 ): Promise<any> => {
@@ -75,6 +76,7 @@ const addOrganizer = (
         logofile,
         сommission,
         clearer,
+        createtime,
       }).then((res: any) => {
         return resolve(res.data);
       }).catch((err) => {

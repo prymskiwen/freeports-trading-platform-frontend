@@ -59,10 +59,11 @@ function useOrganization(): any {
     city: string,
     country: string,
     logofile: string,
+    createtime: Date,
     сommission: string,
     clearer: string,
   ) => {
-    const newOrganization = await addOrganizer(name, street, street1, zip, city, country, logofile, сommission, clearer)
+    const newOrganization = await addOrganizer(name, street, street1, zip, city, country, logofile, createtime, сommission, clearer)
       .then((data) => {
         return data;
       }).catch((err) => {

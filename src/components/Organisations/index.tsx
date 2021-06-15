@@ -38,27 +38,29 @@ const Organisations = (): React.ReactElement => {
         },
       },
       {
-        field: "createdate",
+        field: "createtime",
         title: "Create Date",
+        type: 'date',
+        dateSetting: { locale: "en-GB" },
         cellStyle: {
           width: "25%",
         },
       },
       {
-        field: "activeusers",
+        field: "acitveUser",
         title: "Active Users",
         cellStyle: {
           width: "25%",
         },
       },
       {
-        field: "disableusers",
+        field: "discativeUser",
         title: "Disable Users",
         cellStyle: {
           width: "25%",
         },
       },
-    ]
+    ] as any[]
   })
 
   const [datas, setDatas] = useState([] as any[]);
