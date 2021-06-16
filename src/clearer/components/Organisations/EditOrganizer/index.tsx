@@ -144,11 +144,8 @@ const EditOrganizer = (): React.ReactElement => {
   }, []);
 
   const ondrop = (pic: any) => {
-    console.log(pic);
     const reader = new FileReader();
     reader.onload = (e: any)=>{
-      console.log(e.target.result);
-      // setLogoImage(e.target.result);
       const newOrganizereddetail = { ...organizereddetail } ;
       newOrganizereddetail.logofile = e.target.result;
       setOrganizereddetail(newOrganizereddetail);

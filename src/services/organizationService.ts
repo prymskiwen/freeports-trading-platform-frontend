@@ -42,7 +42,7 @@ const getOrganisationManagers = (id: string): Promise<any> => {
 const getOrganizerManager = (organizeid: string, managerid: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/${organizeid}/manager/${managerid}`)
+      .get(`/organization/${organizeid}/user/${managerid}`)
       .then((res) => {
         return resolve(res.data);
       })

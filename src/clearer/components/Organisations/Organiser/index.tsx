@@ -47,6 +47,8 @@ interface managerType {
   id: string;
   nickname: string;
   email: string;
+  phone: string;
+  avata: string;
 }
 
 const Organiser = (props: any): React.ReactElement => {
@@ -57,6 +59,8 @@ const Organiser = (props: any): React.ReactElement => {
     id: 'string',
     nickname: 'string',
     email: 'string',
+    phone: 'string',
+    avata: '/assets/user4.png',
   });
   
   useEffect(() => {
@@ -69,6 +73,8 @@ const Organiser = (props: any): React.ReactElement => {
           id: managerdata.id,
           nickname: managerdata.nickname,
           email: managerdata.email,
+          phone: managerdata.phone,
+          avata: managerdata.avata,
         })
       }
     };
@@ -78,6 +84,16 @@ const Organiser = (props: any): React.ReactElement => {
       mounted = true;
     }
   }, []);
+
+  const ondropAvata = (avataImg: any) => {
+    const reader = new FileReader();
+    reader.onload = (event: any)=>{
+      const newManager = { ...manager };
+      newManager.avata = event.target.result;
+      setManager(newManager);
+    }
+    reader.readAsDataURL(avataImg[0]);
+  }
 
   return (
     <div className="main-wrapper">
@@ -113,7 +129,7 @@ const Organiser = (props: any): React.ReactElement => {
                 style={{ marginTop: 20 }}
                 component="img"
                 height="140"
-                image="/assets/user4.png"
+                image={manager.avata}
               />
               <ImageUploader
                 withIcon={showingIcon}
@@ -125,6 +141,7 @@ const Organiser = (props: any): React.ReactElement => {
                   background: "#fff0",
                   color: "#000",
                 }}
+                onChange={(ChangeEvent) => ondropAvata(ChangeEvent)}
                 fileContainerStyle={{
                   margin: 0,
                   padding: 0,
