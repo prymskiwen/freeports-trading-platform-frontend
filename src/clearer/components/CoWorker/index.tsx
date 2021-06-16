@@ -23,7 +23,7 @@ import CoWorkerForm from "../CoWorkerForm";
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
     padding: theme.spacing(3),
-    width: 230,
+    maxWidth: 320,
   },
   root: {
     flexGrow: 1,
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
   },
   main: {
-    padding: theme.spacing(8),
+    padding: theme.spacing(2),
   },
   margin: {
     margin: theme.spacing(1),
@@ -76,29 +76,26 @@ const CoWorker = (): React.ReactElement => {
 
   return (
     <Grid container className={classes.root}>
-      <Grid item className={classes.sideMenu} sm={4} lg={3}>
-        <div className={classes.listTitle}>
-          <Typography variant="h5">
-            CO-WORKER
+      <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
+        <Grid container justify="flex-start">
+          <Grid sm={8} item className={classes.accordionCoWorker}>
+            <Typography variant="h5">CO-WORKER</Typography>
+          </Grid>
+          <Grid xs={2} item>
             <IconButton color="inherit" aria-label="Add Role">
               <AddCircleIcon fontSize="large" color="primary" />
             </IconButton>
-          </Typography>
-        </div>
+          </Grid>
+        </Grid>
+        <Grid container>
+          <Grid xs={2} item>
+            <SearchIcon />
+          </Grid>
+          <Grid sm={8} item>
+            <TextField id="input-with-icon-grid" />
+          </Grid>
+        </Grid>
 
-        <div>
-          <div className={classes.margin}>
-            <Grid container spacing={1} alignItems="flex-end">
-              <Grid item>
-                <SearchIcon />
-              </Grid>
-              <Grid item>
-                <TextField id="input-with-icon-grid" />
-              </Grid>
-            </Grid>
-          </div>
-        </div>
-        <div />
         <List>
           {coWorkers.map((coWorker, i) => (
             <ListItem
@@ -112,7 +109,7 @@ const CoWorker = (): React.ReactElement => {
           ))}
         </List>
       </Grid>
-      <Grid item className={classes.main} sm={8} lg={9}>
+      <Grid item className={classes.main} xs={12} sm={8} lg={9}>
         <Accordion>
           <AccordionSummary
             classes={{ content: classes.accordionSummary }}
