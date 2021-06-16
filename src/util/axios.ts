@@ -1,13 +1,11 @@
 /* eslint-disable no-console */
 import axios from "axios";
 import Lockr from "lockr";
-import * as dotenv from "dotenv";
 
 import store from "../store/index";
 import reduxActions from "../store/auth/actions";
 import reduxGlobalActions from "../store/global/actions";
 
-dotenv.config();
 
 const { authLogout } = reduxActions;
 const { clearError, setError } = reduxGlobalActions;

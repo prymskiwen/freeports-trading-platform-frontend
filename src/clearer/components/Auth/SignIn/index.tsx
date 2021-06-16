@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import {
+  Avatar,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Container,
   CssBaseline,
+  FormControlLabel,
   makeStyles,
   TextField,
   Typography,
 } from "@material-ui/core";
-import * as dotenv from "dotenv";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
-import useAuth from "../../../hooks";
-
-dotenv.config();
+import useAuth from "../../../../hooks";
 
 const Copyright = (): React.ReactElement => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      Copyright © {process.env.REACT_APP_NAME}
-      {new Date().getFullYear()}.
+      Copyright © {process.env.REACT_APP_NAME} {new Date().getFullYear()}.
     </Typography>
   );
 };
@@ -31,9 +31,9 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
   },
-  qrCode: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -55,57 +55,25 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
   },
 }));
-const OTPSignIn = (): React.ReactElement => {
-  const {
-    authStep,
-    isAuthenticated,
-    isOTPDefined,
-    loading,
-    error,
-    generateQRCode,
-    checkOTP,
-  } = useAuth();
+const SignIn = (): React.ReactElement => {
+  const { authStep, signIn, loading, error } = useAuth();
   const classes = useStyles();
-  const [OTPassword, setOTPassword] = useState("");
-  const [qrCode, setQRCode] = useState("");
+  const [formInput, setFormInput] = useState({
+    email: "",
+    password: "",
+  });
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleInput = (e: {
-    target: {
-      name: string;
-      value: string;
-    };
-  }) => {
-    const { value } = e.target;
-
-    setOTPassword(value);
-  };
-
-  const handleOTPSubmit = (e: any) => {
+  const handleLoginSubmit = (e: any) => {
     e.preventDefault();
 
-    checkOTP(OTPassword);
+    signIn(formInput);
   };
+  const handleInput = (e: { target: { name: string; value: string } }) => {
+    const { name, value } = e.target;
 
-  useEffect(() => {
-    let unmounted = false;
-
-    const getQRCode = async () => {
-      if (!isOTPDefined) {
-        let qrImg = "";
-        const qr = await generateQRCode();
-
-        qrImg = `data:image/png;base64,${qr}`;
-        if (!unmounted) setQRCode(qrImg);
-      }
-    };
-
-    getQRCode();
-
-    return () => {
-      unmounted = true;
-    };
-  }, [isOTPDefined]);
+    setFormInput({ ...formInput, [name]: value });
+  };
 
   useEffect(() => {
     if (error.errorType !== "") {
@@ -113,48 +81,42 @@ const OTPSignIn = (): React.ReactElement => {
     }
   }, [error]);
 
-  if (authStep === "login") {
-    return <Redirect to="/signin" />;
-  }
-
-  if (isAuthenticated) {
-    return <Redirect to="/dashboard" />;
+  if (authStep === "otp") {
+    return <Redirect to="/signin-otp" />;
   }
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {!isOTPDefined ? (
-          <>
-            <Typography component="h1" variant="subtitle1" align="center">
-              Scan this QR Code image with any Google Authenticator compatible
-              program
-            </Typography>
-            <div className={classes.qrCode}>
-              <img src={qrCode} alt="QR Code" />
-            </div>
-          </>
-        ) : (
-          <></>
-        )}
-        <form className={classes.form} onSubmit={handleOTPSubmit}>
-          {isOTPDefined ? (
-            <Typography component="h1" variant="subtitle1" align="center">
-              Input OTP code from any Google Authenticator compatible program
-            </Typography>
-          ) : (
-            <></>
-          )}
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+        <form className={classes.form} onSubmit={handleLoginSubmit}>
+          <TextField
+            autoFocus
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            type="email"
+            onChange={handleInput}
+          />
           <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            name="code"
-            label="Confirm the OTP code"
+            name="password"
+            label="Password"
             type="password"
-            id="code"
+            id="password"
             onChange={handleInput}
           />
           {error !== "" ? (
@@ -164,6 +126,10 @@ const OTPSignIn = (): React.ReactElement => {
           ) : (
             <></>
           )}
+          <FormControlLabel
+            control={<Checkbox value="remember" color="primary" />}
+            label="Remember me"
+          />
           <div className={classes.progressButtonWrapper}>
             <Button
               type="submit"
@@ -173,7 +139,7 @@ const OTPSignIn = (): React.ReactElement => {
               className={classes.submit}
               disabled={loading}
             >
-              Submit
+              Sign In
             </Button>
             {loading && (
               <CircularProgress size={24} className={classes.progressButton} />
@@ -188,4 +154,4 @@ const OTPSignIn = (): React.ReactElement => {
   );
 };
 
-export default OTPSignIn;
+export default SignIn;

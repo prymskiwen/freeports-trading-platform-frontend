@@ -22,7 +22,7 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { useRole } from "../../hooks";
+import { useRole } from "../../../hooks";
 
 interface RoleType {
   name: string;

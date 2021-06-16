@@ -22,8 +22,8 @@ const Organisations = (): React.ReactElement => {
   const history = useHistory();
 
   const newOrganizer = () => {
-    history.push('/organisations/addOrganization');
-  }
+    history.push("/organisations/addOrganization");
+  };
 
   const { organizers } = useOrganization();
   
@@ -86,17 +86,26 @@ const Organisations = (): React.ReactElement => {
     <div className="main-wrapper">
       <Container>
         <Grid container spacing={3} xs={12}>
-          <Grid container item justify="flex-start" alignItems="center" spacing={5} xs={12}>
+          <Grid
+            container
+            item
+            justify="flex-start"
+            alignItems="center"
+            spacing={5}
+            xs={12}
+          >
             <Grid item>
               <h2>Organisation</h2>
             </Grid>
             <Grid item>
               <IconButton onClick={newOrganizer}>
-                <Icon style={{ fontSize: 45 }} color="primary" >add_circle</Icon>
+                <Icon style={{ fontSize: 45 }} color="primary">
+                  add_circle
+                </Icon>
               </IconButton>
             </Grid>
             <Grid item>
-              <Icon style={{ fontSize: 35 }} >search</Icon>
+              <Icon style={{ fontSize: 35 }}>search</Icon>
               <TextField />
             </Grid>
           </Grid>
@@ -126,7 +135,7 @@ const Organisations = (): React.ReactElement => {
               />
             </Grid>
           </Grid>
-        </Grid> 
+        </Grid>
       </Container>
     </div>
   );

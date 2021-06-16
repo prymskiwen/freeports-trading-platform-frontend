@@ -23,15 +23,14 @@ import {
 } from "@material-ui/icons";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SendIcon from "@material-ui/icons/Send";
-
-import useAuth from "../../hooks";
+import GroupIcon from "@material-ui/icons/Group";
+import useAuth from "../../../hooks";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
   { title: `Organisations`, path: `/organisations`, hasChildren: false },
   { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
   { title: `Tracking`, path: `/tracking`, hasChildren: true },
-  { title: `Co-worker`, path: `/co-worker`, hasChildren: true },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {
@@ -52,9 +51,9 @@ const Header = (): React.ReactElement => {
   const { isAuthenticated, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const goToRoles = () => {
+  const redirect = (path: string) => {
     setAnchorEl(null);
-    history.push("/roles");
+    history.push(path);
   };
 
   const handleSettingsMenuClick = (
@@ -112,12 +111,29 @@ const Header = (): React.ReactElement => {
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleSettingsMenuClose}
+                elevation={0}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                getContentAnchorEl={null}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
               >
-                <MenuItem onClick={goToRoles}>
+                <MenuItem onClick={() => redirect("/roles")}>
                   <ListItemIcon>
                     <SendIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText primary="Roles" />
+                </MenuItem>
+                <MenuItem onClick={() => redirect("/co-worker")}>
+                  <ListItemIcon>
+                    <GroupIcon fontSize="small" />
+                  </ListItemIcon>
+
+                  <ListItemText primary="Co-workers" />
                 </MenuItem>
                 <MenuItem onClick={signOut}>
                   <ListItemIcon>

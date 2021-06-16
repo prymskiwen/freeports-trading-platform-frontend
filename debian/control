@@ -1,4 +1,4 @@
-Source: freeports-trading-platform-clearer
+Source: freeports-trading-platform-frontend
 Section: unknown
 Priority: optional
 Maintainer: Olivier Bitsch <olivier.b@iabsis.com>
@@ -10,6 +10,12 @@ Homepage: <insert the upstream URL, if relevant>
 Rules-Requires-Root: no
 
 Package: freeports-trading-platform-clearer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: freeports-trading-platform-organization
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: <insert up to 60 chars description>

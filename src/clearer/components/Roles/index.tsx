@@ -30,7 +30,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { useRole } from "../../hooks";
+import { useRole } from "../../../hooks";
 
 interface RoleType {
   id: string;
