@@ -63,20 +63,21 @@ const Organiser = (props: any): React.ReactElement => {
     let mounted = false;
     const init = async () => {
       const managerdata = await getOrganizedManager(props.organizerid, props.managerid);
-      setManager({
-        id: managerdata.id,
-        nickname: managerdata.nickname,
-        email: managerdata.email,
-      })
-    }
+        
+      if(!mounted){
+        setManager({
+          id: managerdata.id,
+          nickname: managerdata.nickname,
+          email: managerdata.email,
+        })
+      }
+    };
 
     init()
-
     return () => {
       mounted = true;
     }
-
-  }, [props])
+  }, []);
 
   return (
     <div className="main-wrapper">
