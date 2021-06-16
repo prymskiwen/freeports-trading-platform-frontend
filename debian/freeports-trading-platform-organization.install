@@ -1,0 +1,2 @@
+organization-build/*     /usr/share/freeports-trading-platform/organization
+debian/nginx-organization /usr/share/doc/freeports-trading-platform-organization
