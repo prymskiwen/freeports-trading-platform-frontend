@@ -6,6 +6,7 @@ import {
   addOrganizer,
   addAccount,
   updateOrganizer,
+  updateOrganizerManager,
 } from "../services/organizationService";
 
 function useOrganization(): any {
@@ -108,7 +109,24 @@ function useOrganization(): any {
     return updatedOrganization;
   }
 
-  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization, additionAccount, updateOrganization};
+  const updateOrganizationManager = async (
+    organizerId: string,
+    managerId: string,
+    nickname: string,
+    email: string,
+    phone: string,
+    avata: string,
+  ) => {
+    const updatedOrganizationManager = await updateOrganizerManager(organizerId, managerId, nickname, email, phone, avata)
+      .then((data) => {
+        return data;
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    return updatedOrganizationManager;
+  }
+
+  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization, additionAccount, updateOrganization, updateOrganizationManager};
 }
 
 export default useOrganization;

@@ -1,6 +1,19 @@
 import React, { useEffect, useState} from "react"
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, Grid, Button, Select, MenuItem, TextField, FormControl, CardMedia } from "@material-ui/core"
+import {
+  Container,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+  TextField,
+  FormControl,
+  CardMedia,
+  AccordionSummary,
+  AccordionDetails,
+  Avatar,
+  Accordion } from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ImageUploader from 'react-images-upload';
 
 import { useOrganization } from "../../../../hooks";
@@ -14,6 +27,11 @@ const useStyle = makeStyles((theme) => ({
     fontSize: 25,
     fontWeight: "initial",
     marginLeft: 15,
+  },
+  managerName: {
+    fontWeight: "bold",
+    fontSize: 20,
+    marginLeft: 15
   },
   profilBtn: {
     position: 'relative',
@@ -54,7 +72,9 @@ interface managerType {
 const Organiser = (props: any): React.ReactElement => {
   const classes = useStyle();
   const showingIcon = false;
-  const { getOrganizedManager } = useOrganization();
+  const { getOrganizedManager, updateOrganizationManager } = useOrganization();
+  const [organizerId, setOrganizerId] = useState();
+
   const [manager, setManager] = useState({
     id: 'string',
     nickname: 'string',
@@ -69,13 +89,14 @@ const Organiser = (props: any): React.ReactElement => {
       const managerdata = await getOrganizedManager(props.organizerid, props.managerid);
         
       if(!mounted){
+        setOrganizerId(props.organizerid);
         setManager({
           id: managerdata.id,
           nickname: managerdata.nickname,
           email: managerdata.email,
           phone: managerdata.phone,
           avata: managerdata.avata,
-        })
+        });
       }
     };
 
@@ -84,6 +105,27 @@ const Organiser = (props: any): React.ReactElement => {
       mounted = true;
     }
   }, []);
+
+  const onHandleName = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    const newManager = { ...manager };
+    newManager.nickname = value;
+    setManager(newManager);
+  }
+
+  const onHandleEmail = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    const newManager = { ...manager };
+    newManager.email = value;
+    setManager(newManager);
+  }
+
+  const onHandlePhone = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { value } = event.target;
+    const newManager = { ...manager };
+    newManager.phone = value;
+    setManager(newManager);
+  } 
 
   const ondropAvata = (avataImg: any) => {
     const reader = new FileReader();
@@ -95,67 +137,112 @@ const Organiser = (props: any): React.ReactElement => {
     reader.readAsDataURL(avataImg[0]);
   }
 
+  const updateSubmit = async () => {
+    await updateOrganizationManager(organizerId, manager.id, manager.nickname, manager.email, manager.phone, manager.avata)
+      .then((data: any) => {
+        console.log(data);
+        alert("Saved");
+      }).catch((err: any) => {
+        console.log(err);
+      })
+  }
+
   return (
     <div className="main-wrapper">
       <Container>
-        <Grid container spacing={1} xs={12}>
-          <Grid item container alignItems="center" direction="row" xs={12}>
-            <span style={{ fontSize: 18 }}>Status</span>
-            <Select className={classes.selectStyle}>
-              <MenuItem value="Active" selected>Active</MenuItem>
-              <MenuItem value="Disactive">Disactive</MenuItem>
-            </Select>
-          </Grid>
-          <Grid item container direction="row" spacing={2} xs={12}>
-            <Grid item xs={12} style={{ paddingTop: 15 }}>
-              <FormControl fullWidth>
-                <TextField label="Nick Name" variant="outlined" value={manager.nickname}/>
-              </FormControl>
+        <Accordion style={{width: "100%"}}>
+          <AccordionSummary
+            style={{flexDirection: "row-reverse"}}
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Grid container direction="row" alignItems="center" xs={12}>
+              <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
+                <Avatar alt="john" src="/assets/user4.png" />
+                <span className={classes.managerName} >{manager.nickname}</span>
+              </Grid>
+              <Grid container justify="flex-end" xs={6}>
+                <span>Delete permanently</span>
+              </Grid>
             </Grid>
-            <Grid item xs={6} style={{ paddingTop: 15 }}>
-              <FormControl fullWidth>
-                <TextField label="Email" variant="outlined" value={manager.email}/>
-              </FormControl>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1} xs={12}>
+              <Grid item container alignItems="center" direction="row" xs={12}>
+                <span style={{ fontSize: 18 }}>Status</span>
+                <Select className={classes.selectStyle}>
+                  <MenuItem value="Active" selected>Active</MenuItem>
+                  <MenuItem value="Disactive">Disactive</MenuItem>
+                </Select>
+              </Grid>
+              <Grid item container direction="row" spacing={2} xs={12}>
+                <Grid item xs={12} style={{ paddingTop: 15 }}>
+                  <FormControl fullWidth>
+                    <TextField
+                      label="Nick Name"
+                      variant="outlined"
+                      value={manager.nickname}
+                      onChange={onHandleName} 
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6} style={{ paddingTop: 15 }}>
+                  <FormControl fullWidth>
+                    <TextField
+                      label="Email"
+                      variant="outlined"
+                      value={manager.email}
+                      onChange={onHandleEmail}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6} style={{ paddingTop: 15 }}>
+                  <FormControl fullWidth>
+                    <TextField
+                      label="Phone"
+                      variant="outlined"
+                      value={manager.phone}
+                      onChange={onHandlePhone}
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
+              <Grid item container direction="row" xs={12}>
+                <Grid item xs={4} style={{ paddingTop: 15 }}>
+                  <CardMedia 
+                    style={{ marginTop: 20 }}
+                    component="img"
+                    height="140"
+                    image={manager.avata}
+                  />
+                  <ImageUploader
+                    withIcon={showingIcon}
+                    withLabel={showingIcon}
+                    buttonText='Choose Image'
+                    buttonStyles={{
+                      width: "100%",
+                      margin: 0,
+                      background: "#fff0",
+                      color: "#000",
+                    }}
+                    onChange={(ChangeEvent) => ondropAvata(ChangeEvent)}
+                    fileContainerStyle={{
+                      margin: 0,
+                      padding: 0,
+                      marginTop: "-25px",
+                      background: "#fff9",
+                      borderRadius: 0,
+                    }}
+                  />
+                </Grid>
+                <Grid item container xs={8} justify="flex-end" alignItems="flex-end" style={{ paddingTop: 15 }}>
+                  <Button variant="contained" color="secondary" onClick={updateSubmit}>save changes</Button>
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid item xs={6} style={{ paddingTop: 15 }}>
-              <FormControl fullWidth>
-                <TextField label="Phone" variant="outlined" value="+41 78 255 26 25"/>
-              </FormControl>
-            </Grid>
-          </Grid>
-          <Grid item container direction="row" xs={12}>
-            <Grid item xs={4} style={{ paddingTop: 15 }}>
-              <CardMedia 
-                style={{ marginTop: 20 }}
-                component="img"
-                height="140"
-                image={manager.avata}
-              />
-              <ImageUploader
-                withIcon={showingIcon}
-                withLabel={showingIcon}
-                buttonText='Choose Image'
-                buttonStyles={{
-                  width: "100%",
-                  margin: 0,
-                  background: "#fff0",
-                  color: "#000",
-                }}
-                onChange={(ChangeEvent) => ondropAvata(ChangeEvent)}
-                fileContainerStyle={{
-                  margin: 0,
-                  padding: 0,
-                  marginTop: "-25px",
-                  background: "#fff9",
-                  borderRadius: 0,
-                }}
-              />
-            </Grid>
-            <Grid item container xs={8} justify="flex-end" alignItems="flex-end" style={{ paddingTop: 15 }}>
-              <Button variant="contained" color="secondary">save changes</Button>
-            </Grid>
-          </Grid>
-        </Grid>
+          </AccordionDetails>
+        </Accordion>
       </Container>
     </div>
   );

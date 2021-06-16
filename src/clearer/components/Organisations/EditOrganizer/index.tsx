@@ -313,27 +313,7 @@ const EditOrganizer = (): React.ReactElement => {
             <Grid item xs={12}>
               <List>
                 {managers.map((managerItem) => <ListItem>
-                  <Accordion style={{width: "100%"}}>
-                    <AccordionSummary
-                      style={{flexDirection: "row-reverse"}}
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Grid container direction="row" alignItems="center" xs={12}>
-                        <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
-                          <Avatar alt="john" src="/assets/user4.png" />
-                          <span className={classes.managerName} >{managerItem.nickname}</span>
-                        </Grid>
-                        <Grid container justify="flex-end" xs={6}>
-                          <span>Delete permanently</span>
-                        </Grid>
-                      </Grid>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Organiser organizerid={id}  managerid={managerItem.id} />
-                    </AccordionDetails>
-                  </Accordion>
+                  <Organiser organizerid={id}  managerid={managerItem.id} />
                 </ListItem>)}
                 
               </List>

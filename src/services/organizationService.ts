@@ -39,15 +39,31 @@ const getOrganisationManagers = (id: string): Promise<any> => {
   });
 };
 
-const getOrganizerManager = (organizeid: string, managerid: string): Promise<any> => {
+const getOrganizerManager = (organizerId: string, managerid: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/${organizeid}/user/${managerid}`)
+      .get(`/organization/${organizerId}/user/${managerid}`)
       .then((res) => {
         return resolve(res.data);
       })
       .catch((err) => {
         return reject(err.response.data);
+      });
+  });
+};
+
+const updateOrganizerManager = (organizerId: string, managerId: string, nickname: string, email: string, phone: string, avata: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/organization/${organizerId}/user/${managerId}`, {
+        nickname,
+        email,
+        phone,
+        avata,
+      }).then((res) => {
+        return resolve(res.data);
+      }).catch((err) => {
+        return reject(err.response);
       });
   });
 };
@@ -141,4 +157,5 @@ export {
   addOrganizer,
   addAccount,
   updateOrganizer,
+  updateOrganizerManager,
 }
