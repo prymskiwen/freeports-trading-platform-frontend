@@ -15,7 +15,6 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import purple from "@material-ui/core/colors/purple";
 import MaterialTable from "material-table";
-import { ProgressBar } from "react-bootstrap";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -23,51 +22,45 @@ import data from "./data";
 
 const columns = [
   {
-    field: "organisation",
-    title: "Organisation",
+    field: "name",
+    title: "Name",
     cellStyle: {
       width: "20%",
     },
   },
   {
-    field: "total_trades",
-    title: "Total trades",
+    field: "balance",
+    title: "Balance",
+    cellStyle: {
+      width: "15%",
+    },
+  },
+  {
+    field: "type",
+    title: "Type",
+    cellStyle: {
+      width: "15%",
+    },
+  },
+  {
+    field: "currency",
+    title: "Currency",
+    cellStyle: {
+      width: "15%",
+    },
+  },
+  {
+    field: "last_update",
+    title: "Last Update",
     cellStyle: {
       width: "20%",
     },
   },
   {
-    field: "total_commission",
-    title: "Total commission",
+    field: "reconciliations",
+    title: "Reconciliations",
     cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "nbr_trades",
-    title: "Nbr of trades",
-    cellStyle: {
-      width: "40%",
-    },
-    sortable: false,
-    render: (rowData: any) => {
-      const { nbr_trades: nbrTrades } = rowData;
-
-      return (
-        <div className="flex-center">
-          {nbrTrades.map((ele: number) => {
-            return (
-              <ProgressBar
-                className="w-100 mr-10"
-                variant="secondary"
-                striped
-                now={ele}
-                label={`${ele}%`}
-              />
-            );
-          })}
-        </div>
-      );
+      width: "15%",
     },
   },
 ];
@@ -108,7 +101,7 @@ const NostroAccounts = (): React.ReactElement => {
                 >
                   <AddIcon fontSize="small" />
                 </Fab>
-                Declare new account
+                Declare new External
               </Button>
               <Dialog
                 open={declareAccountModalOpen}
@@ -118,6 +111,7 @@ const NostroAccounts = (): React.ReactElement => {
                 <DialogTitle id="form-dialog-title">
                   Declare New account
                 </DialogTitle>
+                
                 <DialogContent>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
@@ -188,7 +182,7 @@ const NostroAccounts = (): React.ReactElement => {
                 >
                   <AddIcon fontSize="small" />
                 </Fab>
-                Create new vault account
+                Create new vault
               </Button>
             </Grid>
           </Grid>
@@ -197,7 +191,7 @@ const NostroAccounts = (): React.ReactElement => {
               <MaterialTable
                 columns={columns}
                 data={data}
-                title="ACCOUNT ACTIVITIES"
+                title="NOSTRO ACCOUNTS"
                 options={{
                   search: true,
                   pageSize: 10,
