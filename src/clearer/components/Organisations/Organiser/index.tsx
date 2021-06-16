@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Container, Grid, Button, Select, MenuItem, TextField, FormControl, CardMedia } from "@material-ui/core"
 import ImageUploader from 'react-images-upload';
 
-import { useOrganization } from "../../../hooks";
+import { useOrganization } from "../../../../hooks";
 
 const useStyle = makeStyles((theme) => ({
   root: {

@@ -8,7 +8,7 @@ import {  Container,
 } from "@material-ui/core";
 import MaterialTable from "material-table";
 
-import { useOrganization } from "../../hooks"
+import { useOrganization } from "../../../hooks";
 
 interface rowfield {
   id: string,

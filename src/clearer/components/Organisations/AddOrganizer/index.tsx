@@ -20,11 +20,9 @@ import {  Container,
           DialogActions,
           makeStyles,
 } from "@material-ui/core"
-import { Autocomplete } from '@material-ui/lab';
 import ImageUploader from 'react-images-upload';
-import IBAN from 'iban';
 import { useHistory } from "react-router";
-import { useOrganization } from "../../../hooks";
+import { useOrganization } from "../../../../hooks";
 
 
 const useStyles = makeStyles((theme) => ({

@@ -26,7 +26,7 @@ import { useParams, useHistory } from "react-router";
 import { spawnSync } from "child_process";
 import Organiser from "../Organiser";
 
-import { useOrganization } from "../../../hooks";
+import { useOrganization } from "../../../../hooks";
 
 interface ibantype {
   currency: string;
