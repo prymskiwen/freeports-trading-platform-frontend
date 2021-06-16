@@ -1,0 +1,2 @@
+clearer-build/*     /usr/share/freeports-trading-platform/clearer
+debian/nginx-clearer /usr/share/doc/freeports-trading-platform-clearer

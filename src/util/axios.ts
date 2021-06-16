@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import axios from "axios";
 import Lockr from "lockr";
-import * as dotenv from "dotenv";
 
 import store from "../store/index";
 import reduxActions from "../store/auth/actions";
+import reduxGlobalActions from "../store/global/actions";
 
-dotenv.config();
 
 const { authLogout } = reduxActions;
+const { clearError, setError } = reduxGlobalActions;
 
 const API_URL = process.env.REACT_APP_API_URL;
 const PUBLIC_REQUEST_KEY = "public-request";
@@ -21,6 +21,8 @@ axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 axios.interceptors.request.use(
   (config: any) => {
     const jwtToken = Lockr.get("ACCESS_TOKEN");
+
+    store.dispatch(clearError());
 
     if (jwtToken) {
       // eslint-disable-next-line no-param-reassign
@@ -46,10 +48,15 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log(error.response.data);
+    store.dispatch(setError(error.response.data));
     if (error.response.status === 401) {
-      store.dispatch(authLogout());
-    } else if (error.response.status === 403) {
-      // store.dispatch(setError(error.response.data));
+      const jwtToken = Lockr.get("ACCESS_TOKEN");
+      const authStep = Lockr.get("AUTH_STEP");
+
+      if (jwtToken && authStep === "passed") {
+        store.dispatch(authLogout());
+      }
     }
 
     return Promise.reject(error);

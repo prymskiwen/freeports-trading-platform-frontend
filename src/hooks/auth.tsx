@@ -6,10 +6,13 @@ import { login, qrCodeGen, otpCheck } from "../services/authService";
 const {
   authLogin,
   authLoginSuccess,
+  authLoginFailed,
   authLogout,
-  setAuthError,
+  clearError,
+  setError,
   authOTPCheck,
   authOTPCheckSuccess,
+  authOTPCheckFailed,
 } = reduxActions;
 
 function useAuth(): any {
@@ -22,29 +25,27 @@ function useAuth(): any {
         isAuthenticated: state.auth.isAuthenticated,
         isOTPDefined: state.auth.isOTPDefined,
         loading: state.auth.loading,
-        error: state.auth.error,
+        error: state.global.error,
       }),
       shallowEqual
     );
 
   const signIn = async (credentials: any) => {
     dispatch(authLogin());
+    dispatch(clearError());
 
     await login(credentials)
       .then((data) => {
         dispatch(authLoginSuccess(data));
       })
       .catch((err) => {
-        dispatch(setAuthError(err.message));
+        dispatch(setError(err));
+        dispatch(authLoginFailed());
       });
   };
 
   const signOut = () => {
     dispatch(authLogout());
-  };
-
-  const setError = (err: any) => {
-    dispatch(setAuthError(err));
   };
 
   const generateQRCode = async () => {
@@ -55,7 +56,7 @@ function useAuth(): any {
         qrCode = data;
       })
       .catch((err) => {
-        dispatch(setAuthError(err.message));
+        dispatch(setError(err));
       });
 
     return qrCode;
@@ -63,13 +64,15 @@ function useAuth(): any {
 
   const checkOTP = async (password: string) => {
     dispatch(authOTPCheck());
+    dispatch(clearError());
 
     await otpCheck(password)
       .then((data) => {
         dispatch(authOTPCheckSuccess(data));
       })
       .catch((err) => {
-        dispatch(setAuthError(err.message));
+        dispatch(setError(err));
+        dispatch(authOTPCheckFailed());
       });
   };
 

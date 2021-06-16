@@ -14,10 +14,11 @@ import {
   AUTH_CHECK,
   AUTH_LOGIN,
   AUTH_LOGIN_SUCCESS,
-  AUTH_ERROR,
+  AUTH_LOGIN_FAILED,
   QR_CODE_GENERATE,
   AUTH_OTP_CHECK,
   AUTH_OTP_CHECK_SUCCESS,
+  AUTH_OTP_CHECK_FAILED,
   AUTH_LOGOUT,
   AUTH_REFRESH_TOKEN,
   AUTH_USER,
@@ -42,10 +43,9 @@ function authLoginSuccess(payload: any): ReduxAction {
   };
 }
 
-function setAuthError(payload: any): ReduxAction {
+function authLoginFailed(): ReduxAction {
   return {
-    type: AUTH_ERROR,
-    payload,
+    type: AUTH_LOGIN_FAILED,
   };
 }
 
@@ -65,6 +65,12 @@ function authOTPCheckSuccess(payload: any): ReduxAction {
   return {
     type: AUTH_OTP_CHECK_SUCCESS,
     payload,
+  };
+}
+
+function authOTPCheckFailed(): ReduxAction {
+  return {
+    type: AUTH_OTP_CHECK_FAILED,
   };
 }
 
@@ -92,10 +98,11 @@ export default {
   authCheck,
   authLogin,
   authLoginSuccess,
-  setAuthError,
+  authLoginFailed,
   qrCodeGenerate,
   authOTPCheck,
   authOTPCheckSuccess,
+  authOTPCheckFailed,
   authLogout,
   authRefreshToken,
   authUser,
