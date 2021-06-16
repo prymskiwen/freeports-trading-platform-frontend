@@ -111,6 +111,7 @@ const NostroAccounts = (): React.ReactElement => {
                 <DialogTitle id="form-dialog-title">
                   Declare New account
                 </DialogTitle>
+                
                 <DialogContent>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
