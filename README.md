@@ -27,7 +27,7 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 ### `yarn build:organization`
 
-Builds the app for production to the `build` folder.\
+Builds the app for production to the `clearer-build` or `organization-build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.\
