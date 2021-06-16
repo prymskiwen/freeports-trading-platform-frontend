@@ -118,7 +118,8 @@ const CoWorker = (): React.ReactElement => {
             <div className={classes.accordionCoWorker}>
               <ExpandMoreIcon />
               <img
-                className={`${classes.accordionProfile} ${classes.paddingSmall}`}
+                className={`${classes.accordionProfile}
+                 ${classes.paddingSmall}`}
                 src={profile}
                 alt="Co-worker"
               />
