@@ -1,6 +1,6 @@
 STATIC=/usr/share
 VAR=/var
-PROJECT=freeports-trading-platform/clearer
+PROJECT=freeports-trading-platform
 
 all: build
 
@@ -8,15 +8,11 @@ node_modules: build
 
 build:
 	npx yarn install
-	npx yarn run build
+	npx yarn run build:clearer
+	npx yarn run build:organization
 
 install: node_modules
-	## Copy static files
-	mkdir -p $(DESTDIR)$(STATIC)/$(PROJECT)/
-	cp -R build/* $(DESTDIR)$(STATIC)/$(PROJECT)/
-	## Create nginx sample config files
-	mkdir -p $(DESTDIR)$(STATIC)/doc/$(PROJECT)/
-	cp debian/nginx-clearer $(DESTDIR)$(STATIC)/doc/$(PROJECT)/
+	## Replaced by .install files
 
 clean:
 	rm -rf dist/ node_modules/
