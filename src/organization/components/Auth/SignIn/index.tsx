@@ -93,7 +93,7 @@ const SignIn = (): React.ReactElement => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Clearer Sign in
+          Organization Sign in
         </Typography>
         <form className={classes.form} onSubmit={handleLoginSubmit}>
           <TextField

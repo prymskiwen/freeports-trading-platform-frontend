@@ -71,6 +71,12 @@ export default [
     auth: true,
     component: lazy(() => import("../components/CoWorker")),
   },
+  {
+    path: "/desks",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Desks")),
+  },
   /* {
     path: "/error",
     exact: true,

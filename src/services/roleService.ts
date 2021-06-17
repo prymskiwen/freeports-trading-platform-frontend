@@ -62,7 +62,7 @@ const deleteRole = (id: string): Promise<string> => {
 const getClearerRoles = (): Promise<Array<RoleType>> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/clearer/role`)
+      .get(`/role`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -74,7 +74,7 @@ const getClearerRoles = (): Promise<Array<RoleType>> => {
 const getClearerPermissions = (): Promise<Array<PermissionType>> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/permission/clearer`)
+      .get(`/permission/`)
       .then((res: any) => {
         return resolve(res.data);
       })
