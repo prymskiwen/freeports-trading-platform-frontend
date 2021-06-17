@@ -84,14 +84,14 @@ const validate = (values: any) => {
     phone?: string;
   } = {};
   if (!values.firstName) {
-    errors.firstName = "Required";
+    errors.firstName = "This Field Required";
   }
   if (!values.lastName) {
-    errors.lastName = "Required";
+    errors.lastName = "This Field Required";
   }
 
   if (!values.email) {
-    errors.email = "Required";
+    errors.email = "This Field Required";
   }
 
   if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
@@ -99,13 +99,21 @@ const validate = (values: any) => {
   }
 
   if (!values.jobTitle) {
-    errors.jobTitle = "Required";
+    errors.jobTitle = "This Field Required";
   }
 
   if (!values.phone) {
-    errors.phone = "Required";
+    errors.phone = "This Field Required";
   }
 
+  if (
+    // eslint-disable-next-line no-useless-escape
+    !/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(
+      values.phone
+    )
+  ) {
+    errors.phone = "Please enter a valid Phone number";
+  }
   return errors;
 };
 const CoWorkerForm = (): React.ReactElement => {
@@ -258,8 +266,8 @@ const CoWorkerForm = (): React.ReactElement => {
                         <TextField
                           required
                           label="Phone"
-                          name="Phone"
-                          id="Phone"
+                          name="phone"
+                          id="phone"
                           variant="outlined"
                         />
                       </Grid>

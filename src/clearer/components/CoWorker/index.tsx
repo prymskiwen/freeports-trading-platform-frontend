@@ -79,7 +79,7 @@ const CoWorker = (): React.ReactElement => {
       <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
         <Grid container justify="flex-start">
           <Grid sm={8} item className={classes.accordionCoWorker}>
-            <Typography variant="h5">CO-WORKER</Typography>
+            <Typography variant="h6">CO-WORKER</Typography>
           </Grid>
           <Grid xs={2} item>
             <IconButton color="inherit" aria-label="Add Role">
