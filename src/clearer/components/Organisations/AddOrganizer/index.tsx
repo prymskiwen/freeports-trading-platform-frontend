@@ -3,26 +3,17 @@ import {  Container,
           Grid,
           OutlinedInput,
           InputAdornment,
-          IconButton,
           InputLabel,
-          Input,
-          TextField,
+          Chip,
           FormControl,
           MenuItem,
           Select,
-          List,
-          ListItem,
           Button,
-          Icon,
-          Dialog,
-          DialogTitle,
-          DialogContent,
-          DialogActions,
           makeStyles,
 } from "@material-ui/core"
 import ImageUploader from 'react-images-upload';
 import { useHistory } from "react-router";
-import { useOrganization } from "../../../../hooks";
+import { useOrganization, useAccounts } from "../../../../hooks";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -46,12 +37,11 @@ interface additionOrganizerType {
 }
 
 interface accountType {
+  id: string;
   name: string;
   currency: string;
   type: string;
   iban: string;
-  publicAddress: string;
-  vaultWalletId: string;
 }
 
 const AddOrganizer = (): React.ReactElement => {
@@ -71,26 +61,26 @@ const AddOrganizer = (): React.ReactElement => {
     logofile: "",
   });
   
-  const [accounts, setAccounts] = useState([
-    {
-      name: 'account1',
-      iban: 'vs25226632566'
-    },
-    {
-      name: 'account2',
-      iban: 'vs25226631235'
-    },
-    {
-      name: 'account3',
-      iban: 'vs25226636528'
-    },
-    {
-      name: 'account4',
-      iban: 'vs25226648951'
-    }
-  ])
+  const [accounts, setAccounts] = useState([] as accountType[]);
+  const [selectedAccounts, setSelectedAccounts] = useState([] as string[]);
 
   const { addOrganization } = useOrganization();
+  const { allAccounts, assignAccount } = useAccounts();
+
+  useEffect(() => {
+    let mounted = false;
+    const init = async () => {
+      const getaccounts = await allAccounts();
+      if(!mounted){
+        setAccounts(getaccounts);
+      }
+    }
+
+    init();
+    return () => {
+      mounted = true;
+    }
+  }, []);
 
   const onhadlestreet = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { value } = event.target;
@@ -158,6 +148,11 @@ const AddOrganizer = (): React.ReactElement => {
     reader.readAsDataURL(pic[0]);
   }
 
+  const onHanelsetAccount = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const { value } = event.target;
+    setSelectedAccounts(value as string[]);
+  }
+
   const onAdditionfunc = async () => {
     if(organizerData.name === "" || organizerData.commission === "" || organizerData.clearer === "" || organizerData.logofile === ""){
       alert('this is my addition function');
@@ -167,7 +162,19 @@ const AddOrganizer = (): React.ReactElement => {
         .then((data: any) => {
           const responseId = data.id;
             console.log(responseId)
+          if(selectedAccounts.length > 0){
+            selectedAccounts.map(async (accountItem, key) => {
+              await assignAccount(responseId, accountItem)
+                .then((res: any) => {
+                  console.log(res);
+                  if(key === (selectedAccounts.length - 1)){
+                    history.push('/organisations');
+                  }
+                })
+            })
+          }else{
             history.push('/organisations');
+          }
         }).catch((err: any) => {
           console.log(err);
         })
@@ -247,11 +254,12 @@ const AddOrganizer = (): React.ReactElement => {
             <span style={{ fontWeight: "bold" }}>Nostro Accounts</span>
             
             <FormControl fullWidth>
-              <Select>
-                <MenuItem>Then</MenuItem>
-                <MenuItem>Then</MenuItem>
-                <MenuItem>Then</MenuItem>
-                <MenuItem>Then</MenuItem>
+              <Select
+                multiple
+                value={selectedAccounts}
+                onChange={onHanelsetAccount}
+              >
+                {accounts.map((item)=><MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}
               </Select>
             </FormControl>
             {/* <List>
