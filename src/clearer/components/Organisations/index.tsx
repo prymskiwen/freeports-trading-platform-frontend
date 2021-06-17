@@ -8,7 +8,8 @@ import {  Container,
 } from "@material-ui/core";
 import MaterialTable from "material-table";
 
-import { useOrganization } from "../../../hooks";
+
+import axios from "../../../util/axios";
 
 interface rowfield {
   id: string,
@@ -25,8 +26,6 @@ const Organisations = (): React.ReactElement => {
     history.push("/organisations/addOrganization");
   };
 
-  const { organizers } = useOrganization();
-  
   const [state, setState] = useState({
     
     column : [
@@ -63,62 +62,32 @@ const Organisations = (): React.ReactElement => {
     ] as any[]
   })
 
-  const [datas, setDatas] = useState([] as any[]);
-
-  useEffect(() => {
-    let unmounted = false;
-    const init = async () => {
-      const organizerList = await organizers();
-      
-      if(!unmounted) {
-        setDatas(organizerList);
-      }
-    };
-    init()
-
-    return () => {
-      unmounted = true;
-    }
-  }, []);
 
 
   return (
     <div className="main-wrapper">
       <Container>
         <Grid container spacing={3} xs={12}>
-          <Grid
-            container
-            item
-            justify="flex-start"
-            alignItems="center"
-            spacing={5}
-            xs={12}
-          >
-            <Grid item>
-              <h2>Organisation</h2>
-            </Grid>
-            <Grid item>
-              <IconButton onClick={newOrganizer}>
-                <Icon style={{ fontSize: 45 }} color="primary">
-                  add_circle
-                </Icon>
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <Icon style={{ fontSize: 35 }}>search</Icon>
-              <TextField />
-            </Grid>
-          </Grid>
           <Grid container>
             <Grid item xs={12}>
               <MaterialTable
+              title={<h2>Organisation <IconButton onClick={newOrganizer}>
+              <Icon style={{ fontSize: 45 }} color="primary">
+                add_circle
+              </Icon>
+            </IconButton></h2> }
               columns={state.column}
-              data={datas}
-              options={{
-                toolbar: false,
-                search: false,
-                pageSize: 10,
-              }}
+              data={query => new Promise((resolve, reject) =>{
+                axios
+                  .get(`/organization?page=${(query.page + 1)}&limit=${query.pageSize}&search=${query.search}`)
+                  .then((res: any) => {
+                    return resolve({
+                      data: res.data.content,
+                      page: res.data.currentPage - 1,
+                      totalCount:res.data.totalRecords,
+                    })
+                  })
+              })}
               actions={[
                 {
                   icon: 'edit',

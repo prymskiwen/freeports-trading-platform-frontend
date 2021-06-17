@@ -12,10 +12,10 @@ import {
 } from "../services/organizationService";
 
 function useOrganization(): any {
-  const organizers = async () => {
-    const organizations = await getOrganizations()
+  const organizers = async (pageNum: number, pagelimit: number, searchVal: string) => {
+    const organizations = await getOrganizations(pageNum, pagelimit, searchVal)
       .then((data:any) => {
-        return data.content;
+        return data;
       })
       .catch((err) => {
         console.log(err.message);

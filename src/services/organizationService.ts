@@ -1,9 +1,9 @@
 import axios from "../util/axios";
 
-const getOrganizations = (): Promise<Array<any>> => {
+const getOrganizations = (pageNum: number, pagelimit: number, searchVal: string): Promise<Array<any>> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization?page=1&limit=20`)
+      .get(`/organization?page=${pageNum}&limit=${pagelimit}&search=${searchVal}`)
       .then((res: any) => {
         return resolve(res.data);
       })
