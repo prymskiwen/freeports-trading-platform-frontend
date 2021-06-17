@@ -7,13 +7,15 @@ import {
   addAccount,
   updateOrganizer,
   updateOrganizerManager,
+  suspendManager,
+  resumeManager,
 } from "../services/organizationService";
 
 function useOrganization(): any {
-  const organizers = async () => {
-    const organizations = await getOrganizations()
+  const organizers = async (pageNum: number, pagelimit: number, searchVal: string) => {
+    const organizations = await getOrganizations(pageNum, pagelimit, searchVal)
       .then((data:any) => {
-        return data.content;
+        return data;
       })
       .catch((err) => {
         console.log(err.message);
@@ -126,7 +128,33 @@ function useOrganization(): any {
     return updatedOrganizationManager;
   }
 
-  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization, additionAccount, updateOrganization, updateOrganizationManager};
+  const suspendOrganizationManager = async (
+    organizerId: string,
+    managerId: string,
+  ) => {
+    const suspend = await suspendManager(organizerId, managerId)
+      .then((data) => {
+        return data;
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    return suspend;
+  }
+
+  const resumeOrganizationManager = async (
+    organizerId: string,
+    managerId: string,
+  ) => {
+    const resume = await resumeManager(organizerId, managerId)
+      .then((data) => {
+        return data;
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    return resume;
+  }
+
+  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization, additionAccount, updateOrganization, updateOrganizationManager, suspendOrganizationManager, resumeOrganizationManager};
 }
 
 export default useOrganization;
