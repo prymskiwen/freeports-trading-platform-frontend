@@ -23,9 +23,15 @@ export default [
     auth: true,
     component: lazy(() => import("../components/Dashboard")),
   },
+  {
+    path: "/desks",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Desks")),
+  },
   /* {
     path: "/error",
-    exact: true,
+    exact: true,l
     auth: true,
     component: lazy(() => import("../components/Error")),
   }, */
