@@ -72,7 +72,7 @@ interface managerType {
 const Organiser = (props: any): React.ReactElement => {
   const classes = useStyle();
   const showingIcon = false;
-  const { getOrganizedManager, updateOrganizationManager } = useOrganization();
+  const { getOrganizedManager, updateOrganizationManager, suspendOrganizationManager, resumeOrganizationManager } = useOrganization();
   const [organizerId, setOrganizerId] = useState();
 
   const [manager, setManager] = useState({
@@ -171,7 +171,7 @@ const Organiser = (props: any): React.ReactElement => {
             <Grid container spacing={1} xs={12}>
               <Grid item container alignItems="center" direction="row" xs={12}>
                 <span style={{ fontSize: 18 }}>Status</span>
-                <Select className={classes.selectStyle}>
+                <Select className={classes.selectStyle} >
                   <MenuItem value="Active" selected>Active</MenuItem>
                   <MenuItem value="Disactive">Disactive</MenuItem>
                 </Select>
