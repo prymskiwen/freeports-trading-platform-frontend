@@ -33,7 +33,8 @@
     ],
     "max-len": ["warn", { "code": 80 }],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
-    "prettier/prettier": ["off", { "singleQuote": true }]
+    "prettier/prettier": ["off", { "singleQuote": true }],
+    "import/no-unresolved": "off"
   },
   "settings": {
     "import/resolver": {
