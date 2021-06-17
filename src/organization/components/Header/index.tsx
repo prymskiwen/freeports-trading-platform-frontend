@@ -28,9 +28,7 @@ import useAuth from "../../../hooks";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
-  { title: `Organisations`, path: `/organisations`, hasChildren: false },
-  { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
-  { title: `Tracking`, path: `/tracking`, hasChildren: true },
+  { title: `Desks`, path: `/desks`, hasChildren: false },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {
