@@ -159,7 +159,7 @@ const Organiser = (props: any): React.ReactElement => {
           >
             <Grid container direction="row" alignItems="center" xs={12}>
               <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
-                <Avatar alt="john" src="/assets/user4.png" />
+                <Avatar alt="john" src={manager.avata} />
                 <span className={classes.managerName} >{manager.nickname}</span>
               </Grid>
               <Grid container justify="flex-end" xs={6}>

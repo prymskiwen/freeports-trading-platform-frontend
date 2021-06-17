@@ -29,7 +29,7 @@ const getOrganizationDetail = (id: string): Promise<any> => {
 const getOrganisationManagers = (id: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/${id}/user?page=1&limit=20`)
+      .get(`/organization/${id}/manager?page=1&limit=20`)
       .then((res: any) => {
         return resolve(res.data);
       })
