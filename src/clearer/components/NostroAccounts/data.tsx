@@ -73,4 +73,119 @@ const data = [
   },
 ];
 
-export default data;
+const pendingReconciliationsData = [
+  {
+    id: 1,
+    date: "24.06.2021",
+    purpose_of_the_transfer: "Nulla vitae elit libero, a pharetra augue.",
+    credit: "CHF 10’500",
+    debit: "",
+  },
+  {
+    id: 2,
+    date: "24.06.2021",
+    purpose_of_the_transfer: "Aenean eu leo quam. Pellentesque ornare sem...",
+    credit: "CHF 10’500",
+    debit: "",
+  },
+  {
+    id: 3,
+    date: "24.06.2021",
+    purpose_of_the_transfer: "Maecenas faucibus mollis interdum.",
+    credit: "",
+    debit: "CHF 10’500",
+  },
+  {
+    id: 4,
+    date: "24.06.2021",
+    purpose_of_the_transfer: "Duis mollis, est non commodo luctus nisi erat.",
+    credit: "CHF 10’500",
+    debit: "",
+  },
+];
+
+const passedTransactionsData = [
+  {
+    id: 1,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Aenean eu leo quam. Pellentesque ornare sem... ",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+  {
+    id: 2,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Nulla vitae elit libero, a pharetra augue.",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+  {
+    id: 3,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Maecenas faucibus mollis interdum.",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+  {
+    id: 4,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Nulla vitae elit libero, a pharetra augue.",
+    credit: "",
+    debit: "CHF 10’500",
+    sender: "Sender Name",
+  },
+  {
+    id: 5,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Aenean eu leo quam. Pellentesque ornare sem...",
+    credit: "",
+    debit: "CHF 10’500",
+    sender: "Sender Name",
+  },
+  {
+    id: 6,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Maecenas faucibus mollis interdum.",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+  {
+    id: 7,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Nulla vitae elit libero, a pharetra augue.",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+  {
+    id: 8,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Aenean eu leo quam. Pellentesque ornare sem... ",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+  {
+    id: 9,
+    date: "24.06.2021",
+    client_account: "GHGH788765TR",
+    purpose_of_the_transfer: "Aenean eu leo quam. Pellentesque ornare sem...",
+    credit: "CHF 10’500",
+    debit: "",
+    sender: "Sender Name",
+  },
+];
+
+export {data, passedTransactionsData, pendingReconciliationsData};
