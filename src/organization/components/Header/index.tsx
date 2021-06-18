@@ -28,7 +28,9 @@ import useAuth from "../../../hooks";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
-  { title: `Desks`, path: `/desks`, hasChildren: false },
+  { title: `Investors`, path: `/investors`, hasChildren: false },
+  { title: `Trades`, path: `/trades`, hasChildren: false },
+  { title: `Market`, path: `/market`, hasChildren: false },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {
@@ -132,6 +134,13 @@ const Header = (): React.ReactElement => {
                   </ListItemIcon>
 
                   <ListItemText primary="Co-workers" />
+                </MenuItem>
+                <MenuItem onClick={() => redirect("/desks")}>
+                  <ListItemIcon>
+                    <GroupIcon fontSize="small" />
+                  </ListItemIcon>
+
+                  <ListItemText primary="Desks" />
                 </MenuItem>
                 <MenuItem onClick={signOut}>
                   <ListItemIcon>
