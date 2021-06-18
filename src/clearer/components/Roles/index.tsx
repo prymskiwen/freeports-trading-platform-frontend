@@ -195,6 +195,8 @@ const Roles = (): React.ReactElement => {
     setShowAlert(false);
     setSubmitResponse({ type: "", message: "" });
 
+    console.log(newRole);
+
     await updateRole(roleId, newRole)
       .then((data: string) => {
         if (data !== "") {
