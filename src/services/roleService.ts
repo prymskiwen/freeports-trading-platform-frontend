@@ -16,7 +16,7 @@ const addNewRole = (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
-      .post(`/organization/clearer/role`, {
+      .post(`/role`, {
         name,
         permissions,
       })
@@ -35,7 +35,7 @@ const modifyRole = (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
-      .patch(`/organization/clearer/role/${id}`, {
+      .patch(`/role/${id}`, {
         name,
         permissions,
       })
@@ -50,7 +50,7 @@ const modifyRole = (
 const deleteRole = (id: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
-      .delete(`/organization/clearer/role/${id}`)
+      .delete(`/role/${id}`)
       .then((res: any) => {
         return resolve(res.data);
       })
