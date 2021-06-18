@@ -4,7 +4,7 @@ import { getClearerUsersAction } from "../store/clearerUsers/actions";
 import getClearerUsers from "../services/clearerUsersService";
 import { GET_CLEARER_USERS } from "../store/clearerUsers/action-types";
 
-function* getCoWorkers(): Generator<any> {
+function* getCoWorkers() {
   console.log("getCoWorkers");
 
   yield fork(() => requestSaga(getClearerUsersAction, () => getClearerUsers()));

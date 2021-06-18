@@ -1,14 +1,15 @@
 import { put, call } from "redux-saga/effects";
+import ReduxAction from "../store/redux-action";
 import ApiFunction from "../types/ApiFunction";
 
-type Entity = {
-  request: (payload?: any) => any;
-  success: (payload?: any) => any;
-  failure: (payload?: any) => any;
-};
-export default function* requestSaga(
+interface Entity {
+  request: (payload?: any) => ReduxAction;
+  success: (payload?: any) => ReduxAction;
+  failure: (payload?: any) => ReduxAction;
+}
+export default function* requestSaga<T>(
   entity: Entity,
-  apiFn: ApiFunction
+  apiFn: ApiFunction<T>
 ): Generator<any> {
   try {
     const response = yield call(apiFn);

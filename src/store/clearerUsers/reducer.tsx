@@ -2,11 +2,11 @@ import User from "../../types/User";
 import ReduxAction from "../redux-action";
 import { GET_CLEARER_USERS } from "./action-types";
 
-interface State {
+interface ClearerUsersState {
   clearerUsers: User[];
   loading: boolean;
 }
-const initialState: State = {
+const initialState: ClearerUsersState = {
   clearerUsers: [],
   loading: false,
 };
