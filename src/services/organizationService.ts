@@ -1,9 +1,9 @@
 import axios from "../util/axios";
 
-const getOrganizations = (): Promise<Array<any>> => {
+const getOrganizations = (pageNum: number, pagelimit: number, searchVal: string): Promise<Array<any>> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization?page=1&limit=20`)
+      .get(`/organization?page=${pageNum}&limit=${pagelimit}&search=${searchVal}`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -29,7 +29,7 @@ const getOrganizationDetail = (id: string): Promise<any> => {
 const getOrganisationManagers = (id: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/${id}/manager?page=1&limit=20`)
+      .get(`/organization/${id}/manager`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -148,6 +148,30 @@ const addAccount = (
   })
 }
 
+const suspendManager = (organizerId: string, managerId: string) :Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .put(`/organization/${organizerId}/user/${managerId}/suspend`)
+      .then((res: any) => {
+        return resolve(res.data);
+      }).catch((err) => {
+        return reject(err.response);
+      })
+  })
+}
+
+const resumeManager = (organizerId: string, managerId: string) :Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .put(`/organization/${organizerId}/user/${managerId}/resume`)
+      .then((res: any) => {
+        return resolve(res.data);
+      }).catch((err) => {
+        return reject(err.response);
+      })
+  })
+}
+
 export {
   getOrganizations as default,
   getOrganizations,
@@ -158,4 +182,6 @@ export {
   addAccount,
   updateOrganizer,
   updateOrganizerManager,
+  suspendManager,
+  resumeManager,
 }

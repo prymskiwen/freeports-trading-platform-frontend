@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Button,
   Container,
@@ -44,6 +45,11 @@ const columns = [
     title: "Desks",
     cellStyle: {
       width: "25%",
+    },
+    render: (rowData: any) => {
+      const { desk } = rowData;
+
+      return <Link to="/desks/detail">{desk}</Link>;
     },
   },
   {

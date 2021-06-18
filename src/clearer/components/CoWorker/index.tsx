@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -17,8 +17,12 @@ import SearchIcon from "@material-ui/icons/Search";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 
+import { useDispatch, useSelector } from "react-redux";
 import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
+import { GET_CLEARER_USERS } from "../../../store/clearerUsers/action-types";
+import User from "../../../types/User";
+import { useAppSelector } from "../../../store/hooks";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -57,22 +61,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const coWorkers = [
-  { name: "Co-worker name ", id: 1 },
-  { name: "Co-worker name ", id: 2 },
-  { name: "Co-worker name ", id: 3 },
-  { name: "Co-worker name ", id: 4 },
-  { name: "Co-worker name ", id: 5 },
-  { name: "Co-worker name ", id: 6 },
-  { name: "Co-worker name ", id: 7 },
-  { name: "Co-worker name ", id: 8 },
-  { name: "Co-worker name ", id: 9 },
-];
+// const coWorkers = [
+//   { name: "Co-worker name ", id: 1 },
+//   { name: "Co-worker name ", id: 2 },
+//   { name: "Co-worker name ", id: 3 },
+//   { name: "Co-worker name ", id: 4 },
+//   { name: "Co-worker name ", id: 5 },
+//   { name: "Co-worker name ", id: 6 },
+//   { name: "Co-worker name ", id: 7 },
+//   { name: "Co-worker name ", id: 8 },
+//   { name: "Co-worker name ", id: 9 },
+// ];
 
 const CoWorker = (): React.ReactElement => {
   const classes = useStyles();
 
   const [selectedCoWorker, setSelectedCoWorker] = useState(0);
+
+  const { coWorkers } = useAppSelector((state) => ({
+    coWorkers: state.clearerUsers.clearerUsers,
+  }));
+
+  console.log("Co worker ", coWorkers);
+  const dispatch = useDispatch();
+  const handleCoWorkerSelected = (i: number) => {
+    dispatch({ type: GET_CLEARER_USERS.REQUEST });
+    setSelectedCoWorker(i);
+  };
+
+  useEffect(() => {
+    dispatch({ type: GET_CLEARER_USERS.REQUEST });
+  }, []);
 
   return (
     <Grid container className={classes.root}>
@@ -97,16 +116,17 @@ const CoWorker = (): React.ReactElement => {
         </Grid>
 
         <List>
-          {coWorkers.map((coWorker, i) => (
-            <ListItem
-              button
-              key={coWorker.id}
-              onClick={() => setSelectedCoWorker(i)}
-              selected={i === selectedCoWorker}
-            >
-              <ListItemText primary={`${coWorker.name} ${i + 1}`} />
-            </ListItem>
-          ))}
+          {coWorkers &&
+            coWorkers.map((coWorker: User, i: number) => (
+              <ListItem
+                button
+                key={coWorker.id}
+                onClick={() => handleCoWorkerSelected(i)}
+                selected={i === selectedCoWorker}
+              >
+                <ListItemText primary={`${coWorker.nickname} ${i + 1}`} />
+              </ListItem>
+            ))}
         </List>
       </Grid>
       <Grid item className={classes.main} xs={12} sm={8} lg={9}>

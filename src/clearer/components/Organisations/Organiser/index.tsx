@@ -72,9 +72,9 @@ interface managerType {
 const Organiser = (props: any): React.ReactElement => {
   const classes = useStyle();
   const showingIcon = false;
-  const { getOrganizedManager, updateOrganizationManager } = useOrganization();
+  const { getOrganizedManager, updateOrganizationManager, suspendOrganizationManager, resumeOrganizationManager } = useOrganization();
   const [organizerId, setOrganizerId] = useState();
-
+  const [organizerStatus, setOrganizerStatus] = useState(true);
   const [manager, setManager] = useState({
     id: 'string',
     nickname: 'string',
@@ -97,6 +97,12 @@ const Organiser = (props: any): React.ReactElement => {
           phone: managerdata.phone,
           avata: managerdata.avata,
         });
+        console.log(managerdata.suspended);
+        if(managerdata.suspended === 'undefined'){
+          setOrganizerStatus(true);
+        }else{
+          setOrganizerStatus(!managerdata.suspended);
+        }
       }
     };
 
@@ -145,6 +151,19 @@ const Organiser = (props: any): React.ReactElement => {
       }).catch((err: any) => {
         console.log(err);
       })
+
+      if(organizerStatus === true){
+        await resumeOrganizationManager(organizerId, manager.id);
+      }else{
+        await suspendOrganizationManager(organizerId, manager.id);
+      }
+      
+  }
+
+  const onHandleStatus = async (event: React.ChangeEvent<any>) => {
+    const { value } = event.target;
+    console.log(value);
+    setOrganizerStatus(value);
   }
 
   return (
@@ -171,9 +190,9 @@ const Organiser = (props: any): React.ReactElement => {
             <Grid container spacing={1} xs={12}>
               <Grid item container alignItems="center" direction="row" xs={12}>
                 <span style={{ fontSize: 18 }}>Status</span>
-                <Select className={classes.selectStyle}>
-                  <MenuItem value="Active" selected>Active</MenuItem>
-                  <MenuItem value="Disactive">Disactive</MenuItem>
+                <Select className={classes.selectStyle} value={organizerStatus} onChange={onHandleStatus}>
+                  <MenuItem value="true" selected>Active</MenuItem>
+                  <MenuItem value="false">Disactive</MenuItem>
                 </Select>
               </Grid>
               <Grid item container direction="row" spacing={2} xs={12}>
