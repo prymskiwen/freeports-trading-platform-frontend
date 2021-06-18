@@ -14,7 +14,6 @@ export function createReducer(injectedReducers: InjectedReducersType = {}) {
   // if (Object.keys(injectedReducers).length === 0) {
   //   return (state: any) => state;
   // }
-  console.log("Injected reducers ..........");
   return combineReducers({
     auth,
     global,

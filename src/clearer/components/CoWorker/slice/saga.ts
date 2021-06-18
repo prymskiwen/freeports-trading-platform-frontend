@@ -7,8 +7,6 @@ import PaginatedResponse from "../../../../types/PaginatedResponse";
 import User from "../../../../types/User";
 
 export function* getCoWorkers(): Generator<any> {
-  console.log("getCoWorkers");
-
   try {
     const response = yield call(getClearerUsers);
     yield put(
