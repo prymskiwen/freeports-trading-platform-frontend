@@ -29,9 +29,7 @@ import Organiser from "../Organiser";
 import { useOrganization } from "../../../../hooks";
 
 interface ibantype {
-  currency: string;
   iban: string;
-  account: string;
 }
 interface managerType {
   id: string;
