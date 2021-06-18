@@ -21,8 +21,8 @@ axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 axios.interceptors.request.use(
   (config: any) => {
     const jwtToken = Lockr.get("ACCESS_TOKEN");
-    const dispatch = useDispatch();
-    dispatch(clearError());
+
+    window.store.dispatch(clearError());
 
     if (jwtToken) {
       // eslint-disable-next-line no-param-reassign
@@ -30,7 +30,7 @@ axios.interceptors.request.use(
     }
 
     if (!jwtToken && !config.headers[PUBLIC_REQUEST_KEY]) {
-      dispatch(authLogout());
+      window.store.dispatch(authLogout());
       return config;
     }
 
@@ -57,7 +57,7 @@ axios.interceptors.response.use(
       const authStep = Lockr.get("AUTH_STEP");
 
       if (jwtToken && authStep === "passed") {
-        dispatch(authLogout());
+        window.store.dispatch(authLogout());
       }
     }
 

@@ -1,4 +1,4 @@
-import { applyMiddleware } from "redux";
+import { applyMiddleware, Store } from "redux";
 import { createLogger } from "redux-logger";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 
@@ -42,6 +42,8 @@ export default function configureAppStore() {
       auth: authInitialState,
     },
   });
+
+  window.store = store;
 
   return store;
 }
