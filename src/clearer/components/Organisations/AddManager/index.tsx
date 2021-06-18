@@ -4,16 +4,16 @@ import {
     Container,
     Grid,
     FormControl,
-    InputLabel,
-    OutlinedInput,
     makeStyles,
     CardMedia,
     Button,
-    TextField,
  } from "@material-ui/core";
  import ImageUploader from 'react-images-upload';
 import { Form } from "react-final-form";
+import { TextField, Select } from "mui-rff";
 import arrayMutators from "final-form-arrays";
+
+import { useOrganization } from "../../../../hooks";
 
 const useStyle = makeStyles((theme) => ({
   margin: {
@@ -40,11 +40,6 @@ const validate = (values: any) => {
   if(!values.phone){
     errors.phone = "This Field Required";
   }
-
-  console.log(values);
-  // if(!values.nickname) {
-  //   errors = {nickname: "required"};
-  // }
   return errors;
 }
 
@@ -52,23 +47,28 @@ const AddManager = (): React.ReactElement => {
   const { orgaizationId } : any = useParams();
   const classes = useStyle();
   const showingIcon = false;
-  const requirable = true;
-  console.log(orgaizationId);
   const history = useHistory();
 
-  const onSubmit = (values: any) => {
-    console.log(values);
-    alert("mywork");
+  const { addManager } = useOrganization();
+
+  const [managerAvata, setManagerAvata] = useState('');
+
+  const ondrop = (pic: any) => {
+    const reader = new FileReader();
+    reader.onload = (e: any)=>{
+      setManagerAvata(e.target.result);
+    }
+    reader.readAsDataURL(pic[0]);
+    // setLogofile(pic);
   }
 
-  
-  const [manager, setManager] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    avata: '',
-  })
+  const onSubmit = async (values: any) => {
+    const additional = await addManager(orgaizationId, values.nickname, values.email, values.password, values.phone, managerAvata)
+      .then((res: any) =>{
+        console.log(res);
+        history.push(`/organisations/editOrganizer/${orgaizationId}`);
+      })
+  }
 
   return (
     <div className="main-wrapper">
@@ -130,6 +130,7 @@ const AddManager = (): React.ReactElement => {
                   <FormControl fullWidth className={classes.margin} variant="outlined">
                     <TextField
                       required
+                      type="password"
                       id="outlined-adornment-amount"
                       label="Password"
                       name="password"
@@ -143,7 +144,7 @@ const AddManager = (): React.ReactElement => {
                       style={{ marginTop: 20 }}
                       component="img"
                       height="140"
-                      image=""
+                      image={managerAvata}
                     />
                     <ImageUploader
                       withIcon={showingIcon}
@@ -152,6 +153,7 @@ const AddManager = (): React.ReactElement => {
                       buttonStyles={{
                         width: "100%",
                       }}
+                      onChange={(ChangeEvent) => ondrop(ChangeEvent)}
                       fileContainerStyle={{
                         margin: 0,
                         padding: 0,

@@ -111,7 +111,6 @@ const EditOrganizer = (): React.ReactElement => {
     const init = async () => {
       const detail = await getOrganizerdetail(id);
       const managerList = await getManagers(id);
-      console.log(detail)
       if(!mounted){
 
         setOrganizereddetail({
@@ -167,7 +166,6 @@ const EditOrganizer = (): React.ReactElement => {
   }
 
   const onhandledialog = () => {
-    alert('this is m wo');
     console.log(organizereddetail);
   }
 
@@ -191,7 +189,6 @@ const EditOrganizer = (): React.ReactElement => {
   }
 
   const newManager = async () => {
-    alert('this is manager Api');
     history.push(`/organisations/${id}/addmanager`);
   }
 
