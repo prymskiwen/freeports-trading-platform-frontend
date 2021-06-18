@@ -16,14 +16,13 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import SearchIcon from "@material-ui/icons/Search";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
+import { useSelector, useDispatch } from "react-redux";
 
-import { useDispatch, useSelector } from "react-redux";
 import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
-import { GET_CLEARER_USERS } from "../../../store/clearerUsers/action-types";
 import User from "../../../types/User";
-import { useAppSelector } from "../../../store/hooks";
 import { useCoWorkerSlice } from "./slice";
+import { selectCoWorkers } from "./slice/selectors";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -62,36 +61,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// const coWorkers = [
-//   { name: "Co-worker name ", id: 1 },
-//   { name: "Co-worker name ", id: 2 },
-//   { name: "Co-worker name ", id: 3 },
-//   { name: "Co-worker name ", id: 4 },
-//   { name: "Co-worker name ", id: 5 },
-//   { name: "Co-worker name ", id: 6 },
-//   { name: "Co-worker name ", id: 7 },
-//   { name: "Co-worker name ", id: 8 },
-//   { name: "Co-worker name ", id: 9 },
-// ];
-
 const CoWorker = (): React.ReactElement => {
   const classes = useStyles();
 
   const [selectedCoWorker, setSelectedCoWorker] = useState(0);
   const { actions } = useCoWorkerSlice();
-  const { coWorkers } = useAppSelector((state) => ({
-    coWorkers: state.clearerUsers.clearerUsers,
-  }));
+  const coWorkers = useSelector(selectCoWorkers);
 
   console.log("Co worker ", coWorkers);
   const dispatch = useDispatch();
   const handleCoWorkerSelected = (i: number) => {
-    dispatch({ type: GET_CLEARER_USERS.REQUEST });
+    dispatch(actions.getCoWorkers);
     setSelectedCoWorker(i);
   };
 
   useEffect(() => {
-    dispatch({ type: GET_CLEARER_USERS.REQUEST });
+    dispatch(actions.getCoWorkers);
   }, []);
 
   return (

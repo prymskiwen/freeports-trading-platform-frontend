@@ -10,11 +10,12 @@ import routes from "./routes";
 import PrivateRoute from "../../routes/private";
 import PublicRoute from "../../routes/public";
 import Header from "../components/Header";
+import { RootState } from "../../util/types/RootState";
 
 const Routes = (): React.ReactElement => {
   const { error } = useSelector(
-    (state: any) => ({
-      error: state.global.error,
+    (state: RootState) => ({
+      error: state?.global.error,
     }),
     shallowEqual
   );

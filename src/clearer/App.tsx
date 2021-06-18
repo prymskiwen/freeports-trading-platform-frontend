@@ -24,9 +24,7 @@ const App = (): React.ReactElement => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Provider store={store}>
-        <Routes />
-      </Provider>
+      <Routes />
     </ThemeProvider>
   );
 };

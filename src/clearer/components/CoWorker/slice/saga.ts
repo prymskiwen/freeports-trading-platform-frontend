@@ -10,13 +10,15 @@ export function* getCoWorkers(): Generator<any> {
   console.log("getCoWorkers");
 
   try {
-    const response: PaginatedResponse<User> = yield call(getClearerUsers);
-    yield put(actions.getCoWorkersSuccess(response.content));
+    const response = yield call(getClearerUsers);
+    yield put(
+      actions.getCoWorkersSuccess((response as PaginatedResponse<User>).content)
+    );
   } catch (error) {
     console.log("error", error);
   }
 }
 
-export function* clearerUsersSaga(): Generator<any> {
+export function* coWorkersSaga(): Generator<any> {
   yield takeEvery(actions.getCoWorkers, getClearerUsers);
 }

@@ -1,7 +1,7 @@
 import { Saga } from "redux-saga";
 import { SagaInjectionModes } from "redux-injectors";
 import { Reducer, AnyAction } from "@reduxjs/toolkit";
-import { RootState } from "../../store";
+import { RootState } from "./RootState";
 
 type RequiredRootState = Required<RootState>;
 

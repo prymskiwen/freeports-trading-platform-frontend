@@ -6,7 +6,7 @@ import {
   useInjectReducer,
   useInjectSaga,
 } from "../../../../util/redux-injectors";
-import { clearerUsersSaga } from "./saga";
+import { coWorkersSaga } from "./saga";
 import { CoWorkerState } from "./types";
 
 export const initialState: CoWorkerState = {
@@ -15,7 +15,7 @@ export const initialState: CoWorkerState = {
 };
 
 const slice = createSlice({
-  name: "coWorker",
+  name: "coWorkers",
   initialState,
   reducers: {
     getCoWorkers(state) {
@@ -33,6 +33,6 @@ export const { actions: coWorkActions, reducer } = slice;
 
 export const useCoWorkerSlice = () => {
   useInjectReducer({ key: slice.name, reducer: slice.reducer });
-  useInjectSaga({ key: slice.name, saga: clearerUsersSaga });
+  useInjectSaga({ key: slice.name, saga: coWorkersSaga });
   return { actions: slice.actions };
 };

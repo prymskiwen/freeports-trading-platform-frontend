@@ -5,7 +5,7 @@ import purple from "@material-ui/core/colors/purple";
 import green from "@material-ui/core/colors/green";
 
 import Routes from "./routes";
-import store from "../store";
+// import store from "../store";
 
 import "./App.css";
 import "./Custom.css";
@@ -24,9 +24,7 @@ const App = (): React.ReactElement => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Provider store={store}>
-        <Routes />
-      </Provider>
+      <Routes />
     </ThemeProvider>
   );
 };

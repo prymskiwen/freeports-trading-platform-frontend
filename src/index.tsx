@@ -1,11 +1,12 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 
-import store from "./store";
-import authActions from "./store/auth/actions";
+// import authActions from "./store/auth/actions";
+import { Provider } from "react-redux";
 import reportWebVitals from "./reportWebVitals";
 
 import "./index.css";
+import configureAppStore from "./store";
 
 const App = React.lazy(
   () =>
@@ -16,14 +17,17 @@ const App = React.lazy(
     )
 );
 
-const { authCheck } = authActions;
+// const { authCheck } = authActions;
 
-store.dispatch(authCheck());
+const store = configureAppStore();
+// store.dispatch(authCheck());
 
 ReactDOM.render(
   <React.StrictMode>
     <Suspense fallback={<div>Loading...</div>}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Suspense>
   </React.StrictMode>,
   document.getElementById("root")
