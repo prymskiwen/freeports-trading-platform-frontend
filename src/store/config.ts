@@ -4,12 +4,16 @@
 import { createStore, applyMiddleware, compose } from "redux";
 import { createLogger } from "redux-logger";
 import thunk from "redux-thunk";
+import createSagaMiddleware from "redux-saga";
 
 import rootReducer from "./reducers";
+import rootSaga from "../sagas";
 
 export default function configStore(initialState = {}): any {
+  const sagaMiddleware = createSagaMiddleware();
+
   // Middleware and store enhancers
-  const enhancers = [applyMiddleware(thunk)];
+  const enhancers = [applyMiddleware(sagaMiddleware)];
 
   if (process.env.NODE_ENV !== "production") {
     enhancers.push(applyMiddleware(createLogger()));
@@ -19,6 +23,7 @@ export default function configStore(initialState = {}): any {
 
   const store = createStore(rootReducer, initialState, compose(...enhancers));
 
+  sagaMiddleware.run(rootSaga);
   // For hot reloading reducers
   // if (module.hot) {
   //   // Enable Webpack hot module replacement for reducers
