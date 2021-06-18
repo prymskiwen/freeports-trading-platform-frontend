@@ -23,6 +23,7 @@ import CoWorkerForm from "../CoWorkerForm";
 import { GET_CLEARER_USERS } from "../../../store/clearerUsers/action-types";
 import User from "../../../types/User";
 import { useAppSelector } from "../../../store/hooks";
+import { useCoWorkerSlice } from "./slice";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -77,7 +78,7 @@ const CoWorker = (): React.ReactElement => {
   const classes = useStyles();
 
   const [selectedCoWorker, setSelectedCoWorker] = useState(0);
-
+  const { actions } = useCoWorkerSlice();
   const { coWorkers } = useAppSelector((state) => ({
     coWorkers: state.clearerUsers.clearerUsers,
   }));
