@@ -3,6 +3,7 @@ import {
   getOrganizationDetail,
   getOrganisationManagers,
   getOrganizerManager,
+  addOrganizationManager,
   addOrganizer,
   addAccount,
   updateOrganizer,
@@ -42,6 +43,16 @@ function useOrganization(): any {
         console.log(err.message);
       })
     return managers;
+  }
+
+  const addManager = async (organizerId: string, nickname: string, email: string, password: string, phone: string, avata: string) => {
+    const manager = await addOrganizationManager(organizerId, nickname, email, password, phone, avata)
+      .then((data) => {
+        return data;
+      }).catch((err) => {
+        console.log(err.message);
+      })
+    return manager;
   }
 
   const getOrganizedManager = async (organizedId: string, managerId: string) => {
@@ -154,7 +165,7 @@ function useOrganization(): any {
     return resume;
   }
 
-  return {organizers, getOrganizerdetail, getManagers, getOrganizedManager, addOrganization, additionAccount, updateOrganization, updateOrganizationManager, suspendOrganizationManager, resumeOrganizationManager};
+  return {organizers, getOrganizerdetail, getManagers, addManager, getOrganizedManager, addOrganization, additionAccount, updateOrganization, updateOrganizationManager, suspendOrganizationManager, resumeOrganizationManager};
 }
 
 export default useOrganization;

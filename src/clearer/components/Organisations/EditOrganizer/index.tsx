@@ -10,26 +10,19 @@ import {  Container,
           ListItem,
           CardMedia,
           Card,
-          Avatar,
-          Accordion,
-          TextField,
           Input,
           InputAdornment,
-          AccordionSummary,
-          AccordionDetails,
-          MenuItem,
-          Select,
 } from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ImageUploader from 'react-images-upload';
 import { useParams, useHistory } from "react-router";
-import { spawnSync } from "child_process";
-import Organiser from "../Organiser";
+import Manager from "../Manager";
 
 import { useOrganization } from "../../../../hooks";
 
 interface ibantype {
+  currency: string;
   iban: string;
+  account: string;
 }
 interface managerType {
   id: string;
@@ -118,7 +111,6 @@ const EditOrganizer = (): React.ReactElement => {
     const init = async () => {
       const detail = await getOrganizerdetail(id);
       const managerList = await getManagers(id);
-      console.log(detail)
       if(!mounted){
 
         setOrganizereddetail({
@@ -174,7 +166,6 @@ const EditOrganizer = (): React.ReactElement => {
   }
 
   const onhandledialog = () => {
-    alert('this is m wo');
     console.log(organizereddetail);
   }
 
@@ -195,6 +186,10 @@ const EditOrganizer = (): React.ReactElement => {
       }).catch((err: any) => {
         console.log(err);
       })
+  }
+
+  const newManager = async () => {
+    history.push(`/organisations/${id}/addmanager`);
   }
 
   return(
@@ -306,12 +301,19 @@ const EditOrganizer = (): React.ReactElement => {
           </Grid>
           <Grid item xs={6}>
             <Grid container direction="row">
-              <h2>Organization managers</h2>
+              <h2>
+                Organization managers
+                <IconButton onClick={newManager}>
+                  <Icon style={{ fontSize: 45 }} color="primary">
+                    add_circle
+                  </Icon>
+                </IconButton>
+              </h2>
             </Grid>
             <Grid item xs={12}>
               <List>
                 {managers.map((managerItem) => <ListItem>
-                  <Organiser organizerid={id}  managerid={managerItem.id} />
+                  <Manager organizerid={id}  managerid={managerItem.id} />
                 </ListItem>)}
                 
               </List>

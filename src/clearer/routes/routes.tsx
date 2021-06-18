@@ -36,6 +36,12 @@ export default [
     component: lazy(() => import("../components/Organisations/EditOrganizer")),
   },
   {
+    path: "/organisations/:orgaizationId/addmanager",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Organisations/AddManager")),
+  },
+  {
     path: "/nostro-accounts",
     exact: true,
     auth: true,
