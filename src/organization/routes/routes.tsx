@@ -41,6 +41,18 @@ export default [
     auth: true,
     component: lazy(() => import("../components/Investors")),
   },
+  {
+    path: "/trades",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Trades")),
+  },
+  {
+    path: "/trades/:investorId",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Trades/TradeDetail")),
+  },
   /* {
     path: "/error",
     exact: true,l
