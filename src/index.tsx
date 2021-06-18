@@ -1,8 +1,8 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 
-// import authActions from "./store/auth/actions";
 import { Provider } from "react-redux";
+import authActions from "./store/auth/actions";
 import reportWebVitals from "./reportWebVitals";
 
 import "./index.css";
@@ -17,10 +17,10 @@ const App = React.lazy(
     )
 );
 
-// const { authCheck } = authActions;
+const { authCheck } = authActions;
 
 const store = configureAppStore();
-// store.dispatch(authCheck());
+store.dispatch(authCheck());
 
 ReactDOM.render(
   <React.StrictMode>

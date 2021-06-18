@@ -63,13 +63,13 @@ const useStyles = makeStyles((theme) => ({
 
 const CoWorker = (): React.ReactElement => {
   const classes = useStyles();
+  const dispatch = useDispatch();
 
-  const [selectedCoWorker, setSelectedCoWorker] = useState(0);
   const { actions } = useCoWorkerSlice();
   const coWorkers = useSelector(selectCoWorkers);
 
-  console.log("Co worker ", coWorkers);
-  const dispatch = useDispatch();
+  const [selectedCoWorker, setSelectedCoWorker] = useState(0);
+
   const handleCoWorkerSelected = (i: number) => {
     dispatch(actions.getCoWorkers);
     setSelectedCoWorker(i);
