@@ -11,9 +11,10 @@ import global from "./global/reducer";
 export function createReducer(injectedReducers: InjectedReducersType = {}) {
   // Initially we don't have any injectedReducers,
   // so returning identity function to avoid the error
-  if (Object.keys(injectedReducers).length === 0) {
-    return (state: any) => state;
-  }
+  // if (Object.keys(injectedReducers).length === 0) {
+  //   return (state: any) => state;
+  // }
+  console.log("Injected reducers ..........");
   return combineReducers({
     auth,
     global,

@@ -118,6 +118,7 @@ const reducer = (
         loading: true,
       };
     case AUTH_LOGIN_SUCCESS:
+      console.log("Auth login successful........");
       setIdentity(payload);
       return {
         ...login(state, payload),

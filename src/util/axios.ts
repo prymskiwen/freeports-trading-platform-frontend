@@ -1,9 +1,7 @@
-import { useDispatch } from "react-redux";
 /* eslint-disable no-console */
 import axios from "axios";
 import Lockr from "lockr";
 
-// import store from "../store/index";
 import reduxActions from "../store/auth/actions";
 import reduxGlobalActions from "../store/global/actions";
 
@@ -48,10 +46,8 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error(error);
-    const dispatch = useDispatch();
-
-    dispatch(setError(error.response.data));
+    console.log(error.response.data);
+    window.store.dispatch(setError(error.response.data));
     if (error.response.status === 401) {
       const jwtToken = Lockr.get("ACCESS_TOKEN");
       const authStep = Lockr.get("AUTH_STEP");

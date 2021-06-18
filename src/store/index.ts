@@ -5,8 +5,8 @@ import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
 import { createInjectorsEnhancer } from "redux-injectors";
 import { createReducer } from "./reducers";
-import { initialState as authInitialState } from "./auth/reducer";
-import { initialState as globalInitialState } from "./global/reducer";
+// import { initialState as authInitialState } from "./auth/reducer";
+// import { initialState as globalInitialState } from "./global/reducer";
 
 export default function configureAppStore() {
   const reduxSagaMonitorOptions = {};
@@ -37,10 +37,10 @@ export default function configureAppStore() {
       /* istanbul ignore next line */
       process.env.NODE_ENV !== "production",
     enhancers,
-    preloadedState: {
-      global: globalInitialState,
-      auth: authInitialState,
-    },
+    // preloadedState: {
+    //   global: globalInitialState,
+    //   auth: authInitialState,
+    // },
   });
 
   window.store = store;
