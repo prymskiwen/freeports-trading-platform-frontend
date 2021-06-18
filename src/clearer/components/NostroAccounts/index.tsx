@@ -18,7 +18,7 @@ import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import data from "./data";
+import { data } from "./data";
 
 const columns = [
   {
@@ -26,6 +26,14 @@ const columns = [
     title: "Name",
     cellStyle: {
       width: "20%",
+    },
+    sortable: false,
+    render: (rowData: any) => {
+      const { name: names } = rowData;
+
+      return (
+        <Link to="/nostro-accounts/details">{names}</Link>
+      );
     },
   },
   {
@@ -111,7 +119,6 @@ const NostroAccounts = (): React.ReactElement => {
                 <DialogTitle id="form-dialog-title">
                   Declare New account
                 </DialogTitle>
-                
                 <DialogContent>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
