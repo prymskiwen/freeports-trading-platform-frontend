@@ -48,7 +48,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log(error.response.data);
+    console.error(error);
     const dispatch = useDispatch();
 
     dispatch(setError(error.response.data));

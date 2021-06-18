@@ -1,7 +1,7 @@
 import ReduxAction from "../redux-action";
 import { CLEAR_ERROR, SET_ERROR } from "./action-types";
 
-const initialState = {
+export const initialState = {
   error: { errorType: "", message: "" },
 };
 

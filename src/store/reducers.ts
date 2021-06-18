@@ -1,6 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { InjectedReducersType } from "../util/types/injector-typings";
-import auth from "./auth/reduer";
+import auth from "./auth/reducer";
 import global from "./global/reducer";
 
 /**

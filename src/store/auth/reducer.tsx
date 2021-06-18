@@ -14,7 +14,7 @@ import {
   AUTH_REFRESH_TOKEN,
 } from "./action-types";
 
-const initialState = {
+export const initialState = {
   authStep: "login",
   isAuthenticated: false,
   isOTPDefined: false,
