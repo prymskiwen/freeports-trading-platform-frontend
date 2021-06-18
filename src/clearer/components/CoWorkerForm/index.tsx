@@ -303,7 +303,7 @@ const CoWorkerForm = (): React.ReactElement => {
                 </Grid>
               </Grid>
               <Grid container direction="row-reverse">
-                <Button className={classes.saveBtn}>Save Changes</Button>
+                <Button className={classes.saveBtn} type="submit">Save Changes</Button>
               </Grid>
             </Grid>
           </form>

@@ -26,6 +26,30 @@ const getOrganizationDetail = (id: string): Promise<any> => {
   });
 };
 
+const addOrganizationManager = (
+  organizationId: string,
+  nickname: string,
+  email: string,
+  password: string,
+  phone: string,
+  avata: string,
+  ): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/organization/${organizationId}/manager`, {
+        nickname,
+        email,
+        password,
+        phone,
+        avata,
+      }).then((res: any) => {
+        return resolve(res.data);
+      }).catch((err) => {
+        return reject(err.response);
+      })
+  })
+}
+
 const getOrganisationManagers = (id: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
@@ -178,6 +202,7 @@ export {
   getOrganizationDetail,
   getOrganisationManagers,
   getOrganizerManager,
+  addOrganizationManager,
   addOrganizer,
   addAccount,
   updateOrganizer,

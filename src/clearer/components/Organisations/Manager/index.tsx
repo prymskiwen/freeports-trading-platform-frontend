@@ -69,7 +69,7 @@ interface managerType {
   avata: string;
 }
 
-const Organiser = (props: any): React.ReactElement => {
+const Manager = (props: any): React.ReactElement => {
   const classes = useStyle();
   const showingIcon = false;
   const { getOrganizedManager, updateOrganizationManager, suspendOrganizationManager, resumeOrganizationManager } = useOrganization();
@@ -267,4 +267,4 @@ const Organiser = (props: any): React.ReactElement => {
   );
 };
 
-export default Organiser;
+export default Manager;
