@@ -2,10 +2,8 @@
 import axios from "axios";
 import Lockr from "lockr";
 
-import store from "../store/index";
 import reduxActions from "../store/auth/actions";
 import reduxGlobalActions from "../store/global/actions";
-
 
 const { authLogout } = reduxActions;
 const { clearError, setError } = reduxGlobalActions;
@@ -22,7 +20,7 @@ axios.interceptors.request.use(
   (config: any) => {
     const jwtToken = Lockr.get("ACCESS_TOKEN");
 
-    store.dispatch(clearError());
+    window.store.dispatch(clearError());
 
     if (jwtToken) {
       // eslint-disable-next-line no-param-reassign
@@ -30,7 +28,7 @@ axios.interceptors.request.use(
     }
 
     if (!jwtToken && !config.headers[PUBLIC_REQUEST_KEY]) {
-      store.dispatch(authLogout());
+      window.store.dispatch(authLogout());
       return config;
     }
 
@@ -49,13 +47,13 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     console.log(error.response.data);
-    store.dispatch(setError(error.response.data));
+    window.store.dispatch(setError(error.response.data));
     if (error.response.status === 401) {
       const jwtToken = Lockr.get("ACCESS_TOKEN");
       const authStep = Lockr.get("AUTH_STEP");
 
       if (jwtToken && authStep === "passed") {
-        store.dispatch(authLogout());
+        window.store.dispatch(authLogout());
       }
     }
 

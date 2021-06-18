@@ -1,31 +1,49 @@
-import { createStore, applyMiddleware, compose } from "redux";
+import { applyMiddleware, Store } from "redux";
 import { createLogger } from "redux-logger";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 
 import createSagaMiddleware from "redux-saga";
+import { createInjectorsEnhancer } from "redux-injectors";
+import { createReducer } from "./reducers";
+// import { initialState as authInitialState } from "./auth/reducer";
+// import { initialState as globalInitialState } from "./global/reducer";
 
-import rootReducer from "./reducers";
-import rootSaga from "../sagas";
+export default function configureAppStore() {
+  const reduxSagaMonitorOptions = {};
+  const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
+  const { run: runSaga } = sagaMiddleware;
 
-const initialState = {};
+  // Create the store with saga middleware
+  const middlewares = [sagaMiddleware];
+  // Middleware and store enhancers
 
-const sagaMiddleware = createSagaMiddleware();
+  const enhancers = [
+    createInjectorsEnhancer({
+      createReducer,
+      runSaga,
+    }),
+  ];
 
-// Middleware and store enhancers
-const enhancers = [applyMiddleware(sagaMiddleware)];
+  if (process.env.NODE_ENV !== "production") {
+    enhancers.push(applyMiddleware(createLogger()));
+    // window.__REDUX_DEVTOOLS_EXTENSION__ &&
+    //   enhancers.push(window.__REDUX_DEVTOOLS_EXTENSION__())
+  }
 
-if (process.env.NODE_ENV !== "production") {
-  enhancers.push(applyMiddleware(createLogger()));
-  // window.__REDUX_DEVTOOLS_EXTENSION__ &&
-  //   enhancers.push(window.__REDUX_DEVTOOLS_EXTENSION__())
+  const store = configureStore({
+    reducer: createReducer(),
+    middleware: [...getDefaultMiddleware(), ...middlewares],
+    devTools:
+      /* istanbul ignore next line */
+      process.env.NODE_ENV !== "production",
+    enhancers,
+    // preloadedState: {
+    //   global: globalInitialState,
+    //   auth: authInitialState,
+    // },
+  });
+
+  window.store = store;
+
+  return store;
 }
-
-const store = createStore(rootReducer, initialState, compose(...enhancers));
-
-sagaMiddleware.run(rootSaga);
-
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch;
-
-export default store;
