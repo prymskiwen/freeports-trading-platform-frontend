@@ -32,7 +32,7 @@ const login = (credentials: LoginParamsType): Promise<LoginResponseType> => {
       .catch((err) => {
         console.error(err);
 
-        return reject(err.response.data);
+        return reject(err?.response.data);
       });
   });
 };

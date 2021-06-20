@@ -18,5 +18,5 @@ export function* getCoWorkers(): Generator<any> {
 }
 
 export function* coWorkersSaga(): Generator<any> {
-  yield takeEvery(actions.getCoWorkers, getClearerUsers);
+  yield takeEvery(actions.getCoWorkers, getCoWorkers);
 }
