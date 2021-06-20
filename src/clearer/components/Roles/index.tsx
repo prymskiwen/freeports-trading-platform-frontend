@@ -32,7 +32,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { useRole } from "../../../hooks";
 
-interface RoleType {
+export interface RoleType {
   id: string;
   name: string;
   permissions: Array<string>;

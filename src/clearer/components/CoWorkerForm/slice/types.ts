@@ -1,7 +1,7 @@
-import User from "../../../../types/User";
+import { RoleType } from "../../Roles";
 
 /* --- STATE --- */
-export interface CoWorkerState {
-  coWorkers: User[];
+export interface CoWorkerFormState {
+  roles: RoleType[];
   loading: boolean;
 }

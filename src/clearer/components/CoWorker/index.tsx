@@ -116,7 +116,7 @@ const CoWorker = (): React.ReactElement => {
         </List>
       </Grid>
       <Grid item className={classes.main} xs={12} sm={8} lg={9}>
-        <Accordion>
+        <Accordion expanded>
           <AccordionSummary
             classes={{ content: classes.accordionSummary }}
             aria-controls="panel1c-content"
