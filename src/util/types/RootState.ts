@@ -1,6 +1,6 @@
 // [IMPORT NEW CONTAINERSTATE ABOVE] < Needed for generating containers seamlessly
 
-import { CoWorkerState } from "../../clearer/components/CoWorker/slice/types";
+import { CoWorkersState } from "../../clearer/components/CoWorker/slice/types";
 
 /* 
   Because the redux-injectors injects your reducers asynchronously somewhere in your code
@@ -9,7 +9,7 @@ import { CoWorkerState } from "../../clearer/components/CoWorker/slice/types";
   So, not available always
 */
 export interface RootState {
-  coWorkers?: CoWorkerState;
+  coWorkers?: CoWorkersState;
   global?: any;
   auth?: any;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for generating containers seamlessly

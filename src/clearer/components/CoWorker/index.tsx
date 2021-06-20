@@ -21,7 +21,7 @@ import { useSelector, useDispatch } from "react-redux";
 import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
 import User from "../../../types/User";
-import { useCoWorkerSlice } from "./slice";
+import { useCoWorkersSlice } from "./slice";
 import { selectCoWorkers } from "./slice/selectors";
 
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CoWorker = (): React.ReactElement => {
-  const { actions } = useCoWorkerSlice();
+  const { actions } = useCoWorkersSlice();
   const classes = useStyles();
   const dispatch = useDispatch();
 

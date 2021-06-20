@@ -11,13 +11,8 @@ import PrivateRoute from "../../routes/private";
 import PublicRoute from "../../routes/public";
 import Header from "../components/Header";
 import { RootState } from "../../util/types/RootState";
-import auth from "../../store/auth/reducer";
-import global from "../../store/global/reducer";
-import { useInjectReducer } from "../../util/redux-injectors";
 
 const Routes = (): React.ReactElement => {
-  useInjectReducer({ key: "auth", reducer: auth });
-  useInjectReducer({ key: "global", reducer: global });
   const { error } = useSelector((state: RootState) => {
     return {
       error: state?.global.error,

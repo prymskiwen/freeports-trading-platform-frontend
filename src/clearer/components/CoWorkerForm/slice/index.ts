@@ -7,9 +7,9 @@ import {
   useInjectSaga,
 } from "../../../../util/redux-injectors";
 import { coWorkersSaga } from "./saga";
-import { CoWorkersState } from "./types";
+import { CoWorkerState } from "./types";
 
-export const initialState: CoWorkersState = {
+export const initialState: CoWorkerState = {
   coWorkers: [],
   loading: false,
 };
@@ -31,7 +31,7 @@ const slice = createSlice({
 
 export const { actions: coWorkActions, reducer } = slice;
 
-export const useCoWorkersSlice = () => {
+export const useCoWorkerSlice = () => {
   useInjectReducer({ key: slice.name, reducer: slice.reducer });
   useInjectSaga({ key: slice.name, saga: coWorkersSaga });
   (window as any).action = slice.actions;
