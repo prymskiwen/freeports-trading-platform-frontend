@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Grid, Icon, Button, IconButton, NativeSelect, FormControl, Typography, InputLabel, Select } from "@material-ui/core";
+import { Grid, Icon, Button, IconButton, NativeSelect, Card, FormControl, Typography, InputLabel, Select } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
-import { DropdownButton, Dropdown, Card } from "react-bootstrap";
 
+import NotifyCard from "./NotifyCard";
 import useAuth from "../../../hooks";
 
 
@@ -16,19 +16,16 @@ const useStyle = makeStyles((theme) => ({
     boxShadow: '0 0 17px 0',
     display: 'flex',
   },
-  margin0:{
-    margin: 0,
-  },
-  padding5: {
-    padding: 15,
-  },
+  
   nofifyBtn: {
     width: 50,
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    
+  },
+  actBtn: {
+    fontWeight: 500,
   },
   arrowIcon:{
     marginTop: 20,
@@ -100,9 +97,9 @@ const Notification =(): React.ReactElement => {
           {openNotify ? (
             <div className={classes.alertBar}>
               <Grid container item spacing={2} xs={12}>
-                <Grid item xs={12}>
-                  <Button>&gt;Open as Page</Button>
-                  <Button>&gt;History</Button>
+                <Grid container direction="row" justify="flex-end" alignItems="center" item xs={12}>
+                  <Button className={classes.actBtn}>&gt;Open as Page</Button>
+                  <Button className={classes.actBtn}>&gt;History</Button>
                 </Grid>
                 <Grid container direction="row" justify="space-around" alignItems="center" item xs={12}>
                   <span className={classes.notiTypeSpan}>Notification Type</span>
@@ -116,31 +113,10 @@ const Notification =(): React.ReactElement => {
                     </NativeSelect>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
-                  <Card className={classes.padding5}>
-                    <div>
-                      <h3 className={classes.margin0}>Re-funding / 23.06.2021 - 14:12</h3>
-                      <h2 className={classes.margin0}>Notification title</h2>
-                      <h3 className={classes.margin0}>From (name)</h3>
-                      <div>
-                        <Typography>
-                          Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-                        </Typography>
-                      </div>
-                    </div>
-                  </Card>
-                  <Card className={classes.padding5}>
-                    <div>
-                      <h3 className={classes.margin0}>Re-funding / 23.06.2021 - 14:12</h3>
-                      <h2 className={classes.margin0}>Notification title</h2>
-                      <h3 className={classes.margin0}>From (name)</h3>
-                      <div>
-                        <Typography>
-                          Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-                        </Typography>
-                      </div>
-                    </div>
-                  </Card>
+                <Grid container item spacing={2} xs={12}>
+                  <NotifyCard />
+                  <NotifyCard />
+                  <NotifyCard />
                 </Grid>
               </Grid>
             </div>
