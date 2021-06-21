@@ -4,13 +4,12 @@ import {  Container,
           OutlinedInput,
           InputAdornment,
           InputLabel,
-          Chip,
+          Select,
           FormControl,
           MenuItem,
-          Select,
           Button,
           makeStyles,
-} from "@material-ui/core"
+} from "@material-ui/core";
 import ImageUploader from 'react-images-upload';
 import { useHistory } from "react-router";
 import { useOrganization, useAccounts } from "../../../../hooks";
@@ -262,13 +261,6 @@ const AddOrganizer = (): React.ReactElement => {
                 {accounts.map((item)=><MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}
               </Select>
             </FormControl>
-            {/* <List>
-              {additionAccounts.map((accountItem) => <ListItem>
-                  <Icon color="error" >remove_circle</Icon>
-                  <span style={{marginLeft: 10,}}>IBAN: </span>
-                  <span style={{fontWeight: "bold", marginLeft: 25}}>{accountItem.iban}</span>
-              </ListItem>)}
-            </List> */}
           </Grid>
           <Grid item xs={12} style={{padding: 10}}>
             <span style={{fontWeight: "bold"}}>Add Organisation logo</span>
@@ -314,13 +306,6 @@ const AddOrganizer = (): React.ReactElement => {
                   onChange={onhadleclearer}
                 />
               </FormControl>
-              {/* <FormControl fullWidth style={{marginTop: 5}}>
-                <span style={{fontWeight: "bold"}}>Set clearer commission rate</span>
-                <Input 
-                  endAdornment={<InputAdornment position="end">%</InputAdornment>}
-                  onChange={onhadleclearer}
-                />
-              </FormControl> */}
             </Grid>
           </Grid>
           <Grid item container justify="flex-end" xs={12} style={{padding: 10}}>
