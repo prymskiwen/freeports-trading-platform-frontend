@@ -1,5 +1,5 @@
 export default interface User {
-  id: string;
+  id?: string;
 
   nickname: string;
 
@@ -7,7 +7,7 @@ export default interface User {
 
   phone: string;
 
-  avata: string;
+  avatar: string;
 
   jobTitle: string;
 

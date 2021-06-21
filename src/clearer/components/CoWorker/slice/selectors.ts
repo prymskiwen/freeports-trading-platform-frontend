@@ -11,3 +11,12 @@ export const selectCoWorkers = createSelector(
   [selectDomain],
   (coWorkerState) => coWorkerState.coWorkers
 );
+
+export const selectIsFormLoading = createSelector(
+  [selectDomain],
+  (coWorkerState) => coWorkerState.formLoading
+);
+export const selectIsLoading = createSelector(
+  [selectDomain],
+  (coWorkerState) => coWorkerState.loading
+);

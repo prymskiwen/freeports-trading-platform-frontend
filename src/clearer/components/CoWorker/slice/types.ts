@@ -4,4 +4,5 @@ import User from "../../../../types/User";
 export interface CoWorkersState {
   coWorkers: User[];
   loading: boolean;
+  formLoading: boolean;
 }
