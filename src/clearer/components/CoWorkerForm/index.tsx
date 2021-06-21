@@ -62,18 +62,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validate = (values: any) => {
-  const errors: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    jobTitle?: string;
-    phone?: string;
-  } = {};
-  if (!values.firstName) {
-    errors.firstName = "This Field Required";
-  }
-  if (!values.lastName) {
-    errors.lastName = "This Field Required";
+  const errors: Partial<User> = {};
+  if (!values.nickname) {
+    errors.nickname = "This Field Required";
   }
 
   if (!values.email) {
@@ -100,35 +91,36 @@ const validate = (values: any) => {
   ) {
     errors.phone = "Please enter a valid Phone number";
   }
+  console.log("errors ", errors);
   return errors;
 };
 
-interface Props {
+interface CoWorkerFormProps {
   // eslint-disable-next-line react/require-default-props
-  coWorker?: Partial<User>;
+  coWorker: Partial<User>;
+  onSubmit: (coWorker: User) => void;
 }
+// const defaultProps: CoWorkerFormProps = {
+//   coWorker: {
+//     roles: [""],
+//     nickname: "",
+//   },
+// };
 
-const CoWorkerForm = (
-  { coWorker }: Props = {
-    coWorker: {
-      roles: [""],
-      nickname: "",
-    },
-  }
-): React.ReactElement => {
+const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
+  onSubmit,
+  coWorker,
+}: CoWorkerFormProps) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { actions } = useCoWorkerFormSlice();
   const existingRoles = useSelector(selectRoles);
-  const onSubmit = (values: any) => {
-    console.log("Values ", values);
-  };
 
   useEffect(() => {
     dispatch(actions.getRoles());
   }, []);
 
-  console.log("Roles ", existingRoles);
+  console.log("Roles ", existingRoles, coWorker);
   return (
     <Container>
       <Form
@@ -140,6 +132,8 @@ const CoWorkerForm = (
         validate={validate}
         render={({
           handleSubmit,
+          submitting,
+          pristine,
           form: {
             mutators: { push, pop },
           },
@@ -163,15 +157,19 @@ const CoWorkerForm = (
                             autoWidth
                             label="Role"
                             variant="outlined"
+                            value={values.roles ? values.roles[i] : false}
                           >
                             <option aria-label="None" value="" />
 
                             {existingRoles
-                              .filter((role) =>
-                                values.roles[i] === role.id
+                              .filter((role) => {
+                                if (!values.roles || !values.roles.length) {
+                                  return true;
+                                }
+                                return values.roles[i] === role.id
                                   ? true
-                                  : !values.roles.includes(role.id)
-                              )
+                                  : !values.roles.includes(role.id);
+                              })
                               .map((r) => (
                                 <option key={r.id} value={r.id}>
                                   {r.name}
@@ -294,7 +292,11 @@ const CoWorkerForm = (
                 </Grid>
               </Grid>
               <Grid container direction="row-reverse">
-                <Button className={classes.saveBtn} type="submit">
+                <Button
+                  className={classes.saveBtn}
+                  type="submit"
+                  disabled={submitting || pristine}
+                >
                   Save Changes
                 </Button>
               </Grid>
@@ -306,4 +308,5 @@ const CoWorkerForm = (
   );
 };
 
+// CoWorkerForm.defaultProps = defaultProps;
 export default CoWorkerForm;

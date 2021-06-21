@@ -9,6 +9,7 @@ import {
   IconButton,
   Typography,
   Button,
+  CircularProgress,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -22,7 +23,12 @@ import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
 import User from "../../../types/User";
 import { useCoWorkersSlice } from "./slice";
-import { selectCoWorkers } from "./slice/selectors";
+import {
+  selectCoWorkers,
+  selectIsFormLoading,
+  selectIsLoading,
+} from "./slice/selectors";
+import Loader from "../../../components/Loader";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -61,83 +67,134 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const defaultCoWorker = {
+  roles: [""],
+  nickname: "",
+  phone: "",
+  email: "",
+  avatar: "",
+  jobTitle: "",
+};
 const CoWorker = (): React.ReactElement => {
   const { actions } = useCoWorkersSlice();
   const classes = useStyles();
   const dispatch = useDispatch();
 
   const coWorkers = useSelector(selectCoWorkers);
-
-  const [selectedCoWorker, setSelectedCoWorker] = useState(0);
+  const formLoading = useSelector(selectIsFormLoading);
+  const loading = useSelector(selectIsLoading);
+  const [selectedCoWorker, setSelectedCoWorker] = useState<User>();
+  const [newCoWorker, setNewCoWorker] = useState<User>();
 
   const handleCoWorkerSelected = (i: number) => {
-    dispatch(actions.getCoWorkers());
-    setSelectedCoWorker(i);
+    // dispatch(actions.getCoWorkers());
+    setSelectedCoWorker(coWorkers[i]);
+    setNewCoWorker(undefined);
   };
 
   useEffect(() => {
     window.store.dispatch(actions.getCoWorkers());
   }, []);
 
+  const handleNewCoWorker = (coWorker: User) => {
+    console.log("handleNewCoWorker ", coWorker);
+    setNewCoWorker(coWorker);
+    dispatch(actions.createCoWorker(coWorker));
+  };
+
+  const handleCoWorkerUpdate = (coWorker: User) => {
+    console.log("handleCoWorkerUpdate ", coWorker);
+  };
+
+  const handleAddCoWorker = () => {
+    setNewCoWorker(defaultCoWorker);
+    setSelectedCoWorker(undefined);
+  };
   return (
-    <Grid container className={classes.root}>
-      <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
-        <Grid container justify="flex-start">
-          <Grid sm={8} item className={classes.accordionCoWorker}>
-            <Typography variant="h6">CO-WORKER</Typography>
-          </Grid>
-          <Grid xs={2} item>
-            <IconButton color="inherit" aria-label="Add Role">
-              <AddCircleIcon fontSize="large" color="primary" />
-            </IconButton>
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid xs={2} item>
-            <SearchIcon />
-          </Grid>
-          <Grid sm={8} item>
-            <TextField id="input-with-icon-grid" />
-          </Grid>
-        </Grid>
+    <Grid>
+      {loading && <Loader />}
+      {!loading && (
+        <Grid container className={classes.root}>
+          <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
+            <Grid container justify="flex-start">
+              <Grid sm={8} item className={classes.accordionCoWorker}>
+                <Typography variant="h6">CO-WORKER</Typography>
+              </Grid>
+              <Grid xs={2} item>
+                <IconButton
+                  color="inherit"
+                  aria-label="Add Role"
+                  onClick={handleAddCoWorker}
+                >
+                  <AddCircleIcon fontSize="large" color="primary" />
+                </IconButton>
+              </Grid>
+            </Grid>
+            <Grid container>
+              <Grid xs={2} item>
+                <SearchIcon />
+              </Grid>
+              <Grid sm={8} item>
+                <TextField id="input-with-icon-grid" />
+              </Grid>
+            </Grid>
 
-        <List>
-          {coWorkers &&
-            coWorkers.map((coWorker: User, i: number) => (
-              <ListItem
-                button
-                key={coWorker.id}
-                onClick={() => handleCoWorkerSelected(i)}
-                selected={i === selectedCoWorker}
-              >
-                <ListItemText primary={`${coWorker.nickname} ${i + 1}`} />
-              </ListItem>
-            ))}
-        </List>
-      </Grid>
-      <Grid item className={classes.main} xs={12} sm={8} lg={9}>
-        <Accordion expanded>
-          <AccordionSummary
-            classes={{ content: classes.accordionSummary }}
-            aria-controls="panel1c-content"
-          >
-            <div className={classes.accordionCoWorker}>
-              <ExpandMoreIcon />
-              <img
-                className={`${classes.accordionProfile}
+            <List>
+              {coWorkers &&
+                coWorkers.map((coWorker: User, i: number) => (
+                  <ListItem
+                    button
+                    key={coWorker.id}
+                    onClick={() => handleCoWorkerSelected(i)}
+                    selected={
+                      selectedCoWorker && coWorker.id === selectedCoWorker.id
+                    }
+                  >
+                    <ListItemText primary={`${coWorker.nickname} ${i + 1}`} />
+                  </ListItem>
+                ))}
+            </List>
+          </Grid>
+          <Grid item className={classes.main} xs={12} sm={8} lg={9}>
+            {(selectedCoWorker || newCoWorker) && (
+              <Accordion expanded>
+                <AccordionSummary
+                  classes={{ content: classes.accordionSummary }}
+                  aria-controls="panel1c-content"
+                >
+                  <div className={classes.accordionCoWorker}>
+                    <ExpandMoreIcon />
+                    <img
+                      className={`${classes.accordionProfile}
                  ${classes.paddingSmall}`}
-                src={profile}
-                alt="Co-worker"
-              />
-              <Typography>Kim Wexler (Legal officer)</Typography>
-            </div>
+                      src={profile}
+                      alt="Co-worker"
+                    />
+                    {selectedCoWorker && (
+                      <Typography>{selectedCoWorker.nickname}</Typography>
+                    )}
+                  </div>
 
-            <Button>Disable</Button>
-          </AccordionSummary>
-
-          <CoWorkerForm />
-        </Accordion>
-      </Grid>
+                  <Button>Disable</Button>
+                </AccordionSummary>
+                {formLoading && <Loader />}
+                {!formLoading && selectedCoWorker && (
+                  <CoWorkerForm
+                    onSubmit={handleCoWorkerUpdate}
+                    coWorker={selectedCoWorker}
+                  />
+                )}
+                {!formLoading && newCoWorker && (
+                  <CoWorkerForm
+                    onSubmit={handleNewCoWorker}
+                    coWorker={newCoWorker}
+                  />
+                )}
+              </Accordion>
+            )}{" "}
+          </Grid>
+        </Grid>
+      )}
     </Grid>
   );
 };
