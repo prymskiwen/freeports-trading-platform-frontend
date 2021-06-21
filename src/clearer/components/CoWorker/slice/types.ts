@@ -1,7 +1,7 @@
 import User from "../../../../types/User";
 
 /* --- STATE --- */
-export interface CoWorkerState {
+export interface CoWorkersState {
   coWorkers: User[];
   loading: boolean;
 }

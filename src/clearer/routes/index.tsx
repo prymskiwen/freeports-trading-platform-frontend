@@ -14,7 +14,6 @@ import { RootState } from "../../util/types/RootState";
 
 const Routes = (): React.ReactElement => {
   const { error } = useSelector((state: RootState) => {
-    console.log("state ...........", state);
     return {
       error: state?.global.error,
     };

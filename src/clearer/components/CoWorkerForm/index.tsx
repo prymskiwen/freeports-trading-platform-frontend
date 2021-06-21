@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { Container, IconButton, Divider, Button } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
-import { v4 as uuidv4 } from "uuid";
 import { Form } from "react-final-form";
 import { TextField, Select } from "mui-rff";
 import arrayMutators from "final-form-arrays";
 import { FieldArray } from "react-final-form-arrays";
+import { useDispatch, useSelector } from "react-redux";
 import profile from "../../../assets/images/profile.jpg";
+import { useCoWorkerFormSlice } from "./slice";
+import { selectRoles } from "./slice/selectors";
+import User from "../../../types/User";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -58,23 +61,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface Role {
-  name: string;
-  title: string;
-  id?: string;
-}
-const roles: Role[] = [
-  { name: "QUALITY_MANAGER", title: "Quality manager" },
-  { name: "ADMINISTRATIVE_LEAD", title: "Administrative lead" },
-  { name: "LEGAL_OFFICER", title: "Legal offer" },
-];
-
-const defaultRole = {
-  name: "ADMINISTRATIVE_LEAD",
-  id: uuidv4(),
-  title: "Quality manager",
-};
-
 const validate = (values: any) => {
   const errors: {
     firstName?: string;
@@ -116,13 +102,33 @@ const validate = (values: any) => {
   }
   return errors;
 };
-const CoWorkerForm = (): React.ReactElement => {
-  const classes = useStyles();
 
+interface Props {
+  // eslint-disable-next-line react/require-default-props
+  coWorker?: Partial<User>;
+}
+
+const CoWorkerForm = (
+  { coWorker }: Props = {
+    coWorker: {
+      roles: [""],
+      nickname: "",
+    },
+  }
+): React.ReactElement => {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { actions } = useCoWorkerFormSlice();
+  const existingRoles = useSelector(selectRoles);
   const onSubmit = (values: any) => {
     console.log("Values ", values);
   };
 
+  useEffect(() => {
+    dispatch(actions.getRoles());
+  }, []);
+
+  console.log("Roles ", existingRoles);
   return (
     <Container>
       <Form
@@ -130,12 +136,7 @@ const CoWorkerForm = (): React.ReactElement => {
         mutators={{
           ...arrayMutators,
         }}
-        initialValues={{
-          roles: [defaultRole.name],
-          firstName: "",
-          lastName: "",
-          status: "",
-        }}
+        initialValues={coWorker}
         validate={validate}
         render={({
           handleSubmit,
@@ -165,15 +166,15 @@ const CoWorkerForm = (): React.ReactElement => {
                           >
                             <option aria-label="None" value="" />
 
-                            {roles
+                            {existingRoles
                               .filter((role) =>
-                                values.roles[i] === role.name
+                                values.roles[i] === role.id
                                   ? true
-                                  : !values.roles.includes(role.name)
+                                  : !values.roles.includes(role.id)
                               )
                               .map((r) => (
-                                <option key={r.name} value={r.name}>
-                                  {r.title}
+                                <option key={r.id} value={r.id}>
+                                  {r.name}
                                 </option>
                               ))}
                           </Select>
@@ -190,7 +191,7 @@ const CoWorkerForm = (): React.ReactElement => {
                         )}
                         {fields &&
                           i === (fields.length || 0) - 1 &&
-                          (fields.length || 0) < roles.length && (
+                          (fields.length || 0) < existingRoles.length && (
                             <Grid item xs={1}>
                               <IconButton
                                 onClick={() => push("roles", "")}
@@ -233,21 +234,12 @@ const CoWorkerForm = (): React.ReactElement => {
                 <Grid container>
                   <Grid item sm={12} md={9}>
                     <Grid container spacing={3}>
-                      <Grid item sm={12} md={6}>
+                      <Grid item sm={12}>
                         <TextField
                           required
-                          id="first-name"
-                          name="firstName"
-                          label="First Name"
-                          variant="outlined"
-                        />
-                      </Grid>
-                      <Grid item sm={12} md={6}>
-                        <TextField
-                          required
-                          id="last-name"
-                          label="Last Name"
-                          name="lastName"
+                          id="nickname"
+                          name="nickname"
+                          label="Nickname"
                           variant="outlined"
                         />
                       </Grid>
@@ -276,7 +268,6 @@ const CoWorkerForm = (): React.ReactElement => {
                     <Grid container spacing={3}>
                       <Grid item sm={12} md={6}>
                         <TextField
-                          required
                           id="job-title"
                           label="Jub title"
                           name="jobTitle"
@@ -303,7 +294,9 @@ const CoWorkerForm = (): React.ReactElement => {
                 </Grid>
               </Grid>
               <Grid container direction="row-reverse">
-                <Button className={classes.saveBtn} type="submit">Save Changes</Button>
+                <Button className={classes.saveBtn} type="submit">
+                  Save Changes
+                </Button>
               </Grid>
             </Grid>
           </form>

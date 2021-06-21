@@ -6,34 +6,36 @@ import {
   useInjectReducer,
   useInjectSaga,
 } from "../../../../util/redux-injectors";
-import { coWorkersSaga } from "./saga";
-import { CoWorkersState } from "./types";
+import { RoleType } from "../../Roles";
+import { coWorkerFormSaga } from "./saga";
+import { CoWorkerFormState } from "./types";
 
-export const initialState: CoWorkersState = {
-  coWorkers: [],
+export const initialState: CoWorkerFormState = {
+  roles: [],
   loading: false,
 };
 
 const slice = createSlice({
-  name: "coWorkers",
+  name: "coWorkerForm",
   initialState,
   reducers: {
-    getCoWorkers(state) {
+    getRoles(state) {
       state.loading = true;
-      state.coWorkers = [];
+      state.roles = [];
     },
-    getCoWorkersSuccess(state, action: PayloadAction<User[]>) {
+    getRolesSuccess(state, action: PayloadAction<RoleType[]>) {
       state.loading = true;
-      state.coWorkers = action.payload;
+      console.log("got roles successfully ", action.payload);
+      state.roles = action.payload;
     },
   },
 });
 
 export const { actions: coWorkActions, reducer } = slice;
 
-export const useCoWorkersSlice = () => {
+export const useCoWorkerFormSlice = () => {
   useInjectReducer({ key: slice.name, reducer: slice.reducer });
-  useInjectSaga({ key: slice.name, saga: coWorkersSaga });
+  useInjectSaga({ key: slice.name, saga: coWorkerFormSaga });
   (window as any).action = slice.actions;
   return { actions: slice.actions };
 };

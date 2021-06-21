@@ -1,12 +1,10 @@
-import { applyMiddleware, Store } from "redux";
+import { applyMiddleware, combineReducers, Store } from "redux";
 import { createLogger } from "redux-logger";
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 
 import createSagaMiddleware from "redux-saga";
 import { createInjectorsEnhancer } from "redux-injectors";
 import { createReducer } from "./reducers";
-// import { initialState as authInitialState } from "./auth/reducer";
-// import { initialState as globalInitialState } from "./global/reducer";
 
 export default function configureAppStore() {
   const reduxSagaMonitorOptions = {};

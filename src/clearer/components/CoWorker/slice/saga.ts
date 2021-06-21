@@ -7,8 +7,6 @@ import PaginatedResponse from "../../../../types/PaginatedResponse";
 import User from "../../../../types/User";
 
 export function* getCoWorkers(): Generator<any> {
-  console.log("getCoWorkers");
-
   try {
     const response = yield call(getClearerUsers);
     yield put(
@@ -20,5 +18,5 @@ export function* getCoWorkers(): Generator<any> {
 }
 
 export function* coWorkersSaga(): Generator<any> {
-  yield takeEvery(actions.getCoWorkers, getClearerUsers);
+  yield takeEvery(actions.getCoWorkers, getCoWorkers);
 }
