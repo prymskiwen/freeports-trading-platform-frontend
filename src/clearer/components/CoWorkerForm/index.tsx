@@ -157,6 +157,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                             autoWidth
                             label="Role"
                             variant="outlined"
+                            value={values.roles ? values.roles[i] : false}
                           >
                             <option aria-label="None" value="" />
 

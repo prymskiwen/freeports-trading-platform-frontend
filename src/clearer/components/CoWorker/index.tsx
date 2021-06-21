@@ -87,7 +87,7 @@ const CoWorker = (): React.ReactElement => {
   const [newCoWorker, setNewCoWorker] = useState<User>();
 
   const handleCoWorkerSelected = (i: number) => {
-    dispatch(actions.getCoWorkers());
+    // dispatch(actions.getCoWorkers());
     setSelectedCoWorker(coWorkers[i]);
     setNewCoWorker(undefined);
   };
