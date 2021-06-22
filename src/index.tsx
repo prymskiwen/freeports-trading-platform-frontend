@@ -7,6 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 
 import "./index.css";
 import configureAppStore from "./store";
+import Loader from "./components/Loader";
 
 const App = React.lazy(
   () =>
@@ -24,7 +25,7 @@ store.dispatch(authCheck());
 
 ReactDOM.render(
   <React.StrictMode>
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <Provider store={store}>
         <App />
       </Provider>

@@ -34,7 +34,8 @@
     "max-len": ["warn", { "code": 80 }],
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "prettier/prettier": ["off", { "singleQuote": true }],
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "import/prefer-default-export": "off"
   },
   "settings": {
     "import/resolver": {
