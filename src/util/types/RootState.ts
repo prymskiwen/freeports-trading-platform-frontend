@@ -2,6 +2,7 @@
 
 import { CoWorkersState } from "../../clearer/components/CoWorker/slice/types";
 import { CoWorkerFormState } from "../../clearer/components/CoWorkerForm/slice/types";
+import { ProfileState } from "../../organization/components/Profile/slice/types";
 
 /* 
   Because the redux-injectors injects your
@@ -16,6 +17,7 @@ export interface RootState {
   global?: any;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
+  profileForm?: ProfileState;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for
   // generating containers seamlessly
 }
