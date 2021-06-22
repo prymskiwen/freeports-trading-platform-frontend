@@ -18,6 +18,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import { useSelector, useDispatch } from "react-redux";
+import { useHistory, useParams } from "react-router";
 
 import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
@@ -27,6 +28,7 @@ import {
   selectCoWorkers,
   selectIsFormLoading,
   selectIsLoading,
+  selectSelectedCoWorker,
 } from "./slice/selectors";
 import Loader from "../../../components/Loader";
 
@@ -79,17 +81,41 @@ const CoWorker = (): React.ReactElement => {
   const { actions } = useCoWorkersSlice();
   const classes = useStyles();
   const dispatch = useDispatch();
+  const history = useHistory();
+  const { coWorkerId } = useParams<{ coWorkerId: string }>();
 
   const coWorkers = useSelector(selectCoWorkers);
   const formLoading = useSelector(selectIsFormLoading);
   const loading = useSelector(selectIsLoading);
-  const [selectedCoWorker, setSelectedCoWorker] = useState<User>();
-  const [newCoWorker, setNewCoWorker] = useState<User>();
+  const selectedCoWorker: User = useSelector(selectSelectedCoWorker);
 
+  console.log("rerender ", coWorkerId, selectedCoWorker);
+  if (
+    coWorkerId &&
+    coWorkerId !== "new" &&
+    coWorkers.length &&
+    (!selectedCoWorker || selectedCoWorker.id !== coWorkerId)
+  ) {
+    console.log("coWorker id ", coWorkerId, selectedCoWorker);
+    const foundCoWorker = coWorkers.find(
+      (coWorker) => coWorker.id === coWorkerId
+    );
+    if (foundCoWorker) {
+      dispatch(actions.selectCoWorker(foundCoWorker));
+    }
+  }
+
+  if (coWorkerId === "new") {
+    if (selectedCoWorker?.id) {
+      history.push(`/co-workers/${selectedCoWorker.id}`);
+      dispatch(actions.selectCoWorker(selectedCoWorker));
+    } else if (!selectedCoWorker) {
+      dispatch(actions.selectCoWorker(defaultCoWorker));
+    }
+  }
   const handleCoWorkerSelected = (i: number) => {
-    // dispatch(actions.getCoWorkers());
-    setSelectedCoWorker(coWorkers[i]);
-    setNewCoWorker(undefined);
+    history.push(`/co-workers/${coWorkers[i].id}`);
+    dispatch(actions.selectCoWorker(coWorkers[i]));
   };
 
   useEffect(() => {
@@ -97,9 +123,8 @@ const CoWorker = (): React.ReactElement => {
   }, []);
 
   const handleNewCoWorker = (coWorker: User) => {
-    console.log("handleNewCoWorker ", coWorker);
-    setNewCoWorker(coWorker);
-    dispatch(actions.createCoWorker(coWorker));
+    // dispatch(actions.selectCoWorker(coWorker));
+    dispatch(actions.createCoWorker({ user: coWorker }));
   };
 
   const handleCoWorkerUpdate = (coWorker: User) => {
@@ -107,8 +132,8 @@ const CoWorker = (): React.ReactElement => {
   };
 
   const handleAddCoWorker = () => {
-    setNewCoWorker(defaultCoWorker);
-    setSelectedCoWorker(undefined);
+    dispatch(actions.selectCoWorker(defaultCoWorker));
+    history.push("/co-workers/new");
   };
   return (
     <Grid>
@@ -156,7 +181,7 @@ const CoWorker = (): React.ReactElement => {
             </List>
           </Grid>
           <Grid item className={classes.main} xs={12} sm={8} lg={9}>
-            {(selectedCoWorker || newCoWorker) && (
+            {selectedCoWorker && (
               <Accordion expanded>
                 <AccordionSummary
                   classes={{ content: classes.accordionSummary }}
@@ -180,14 +205,12 @@ const CoWorker = (): React.ReactElement => {
                 {formLoading && <Loader />}
                 {!formLoading && selectedCoWorker && (
                   <CoWorkerForm
-                    onSubmit={handleCoWorkerUpdate}
+                    onSubmit={
+                      selectedCoWorker.id
+                        ? handleCoWorkerUpdate
+                        : handleNewCoWorker
+                    }
                     coWorker={selectedCoWorker}
-                  />
-                )}
-                {!formLoading && newCoWorker && (
-                  <CoWorkerForm
-                    onSubmit={handleNewCoWorker}
-                    coWorker={newCoWorker}
                   />
                 )}
               </Accordion>

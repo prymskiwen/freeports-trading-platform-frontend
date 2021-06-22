@@ -128,7 +128,7 @@ const Header = (): React.ReactElement => {
                   </ListItemIcon>
                   <ListItemText primary="Roles" />
                 </MenuItem>
-                <MenuItem onClick={() => redirect("/co-worker")}>
+                <MenuItem onClick={() => redirect("/co-workers")}>
                   <ListItemIcon>
                     <GroupIcon fontSize="small" />
                   </ListItemIcon>
