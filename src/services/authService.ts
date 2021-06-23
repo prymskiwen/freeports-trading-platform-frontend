@@ -65,4 +65,17 @@ const otpCheck = (otpCode: string): Promise<LoginResponseType> => {
   });
 };
 
-export { login as default, login, qrCodeGen, otpCheck };
+const publicKey = (): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get("auth/publicKey")
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      })
+  })
+}
+
+export { login as default, login, qrCodeGen, otpCheck, publicKey };

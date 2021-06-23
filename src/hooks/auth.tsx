@@ -1,7 +1,7 @@
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import reduxActions from "../store/actions";
-import { login, qrCodeGen, otpCheck } from "../services/authService";
+import { login, qrCodeGen, otpCheck, publicKey } from "../services/authService";
 
 const {
   authLogin,
@@ -76,6 +76,29 @@ function useAuth(): any {
       });
   };
 
+  const checkPublicKey = async () => {
+    const result: {
+      success?: boolean,
+      data?: string,
+    } = {};
+
+    await publicKey()
+    .then((data) => {
+      console.log(data);
+      if(data.publickey.length > 0){
+        result.success = false;
+        result.data = "Your local key dont correspond with server Key";
+      }else{
+        result.success = false;
+        result.data = "You dont have any key yet";
+      }
+    })
+    .catch((err) => {
+      dispatch(setError(err));
+    })
+    return result;
+  }
+
   return {
     authStep,
     isAuthenticated,
@@ -87,6 +110,7 @@ function useAuth(): any {
     setError,
     generateQRCode,
     checkOTP,
+    checkPublicKey,
   };
 }
 
