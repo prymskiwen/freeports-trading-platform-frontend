@@ -82,19 +82,16 @@ const CoWorker = (): React.ReactElement => {
   const loading = useSelector(selectIsLoading);
   const selectedCoWorker: User = useSelector(selectSelectedCoWorker);
 
-  console.log("rerender ", coWorkerId, selectedCoWorker);
   if (
     coWorkerId &&
     coWorkerId !== "new" &&
     coWorkers.length &&
     (!selectedCoWorker || selectedCoWorker.id !== coWorkerId)
   ) {
-    console.log("coWorker id >>>", coWorkerId, selectedCoWorker);
     const foundCoWorker = coWorkers.find(
       (coWorker) => coWorker.id === coWorkerId
     );
     if (foundCoWorker) {
-      console.log("::coworker not new not selected ");
       // dispatch(actions.selectCoWorker(foundCoWorker));
     }
   }
@@ -102,10 +99,8 @@ const CoWorker = (): React.ReactElement => {
   if (coWorkerId === "new") {
     if (selectedCoWorker?.id) {
       history.push(`/co-workers/${selectedCoWorker.id}`);
-      console.log("::coworker new no id ");
       dispatch(actions.selectCoWorker(selectedCoWorker));
     } else if (!selectedCoWorker) {
-      console.log("::coworker new and not selected use default ");
       dispatch(actions.selectCoWorker(defaultCoWorker));
     }
   }
@@ -124,7 +119,7 @@ const CoWorker = (): React.ReactElement => {
   };
 
   const handleCoWorkerUpdate = (coWorker: User) => {
-    console.log("handleCoWorkerUpdate ", coWorker);
+    return null;
   };
 
   const handleAddCoWorker = () => {

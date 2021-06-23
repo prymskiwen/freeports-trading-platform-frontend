@@ -100,12 +100,6 @@ interface CoWorkerFormProps {
   coWorker: Partial<User>;
   onSubmit: (coWorker: User) => void;
 }
-// const defaultProps: CoWorkerFormProps = {
-//   coWorker: {
-//     roles: [""],
-//     nickname: "",
-//   },
-// };
 
 const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
   onSubmit,
@@ -120,7 +114,6 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
     dispatch(actions.getRoles());
   }, []);
 
-  console.log("Roles> ", existingRoles, coWorker.roles);
   return (
     <Container>
       <Form
