@@ -20,3 +20,8 @@ export const selectIsLoading = createSelector(
   [selectDomain],
   (coWorkerState) => coWorkerState.loading
 );
+
+export const selectSelectedCoWorker = createSelector(
+  [selectDomain],
+  (coWorkerState) => coWorkerState.selectedCoWorker
+);
