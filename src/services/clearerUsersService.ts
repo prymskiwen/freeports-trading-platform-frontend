@@ -45,4 +45,25 @@ const getClearerUser = (id: string): Promise<User> => {
       });
   });
 };
-export { createClearerUser, getClearerUsers as default, getClearerUser };
+
+const updateClearerUser = (id: string, user: User): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/user/${id}`, user)
+      .then((res: any) => {
+        console.log(" user update response ", res.data);
+
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+export {
+  createClearerUser,
+  getClearerUsers as default,
+  getClearerUser,
+  updateClearerUser,
+};

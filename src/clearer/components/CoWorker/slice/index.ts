@@ -41,6 +41,9 @@ const slice = createSlice({
     createCoWorker(state, action: PayloadAction<{ user: User }>) {
       state.formLoading = true;
     },
+    updateCoWorker(state, action: PayloadAction<{ user: User }>) {
+      state.formLoading = true;
+    },
     createCoWorkersSuccess(
       state,
       action: PayloadAction<ResourceCreatedResponse>

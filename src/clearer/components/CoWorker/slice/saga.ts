@@ -25,9 +25,41 @@ export function* getCoWorkers(): Generator<any> {
 
 export function* createCoWorker({
   payload,
-}: PayloadAction<{ user: User; history: any }>): Generator<any> {
+}: PayloadAction<{ user: User }>): Generator<any> {
   try {
     const response = yield call(createClearerUser, payload.user);
+
+    // assign user roles
+    if (payload.user.roles?.length) {
+      yield call(
+        assignClearerRolesToUser,
+        (response as ResourceCreatedResponse).id,
+        payload.user.roles
+      );
+    }
+    yield put(
+      actions.createCoWorkersSuccess(response as ResourceCreatedResponse)
+    );
+    yield put(actions.getCoWorkers());
+
+    yield take(actions.getCoWorkersSuccess);
+
+    const coWorkers = yield select(selectCoWorkers);
+    const selectedCoWorker = (coWorkers as Array<User>).find(
+      (c) => c.id === (response as ResourceCreatedResponse).id
+    );
+    if (selectedCoWorker) {
+      yield put(actions.selectCoWorker(selectedCoWorker));
+    }
+  } catch (error) {
+    console.log("error", error);
+  }
+}
+export function* updateCoWorker({
+  payload,
+}: PayloadAction<{ user: User }>): Generator<any> {
+  try {
+    const response = yield call(updateClearerCoWorker, payload.user);
 
     // assign user roles
     if (payload.user.roles?.length) {
