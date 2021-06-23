@@ -41,26 +41,26 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const columns = [
   {
-    field: "investor_iD",
+    field: "investorId",
     title: "Investor ID",
     cellStyle: {
       width: "30%",
     },
     render: (rowData: any) => {
-      const { investor_id: investorID } = rowData;
+      const { investorId } = rowData;
 
-      return <Link to="/investors/detail">{investorID}</Link>;
+      return <Link to={`/investors/${investorId}`}>{investorId}</Link>;
     },
   },
   {
-    field: "account_summary",
+    field: "accountSummary",
     title: "Account summary",
     cellStyle: {
       width: "30%",
     },
   },
   {
-    field: "trading_account_summary",
+    field: "tradingAccountSummary",
     title: "Trading account summary",
     cellStyle: {
       width: "40%",
