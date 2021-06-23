@@ -10,8 +10,17 @@ import {
 import { coWorkersSaga } from "./saga";
 import { CoWorkersState } from "./types";
 
+const defaultCoWorker = {
+  roles: [""],
+  nickname: "",
+  phone: "",
+  email: "",
+  avatar: "",
+  jobTitle: "",
+};
 export const initialState: CoWorkersState = {
   coWorkers: [],
+  selectedCoWorker: defaultCoWorker,
   loading: false,
   formLoading: false,
 };
@@ -29,13 +38,20 @@ const slice = createSlice({
       state.coWorkers = action.payload;
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createCoWorker(state, action: PayloadAction<User>) {
+    createCoWorker(state, action: PayloadAction<{ user: User }>) {
       state.formLoading = true;
     },
     createCoWorkersSuccess(
       state,
       action: PayloadAction<ResourceCreatedResponse>
     ) {
+      state.formLoading = false;
+    },
+    selectCoWorker(state, action: PayloadAction<User>) {
+      state.formLoading = true;
+    },
+    selectCoWorkerSuccess(state, action: PayloadAction<User>) {
+      state.selectedCoWorker = action.payload;
       state.formLoading = false;
     },
   },

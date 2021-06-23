@@ -51,7 +51,9 @@ export default [
     path: "/nostro-accounts/details",
     exact: true,
     auth: true,
-    component: lazy(() => import("../components/NostroAccounts/NostroAccountDetails")),
+    component: lazy(
+      () => import("../components/NostroAccounts/NostroAccountDetails")
+    ),
   },
   {
     path: "/tracking",
@@ -78,7 +80,13 @@ export default [
     component: lazy(() => import("../components/Dashboard")),
   },
   {
-    path: "/co-worker",
+    path: "/co-workers",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/CoWorker")),
+  },
+  {
+    path: "/co-workers/:coWorkerId",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/CoWorker")),
