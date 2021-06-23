@@ -66,7 +66,7 @@ function decodeBase64(base64: string) {
  */
 function friendlyError(msg: string | undefined, friendlyText: string) {
   const e = new Error(msg);
-  e.friendlyText = friendlyText;
+  e.message = friendlyText;
   return e;
 }
 
@@ -416,7 +416,7 @@ async function encryptMegolmKeyFile(
   return packMegolmKeyFile(resultBuffer);
 }
 
-function readFileAsArrayBuffer(file: Blob) {
+function readFileAsArrayBuffer(file: Blob): Promise<any> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {

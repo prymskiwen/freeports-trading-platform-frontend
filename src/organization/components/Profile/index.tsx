@@ -73,14 +73,12 @@ const Profile = (): React.ReactElement => {
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const keyfileRef = useRef<HTMLInputElement | null>(null);
+  const [key, setKey] = useState("");
+  const [passphrase, setPassPhrase] = useState("");
 
   useEffect(() => {
     dispatch(actions.getProfile());
   }, []);
-
-  const onPasswordReset = (values: any) => {
-    console.log("Values ", values);
-  };
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.currentTarget;
@@ -101,8 +99,38 @@ const Profile = (): React.ReactElement => {
     if (keyfileRef.current !== null) keyfileRef.current.click();
   };
 
+  const onKeyChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    setKey(value);
+  };
+
+  const onPassPhraseChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    setPassPhrase(value);
+  };
+
   const onCreateCertificate = () => {
-    console.log("create");
+    dispatch(actions.createKeyPair({ key, passphrase }));
+  };
+
+  const downloadString = (text: string, fileType: string, fileName: string) => {
+    const blob = new Blob([text], { type: fileType });
+
+    const a = document.createElement("a");
+    a.download = fileName;
+    a.href = URL.createObjectURL(blob);
+    a.dataset.downloadurl = [fileType, a.download, a.href].join(":");
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+    }, 1500);
   };
 
   return (
@@ -289,6 +317,8 @@ const Profile = (): React.ReactElement => {
                     label="Key name"
                     variant="outlined"
                     fullWidth
+                    value={key}
+                    onChange={onKeyChange}
                   />
                 </Grid>
               </Grid>
@@ -297,12 +327,14 @@ const Profile = (): React.ReactElement => {
                   <TextField
                     required
                     margin="dense"
-                    id="password"
-                    name="password"
+                    id="passphrase"
+                    name="passphrase"
                     label="Password"
                     type="password"
                     variant="outlined"
                     fullWidth
+                    value={passphrase}
+                    onChange={onPassPhraseChange}
                   />
                 </Grid>
               </Grid>
