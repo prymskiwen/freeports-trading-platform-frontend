@@ -25,7 +25,7 @@ const PublicKeyBanner = (): React.ReactElement =>{
       <Snackbar
         key={messageInfo}
         open={opened}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         anchorOrigin={{vertical, horizontal}}
         onClose={handleClose}
         message="missing public key"
