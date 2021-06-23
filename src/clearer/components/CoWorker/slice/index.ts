@@ -49,7 +49,13 @@ const slice = createSlice({
     },
     selectCoWorker(state, action: PayloadAction<User>) {
       console.log("Selected coworker ", action.payload);
+      // state.selectedCoWorker = action.payload;
+      state.formLoading = true;
+    },
+    selectCoWorkerSuccess(state, action: PayloadAction<User>) {
+      console.log("Selected coworker sucss ", action.payload);
       state.selectedCoWorker = action.payload;
+      state.formLoading = false;
     },
   },
 });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -9,7 +9,6 @@ import {
   IconButton,
   Typography,
   Button,
-  CircularProgress,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -23,13 +22,14 @@ import { useHistory, useParams } from "react-router";
 import profile from "../../../assets/images/profile.jpg";
 import CoWorkerForm from "../CoWorkerForm";
 import User from "../../../types/User";
-import { useCoWorkersSlice } from "./slice";
+import { useCoWorkersSlice, initialState } from "./slice";
 import {
   selectCoWorkers,
   selectIsFormLoading,
   selectIsLoading,
   selectSelectedCoWorker,
 } from "./slice/selectors";
+
 import Loader from "../../../components/Loader";
 
 const useStyles = makeStyles((theme) => ({
@@ -69,14 +69,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const defaultCoWorker = {
-  roles: [""],
-  nickname: "",
-  phone: "",
-  email: "",
-  avatar: "",
-  jobTitle: "",
-};
+const defaultCoWorker = initialState.selectedCoWorker;
 const CoWorker = (): React.ReactElement => {
   const { actions } = useCoWorkersSlice();
   const classes = useStyles();
@@ -96,20 +89,23 @@ const CoWorker = (): React.ReactElement => {
     coWorkers.length &&
     (!selectedCoWorker || selectedCoWorker.id !== coWorkerId)
   ) {
-    console.log("coWorker id ", coWorkerId, selectedCoWorker);
+    console.log("coWorker id >>>", coWorkerId, selectedCoWorker);
     const foundCoWorker = coWorkers.find(
       (coWorker) => coWorker.id === coWorkerId
     );
     if (foundCoWorker) {
-      dispatch(actions.selectCoWorker(foundCoWorker));
+      console.log("::coworker not new not selected ");
+      // dispatch(actions.selectCoWorker(foundCoWorker));
     }
   }
 
   if (coWorkerId === "new") {
     if (selectedCoWorker?.id) {
       history.push(`/co-workers/${selectedCoWorker.id}`);
+      console.log("::coworker new no id ");
       dispatch(actions.selectCoWorker(selectedCoWorker));
     } else if (!selectedCoWorker) {
+      console.log("::coworker new and not selected use default ");
       dispatch(actions.selectCoWorker(defaultCoWorker));
     }
   }

@@ -120,7 +120,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
     dispatch(actions.getRoles());
   }, []);
 
-  console.log("Roles ", existingRoles, coWorker);
+  console.log("Roles> ", existingRoles, coWorker.roles);
   return (
     <Container>
       <Form
