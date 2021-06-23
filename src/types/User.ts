@@ -1,3 +1,5 @@
+import { RoleType } from "../clearer/components/Roles";
+
 export default interface User {
   id?: string;
 
