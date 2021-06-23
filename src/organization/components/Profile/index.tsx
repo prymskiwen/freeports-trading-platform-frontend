@@ -1,9 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form } from "react-final-form";
-import { TextField } from "mui-rff";
-import arrayMutators from "final-form-arrays";
 import {
   Avatar,
   Button,
@@ -12,9 +9,14 @@ import {
   CardContent,
   CardActions,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
   makeStyles,
+  TextField,
 } from "@material-ui/core";
 
 import { useProfileSlice } from "./slice";
@@ -53,63 +55,15 @@ const useStyles = makeStyles((theme) => ({
   cardHeader: {
     "& .MuiCardHeader-action": {
       marginTop: 0,
+      "& button": {
+        margin: "0 10px",
+      },
     },
   },
+  hiddenFileInput: {
+    display: "none",
+  },
 }));
-
-const profileValidate = (values: any) => {
-  const errors: {
-    nickname?: string;
-    email?: string;
-    phone?: string;
-    avata?: string;
-  } = {};
-  if (!values.nickname) {
-    errors.nickname = "This Field Required";
-  }
-
-  if (!values.email) {
-    errors.email = "This Field Required";
-  }
-
-  if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-    errors.email = "Please enter a valid Email";
-  }
-
-  if (!values.phone) {
-    errors.phone = "This Field Required";
-  }
-
-  if (
-    // eslint-disable-next-line no-useless-escape
-    !/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(
-      values.phone
-    )
-  ) {
-    errors.phone = "Please enter a valid Phone number";
-  }
-  return errors;
-};
-
-const passwordValidate = (values: any) => {
-  const errors: {
-    password?: string;
-    confirmPassword?: string;
-  } = {};
-  if (!values.password) {
-    errors.password = "This Field Required";
-  }
-
-  if (!values.confirmPassword) {
-    errors.confirmPassword = "This Field Required";
-  }
-
-  if (values.password !== values.confirmPassword) {
-    errors.confirmPassword = "Password does not match";
-  }
-
-  return errors;
-};
 
 const Profile = (): React.ReactElement => {
   const classes = useStyles();
@@ -117,14 +71,12 @@ const Profile = (): React.ReactElement => {
   const { actions } = useProfileSlice();
   const { profile } = useSelector(selectProfile);
   const [avatar, setAvatar] = useState(defaultAvatar);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const keyfileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     dispatch(actions.getProfile());
   }, []);
-
-  const onProfileUpdate = (values: any) => {
-    console.log("Values ", values);
-  };
 
   const onPasswordReset = (values: any) => {
     console.log("Values ", values);
@@ -133,9 +85,24 @@ const Profile = (): React.ReactElement => {
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.currentTarget;
     if (files && files.length) {
-      console.log(URL.createObjectURL(files[0]));
       setAvatar(URL.createObjectURL(files[0]));
     }
+  };
+
+  const handleCreateDialogOpen = () => {
+    setCreateDialogOpen(true);
+  };
+
+  const handleCreateDialogClose = () => {
+    setCreateDialogOpen(false);
+  };
+
+  const handleImportFileDialogOpen = () => {
+    if (keyfileRef.current !== null) keyfileRef.current.click();
+  };
+
+  const onCreateCertificate = () => {
+    console.log("create");
   };
 
   return (
@@ -143,192 +110,217 @@ const Profile = (): React.ReactElement => {
       <Container>
         <Grid container spacing={4}>
           <Grid item xs={12}>
-            <Form
-              onSubmit={onProfileUpdate}
-              mutators={{
-                ...arrayMutators,
-              }}
-              validate={profileValidate}
-              render={({
-                handleSubmit,
-                form: {
-                  mutators: { push, pop },
-                },
-                values,
-              }) => (
-                <form onSubmit={handleSubmit} noValidate>
-                  <Card>
-                    <CardHeader title="Personal Info" />
-                    <Divider />
-                    <CardContent>
-                      <Grid container alignItems="flex-start" spacing={2}>
-                        <Grid item xs={12}>
-                          <Grid container>
-                            <Grid item sm={12} md={6}>
-                              <Grid container spacing={3}>
-                                <Grid item sm={12}>
-                                  <TextField
-                                    InputProps={{ readOnly: true }}
-                                    id="nickname"
-                                    name="nickname"
-                                    label="Nickname"
-                                    variant="outlined"
-                                    value={profile.nickname}
-                                  />
-                                </Grid>
-                              </Grid>
-                              <Grid container spacing={3}>
-                                <Grid item sm={12} md={6}>
-                                  <TextField
-                                    InputProps={{ readOnly: true }}
-                                    id="email"
-                                    name="email"
-                                    label="Email"
-                                    variant="outlined"
-                                    value={profile.email}
-                                  />
-                                </Grid>
-                                <Grid item sm={12} md={6}>
-                                  <TextField
-                                    InputProps={{ readOnly: true }}
-                                    label="Phone"
-                                    name="phone"
-                                    id="phone"
-                                    variant="outlined"
-                                    value={profile.phone}
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                            <Grid item sm={12} md={6}>
-                              <Grid
-                                container
-                                alignItems="center"
-                                justify="center"
-                              >
-                                <div className={classes.profileImageContainer}>
-                                  <Avatar
-                                    src={avatar}
-                                    alt="Avatar"
-                                    className={classes.profileImage}
-                                  />
-                                  <input
-                                    type="file"
-                                    name="avatar"
-                                    className={classes.fileInput}
-                                    onChange={onAvatarChange}
-                                  />
-                                </div>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                    {/* <Divider />
-                    <CardActions>
-                      <Grid container direction="row-reverse">
-                        <Button
-                          color="primary"
-                          variant="contained"
-                          type="submit"
-                        >
-                          Save Changes
-                        </Button>
-                      </Grid>
-                    </CardActions> */}
-                  </Card>
-                </form>
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Form
-              onSubmit={onPasswordReset}
-              mutators={{
-                ...arrayMutators,
-              }}
-              validate={passwordValidate}
-              render={({
-                handleSubmit,
-                form: {
-                  mutators: { push, pop },
-                },
-                values,
-              }) => (
-                <form onSubmit={handleSubmit} noValidate>
-                  <Card>
-                    <CardHeader title="Reset Password" />
-                    <Divider />
-                    <CardContent>
-                      <Grid container alignItems="flex-start" spacing={2}>
-                        <Grid item xs={12}>
-                          <Grid container>
-                            <Grid item sm={12} md={6}>
-                              <Grid container spacing={3}>
-                                <Grid item sm={12}>
-                                  <TextField
-                                    required
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    label="Password"
-                                    variant="outlined"
-                                  />
-                                </Grid>
-                              </Grid>
-                              <Grid container spacing={3}>
-                                <Grid item sm={12}>
-                                  <TextField
-                                    required
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type="password"
-                                    label="Confirm Password"
-                                    variant="outlined"
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                    <Divider />
-                    <CardActions>
-                      <Grid container direction="row-reverse">
-                        <Button
-                          color="primary"
-                          variant="contained"
-                          type="submit"
-                        >
-                          Reset
-                        </Button>
-                      </Grid>
-                    </CardActions>
-                  </Card>
-                </form>
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
             <Card>
               <CardHeader
-                title="OTP Secret KEY"
                 className={classes.cardHeader}
                 action={
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    type="submit"
-                    style={{ marginTop: 0 }}
-                  >
-                    Reset
-                  </Button>
+                  <>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={handleCreateDialogOpen}
+                    >
+                      Create Certificate
+                    </Button>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={handleImportFileDialogOpen}
+                    >
+                      Import Key
+                    </Button>
+                    <input
+                      ref={keyfileRef}
+                      type="file"
+                      id="keyfile"
+                      name="keyfile"
+                      className={classes.hiddenFileInput}
+                    />
+                  </>
                 }
               />
             </Card>
           </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader title="Personal Info" />
+              <Divider />
+              <CardContent>
+                <Grid container alignItems="flex-start" spacing={2}>
+                  <Grid item sm={12} md={6}>
+                    <Grid container spacing={3}>
+                      <Grid item sm={12}>
+                        <TextField
+                          InputProps={{ readOnly: true }}
+                          id="nickname"
+                          name="nickname"
+                          label="Nickname"
+                          variant="outlined"
+                          value={profile.nickname}
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={3}>
+                      <Grid item sm={12} md={6}>
+                        <TextField
+                          InputProps={{ readOnly: true }}
+                          id="email"
+                          name="email"
+                          label="Email"
+                          variant="outlined"
+                          value={profile.email}
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item sm={12} md={6}>
+                        <TextField
+                          InputProps={{ readOnly: true }}
+                          label="Phone"
+                          name="phone"
+                          id="phone"
+                          variant="outlined"
+                          value={profile.phone}
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={3}>
+                      <Grid item sm={12}>
+                        <TextField
+                          InputProps={{ readOnly: true }}
+                          id="jobTitle"
+                          name="jobTitle"
+                          label="Job Title"
+                          variant="outlined"
+                          value={profile.jobTitle}
+                          fullWidth
+                        />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item sm={12} md={6}>
+                    <Grid container alignItems="center" justify="center">
+                      <div className={classes.profileImageContainer}>
+                        <Avatar
+                          src={avatar}
+                          alt="Avatar"
+                          className={classes.profileImage}
+                        />
+                        <input
+                          type="file"
+                          name="avatar"
+                          className={classes.fileInput}
+                          onChange={onAvatarChange}
+                        />
+                      </div>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <CardHeader title="Reset Password" />
+              <Divider />
+              <CardContent>
+                <Grid container alignItems="flex-start" spacing={2}>
+                  <Grid item xs={12}>
+                    <Grid container>
+                      <Grid item sm={12} md={6}>
+                        <Grid container spacing={3}>
+                          <Grid item sm={12}>
+                            <TextField
+                              required
+                              id="password"
+                              name="password"
+                              type="password"
+                              label="Password"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={3}>
+                          <Grid item sm={12}>
+                            <TextField
+                              required
+                              id="confirmPassword"
+                              name="confirmPassword"
+                              type="password"
+                              label="Confirm Password"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </CardContent>
+              <Divider />
+              <CardActions>
+                <Grid container direction="row-reverse">
+                  <Button color="primary" variant="contained" type="submit">
+                    Reset
+                  </Button>
+                </Grid>
+              </CardActions>
+            </Card>
+          </Grid>
+          <Dialog
+            open={createDialogOpen}
+            onClose={handleCreateDialogClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Create Certificate</DialogTitle>
+            <Divider />
+            <DialogContent>
+              <Grid container>
+                <Grid item xs={12}>
+                  <TextField
+                    autoFocus
+                    required
+                    margin="dense"
+                    id="name"
+                    name="key"
+                    label="Key name"
+                    variant="outlined"
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+              <Grid container>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    margin="dense"
+                    id="password"
+                    name="password"
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <Divider />
+            <DialogActions>
+              <Button onClick={handleCreateDialogClose} variant="contained">
+                Cancel
+              </Button>
+              <Button
+                onClick={onCreateCertificate}
+                color="primary"
+                variant="contained"
+              >
+                Create
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </Container>
     </div>
