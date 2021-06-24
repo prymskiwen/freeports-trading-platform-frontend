@@ -19,8 +19,6 @@ export const initialState: ProfileState = {
     avatar: "",
     suspended: false,
   },
-  keyPair: { key: "", passphrase: "" },
-  encryptedKey: "",
   loading: false,
 };
 
@@ -34,13 +32,6 @@ const slice = createSlice({
     getProfileSuccess(state, action: PayloadAction<any>) {
       state.loading = false;
       state.profile = action.payload;
-    },
-    createKeyPair(state, action: PayloadAction<any>) {
-      state.loading = true;
-      state.keyPair = action.payload;
-    },
-    encryptKeySuccess(state, action: PayloadAction<any>) {
-      state.encryptedKey = action.payload;
     },
   },
 });

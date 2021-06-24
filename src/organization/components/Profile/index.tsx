@@ -21,6 +21,8 @@ import {
 
 import { useProfileSlice } from "./slice";
 import { selectProfile } from "./slice/selectors";
+import { encryptMegolmKeyFile } from "../../../util/keyStore/MegolmExportEncryption";
+import KeyStore from "../../../util/keyStore/keystore";
 import defaultAvatar from "../../../assets/images/profile.jpg";
 
 const useStyles = makeStyles((theme) => ({
@@ -113,11 +115,22 @@ const Profile = (): React.ReactElement => {
     setPassPhrase(value);
   };
 
-  const onCreateCertificate = () => {
-    dispatch(actions.createKeyPair({ key, passphrase }));
+  const arrayBufferToBase64 = (arrayBuffer: any) => {
+    const byteArray = new Uint8Array(arrayBuffer);
+    let byteString = "";
+    for (let i = 0; i < byteArray.byteLength; i += 1) {
+      byteString += String.fromCharCode(byteArray[i]);
+    }
+    const b64 = window.btoa(byteString);
+
+    return b64;
   };
 
-  const downloadString = (text: string, fileType: string, fileName: string) => {
+  const downloadString = (
+    text: ArrayBufferLike,
+    fileType: string,
+    fileName: string
+  ) => {
     const blob = new Blob([text], { type: fileType });
 
     const a = document.createElement("a");
@@ -131,6 +144,79 @@ const Profile = (): React.ReactElement => {
     setTimeout(() => {
       URL.revokeObjectURL(a.href);
     }, 1500);
+  };
+
+  const createDataUrlFromByteArray = (byteArray: Uint8Array) => {
+    let binaryString = "";
+
+    for (let i = 0; i < byteArray.byteLength; i += 1) {
+      binaryString += String.fromCharCode(byteArray[i]);
+    }
+
+    return `data:application/octet-stream;base64,${btoa(binaryString)}`;
+  };
+
+  const escapeHTML = (s: string) => {
+    return s
+      .toString()
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+  };
+
+  const addToKeyList = (savedObject: any) => {
+    const dataUrl = createDataUrlFromByteArray(
+      new Uint8Array(savedObject.spki)
+    );
+    const name = escapeHTML(savedObject.name);
+
+    console.log(`${name}.publickey`);
+    console.log(dataUrl);
+
+    /* if (document.getElementById("list-keys"))
+      document
+        .getElementById("list-keys")
+        .insertAdjacentHTML(
+          "beforeEnd",
+          `<li><a download="${name}.publicKey" href="${dataUrl}">${name}</a></li>`
+        ); */
+  };
+
+  const onCreateCertificate = async () => {
+    const algorithmName = "RSASSA-PKCS1-v1_5";
+    const usages: Array<KeyUsage> = ["sign", "verify"];
+    const params = {
+      name: algorithmName,
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: { name: "SHA-256" },
+    };
+    const keyPair = await window.crypto.subtle.generateKey(
+      params,
+      true,
+      usages
+    );
+    const keyArrayBuffer = await window.crypto.subtle.exportKey(
+      "pkcs8",
+      keyPair.privateKey
+    );
+    const keyPem = arrayBufferToBase64(keyArrayBuffer);
+    const encryptedKey = await encryptMegolmKeyFile(keyPem, passphrase, {});
+
+    downloadString(encryptedKey, "pem", key);
+
+    const privateKey = await window.crypto.subtle.importKey(
+      "pkcs8",
+      keyArrayBuffer,
+      params,
+      false,
+      ["sign"]
+    );
+    const results = await KeyStore.saveKey(keyPair.publicKey, privateKey, key);
+
+    addToKeyList(results);
   };
 
   return (

@@ -19,220 +19,217 @@
 // The key storage database name is hard coded as KeyStore. It
 // uses one object store, called keys.
 //
-function KeyStore() {
-  "use strict";
-  var self = this;
-  self.db = null;
-  self.dbName = "KeyStore";
-  self.objectStoreName = "keys";
+let db: any = null;
+const dbName = "KeyStore";
+const objectStoreName = "keys";
 
-  self.open = function () {
-    return new Promise(function (fulfill, reject) {
-      if (!window.indexedDB) {
-        reject(new Error("IndexedDB is not supported by this browser."));
+const open = (): Promise<any> => {
+  return new Promise((fulfill, reject) => {
+    if (!window.indexedDB) {
+      reject(new Error("IndexedDB is not supported by this browser."));
+    }
+
+    const req: IDBOpenDBRequest = indexedDB.open(dbName, 1);
+    req.onsuccess = (evt: any) => {
+      db = evt.target.result;
+      fulfill(this);
+    };
+    req.onerror = (evt: any) => {
+      reject(evt.error);
+    };
+    req.onblocked = () => {
+      reject(new Error("Database already open"));
+    };
+
+    // If the database is being created or upgraded to a new version,
+    // see if the object store and its indexes need to be created.
+    req.onupgradeneeded = (evt: any) => {
+      db = evt.target.result;
+      if (!db.objectStoreNames.contains(objectStoreName)) {
+        const objStore = db.createObjectStore(objectStoreName, {
+          autoIncrement: true,
+        });
+        objStore.createIndex("name", "name", { unique: false });
+        objStore.createIndex("spki", "spki", { unique: false });
       }
+    };
+  });
+};
 
-      var req = indexedDB.open(self.dbName, 1);
-      req.onsuccess = function (evt) {
-        self.db = evt.target.result;
-        fulfill(self);
+// saveKey method
+//
+// Takes the public and private keys, and an arbitrary name
+// for the saved key. The private key can be passed as null if unavailable.
+//
+// Returns a Promise. If a key can be saved, the
+// Promise is fulfilled with a copy of the object
+// that was saved. Otherwise, it is rejected with an Error.
+//
+const saveKey = (
+  publicKey: string,
+  privateKey: string,
+  name: string
+): Promise<any> => {
+  return new Promise((fulfill, reject) => {
+    if (!db) {
+      reject(new Error("KeyStore is not open."));
+    }
+
+    if (publicKey) {
+      const format = "spki";
+      const key = publicKey;
+      window.crypto.subtle
+        .exportKey(format, key)
+        .then((spki) => {
+          const savedObject = {
+            publicKey,
+            privateKey,
+            name,
+            spki,
+          };
+
+          const transaction = db.transaction([objectStoreName], "readwrite");
+          transaction.onerror = (evt: any) => {
+            reject(evt.error);
+          };
+          transaction.onabort = (evt: any) => {
+            reject(evt.error);
+          };
+          transaction.oncomplete = (evt: any) => {
+            fulfill(savedObject);
+          };
+
+          const objectStore = transaction.objectStore(objectStoreName);
+          const request = objectStore.add(savedObject);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    } else {
+      const savedObject = {
+        publicKey,
+        privateKey,
+        name,
       };
-      req.onerror = function (evt) {
+
+      const transaction = db.transaction([objectStoreName], "readwrite");
+      transaction.onerror = (evt: any) => {
         reject(evt.error);
       };
-      req.onblocked = function () {
-        reject(new Error("Database already open"));
+      transaction.onabort = (evt: any) => {
+        reject(evt.error);
+      };
+      transaction.oncomplete = (evt: any) => {
+        fulfill(savedObject);
       };
 
-      // If the database is being created or upgraded to a new version,
-      // see if the object store and its indexes need to be created.
-      req.onupgradeneeded = function (evt) {
-        self.db = evt.target.result;
-        if (!self.db.objectStoreNames.contains(self.objectStoreName)) {
-          var objStore = self.db.createObjectStore(self.objectStoreName, {
-            autoIncrement: true,
-          });
-          objStore.createIndex("name", "name", { unique: false });
-          objStore.createIndex("spki", "spki", { unique: false });
-        }
-      };
-    });
-  };
+      const objectStore = transaction.objectStore(objectStoreName);
+      const request = objectStore.add(savedObject);
+    }
+  });
+};
 
-  // saveKey method
-  //
-  // Takes the public and private keys, and an arbitrary name
-  // for the saved key. The private key can be passed as null if unavailable.
-  //
-  // Returns a Promise. If a key can be saved, the
-  // Promise is fulfilled with a copy of the object
-  // that was saved. Otherwise, it is rejected with an Error.
-  //
-  self.saveKey = function (publicKey, privateKey, name) {
-    return new Promise(function (fulfill, reject) {
-      if (!self.db) {
-        reject(new Error("KeyStore is not open."));
-      }
+// getKey method
+//
+// Takes the name of a property (one of id, name, or spki), and
+// the value of that property to search for.
+//
+// Returns a Promise. If a key with the given propertyValue of
+// the specified propertyName exists in the database, the Promise
+// is fulfilled with the saved object, otherwise it is rejected
+// with an Error.
+//
+// If there are multiple objects with the requested propertyValue,
+// only one of them is passed to the fulfill function.
+//
+const getKey = (propertyName: string, propertyValue: string): Promise<any> => {
+  return new Promise((fulfill, reject) => {
+    if (!db) {
+      reject(new Error("KeyStore is not open."));
+    }
 
-      if (publicKey) {
-        window.crypto.subtle
-          .exportKey("spki", publicKey)
-          .then(function (spki) {
-            var savedObject = {
-              publicKey: publicKey,
-              privateKey: privateKey,
-              name: name,
-              spki: spki,
-            };
+    const transaction = db.transaction([objectStoreName], "readonly");
+    const objectStore = transaction.objectStore(objectStoreName);
 
-            var transaction = self.db.transaction(
-              [self.objectStoreName],
-              "readwrite"
-            );
-            transaction.onerror = function (evt) {
-              reject(evt.error);
-            };
-            transaction.onabort = function (evt) {
-              reject(evt.error);
-            };
-            transaction.oncomplete = function (evt) {
-              fulfill(savedObject);
-            };
+    let request;
+    if (propertyName === "id") {
+      request = objectStore.get(propertyValue);
+    } else if (propertyName === "name") {
+      request = objectStore.index("name").get(propertyValue);
+    } else if (propertyName === "spki") {
+      request = objectStore.index("spki").get(propertyValue);
+    } else {
+      reject(new Error(`No such property: ${propertyName}`));
+    }
 
-            var objectStore = transaction.objectStore(self.objectStoreName);
-            var request = objectStore.add(savedObject);
-          })
-          .catch(function (err) {
-            reject(err);
-          });
+    request.onsuccess = (evt: any) => {
+      fulfill(evt.target.result);
+    };
+
+    request.onerror = (evt: any) => {
+      reject(evt.target.error);
+    };
+  });
+};
+
+// listKeys method
+//
+// Takes no parameters.
+//
+// Returns a Promise. Unless there is an error, fulfills the
+// Promise with an array of all objects from the key storage
+// database. Otherwise it rejects it with an Error.
+//
+const listKeys = (): Promise<any> => {
+  return new Promise((fulfill, reject) => {
+    if (!db) {
+      reject(new Error("KeyStore is not open."));
+    }
+
+    const list: Array<{ id: string; value: string }> = [];
+
+    const transaction = db.transaction([objectStoreName], "readonly");
+    transaction.onerror = (evt: any) => {
+      reject(evt.error);
+    };
+    transaction.onabort = (evt: any) => {
+      reject(evt.error);
+    };
+
+    const objectStore = transaction.objectStore(objectStoreName);
+    const cursor = objectStore.openCursor();
+
+    cursor.onsuccess = (evt: any) => {
+      if (evt.target.result) {
+        list.push({
+          id: evt.target.result.key,
+          value: evt.target.result.value,
+        });
+        evt.target.result.continue();
       } else {
-        var savedObject = {
-          publicKey: publicKey,
-          privateKey: privateKey,
-          name: name,
-        };
-
-        var transaction = self.db.transaction(
-          [self.objectStoreName],
-          "readwrite"
-        );
-        transaction.onerror = function (evt) {
-          reject(evt.error);
-        };
-        transaction.onabort = function (evt) {
-          reject(evt.error);
-        };
-        transaction.oncomplete = function (evt) {
-          fulfill(savedObject);
-        };
-
-        var objectStore = transaction.objectStore(self.objectStoreName);
-        var request = objectStore.add(savedObject);
+        fulfill(list);
       }
-    });
-  };
+    };
+  });
+};
 
-  // getKey method
-  //
-  // Takes the name of a property (one of id, name, or spki), and
-  // the value of that property to search for.
-  //
-  // Returns a Promise. If a key with the given propertyValue of
-  // the specified propertyName exists in the database, the Promise
-  // is fulfilled with the saved object, otherwise it is rejected
-  // with an Error.
-  //
-  // If there are multiple objects with the requested propertyValue,
-  // only one of them is passed to the fulfill function.
-  //
-  self.getKey = function (propertyName, propertyValue) {
-    return new Promise(function (fulfill, reject) {
-      if (!self.db) {
-        reject(new Error("KeyStore is not open."));
-      }
+// close method
+//
+// Takes no parameters.
+//
+// Simply closes the database and returns immediately. Note that
+// the IndexedDB system actually closes the database in a separate
+// thread, and there is no way to know when that process is complete.
+//
+const close = (): Promise<void> => {
+  return new Promise((fulfill, reject) => {
+    if (!db) {
+      reject(new Error("KeyStore is not open."));
+    }
+    db.close();
+    db = null;
+    fulfill();
+  });
+};
 
-      var transaction = self.db.transaction([self.objectStoreName], "readonly");
-      var objectStore = transaction.objectStore(self.objectStoreName);
-
-      var request;
-      if (propertyName === "id") {
-        request = objectStore.get(propertyValue);
-      } else if (propertyName === "name") {
-        request = objectStore.index("name").get(propertyValue);
-      } else if (propertyName === "spki") {
-        request = objectStore.index("spki").get(propertyValue);
-      } else {
-        reject(new Error("No such property: " + propertyName));
-      }
-
-      request.onsuccess = function (evt) {
-        fulfill(evt.target.result);
-      };
-
-      request.onerror = function (evt) {
-        reject(evt.target.error);
-      };
-    });
-  };
-
-  // listKeys method
-  //
-  // Takes no parameters.
-  //
-  // Returns a Promise. Unless there is an error, fulfills the
-  // Promise with an array of all objects from the key storage
-  // database. Otherwise it rejects it with an Error.
-  //
-  self.listKeys = function () {
-    return new Promise(function (fulfill, reject) {
-      if (!self.db) {
-        reject(new Error("KeyStore is not open."));
-      }
-
-      var list = [];
-
-      var transaction = self.db.transaction([self.objectStoreName], "readonly");
-      transaction.onerror = function (evt) {
-        reject(evt.error);
-      };
-      transaction.onabort = function (evt) {
-        reject(evt.error);
-      };
-
-      var objectStore = transaction.objectStore(self.objectStoreName);
-      var cursor = objectStore.openCursor();
-
-      cursor.onsuccess = function (evt) {
-        if (evt.target.result) {
-          list.push({
-            id: evt.target.result.key,
-            value: evt.target.result.value,
-          });
-          evt.target.result.continue();
-        } else {
-          fulfill(list);
-        }
-      };
-    });
-  };
-
-  // close method
-  //
-  // Takes no parameters.
-  //
-  // Simply closes the database and returns immediately. Note that
-  // the IndexedDB system actually closes the database in a separate
-  // thread, and there is no way to know when that process is complete.
-  //
-  self.close = function () {
-    return new Promise(function (fulfill, reject) {
-      if (!self.db) {
-        reject(new Error("KeyStore is not open."));
-      }
-
-      self.db.close();
-      self.db = null;
-      fulfill();
-    });
-  };
-}
+export { open as default, open, saveKey, getKey, listKeys, close };
