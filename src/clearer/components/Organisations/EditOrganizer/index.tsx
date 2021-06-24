@@ -87,13 +87,8 @@ const EditOrganizer = (): React.ReactElement => {
   const history = useHistory();
   const classes = useStyle();
   const showingIcon = false;
-  const showingLogo = true;
-  const testname = "workinger";
-
   const { getOrganizerdetail, getManagers,  updateOrganization} = useOrganization();
   const [isEditable, setIsEditable] = useState(false);
-  const [LogoImage, setLogoImage] = useState();
-  const [Logofile, setLogofile] = useState();
   const [organizereddetail, setOrganizereddetail] = useState({
     id: "string",
     name: "string",
@@ -105,14 +100,13 @@ const EditOrganizer = (): React.ReactElement => {
     disacitveUser: "string",
   })
   const [managers, setManagers] = useState([] as managerType[]);
-  const [iban, setIban] = useState([] as ibantype[])
+  const [iban, setIban] = useState([] as ibantype[]);
   useEffect(() => {
     let mounted = false;
     const init = async () => {
       const detail = await getOrganizerdetail(id);
       const managerList = await getManagers(id);
       if(!mounted){
-
         setOrganizereddetail({
           id: detail.id,
           name: detail.name,

@@ -84,6 +84,32 @@ const getClearerPermissions = (): Promise<Array<PermissionType>> => {
   });
 };
 
+const assignClearerRolesToUser = (userId: string, roles: string[]) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/user/${userId}/role/assign`, { roles })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const updateClearerRolesToUser = (userId: string, roles: string[]) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/user/${userId}/role`, { roles })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 export {
   getClearerRoles as default,
   addNewRole,
@@ -91,4 +117,6 @@ export {
   deleteRole,
   getClearerRoles,
   getClearerPermissions,
+  assignClearerRolesToUser,
+  updateClearerRolesToUser,
 };

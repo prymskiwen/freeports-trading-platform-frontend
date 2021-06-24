@@ -10,6 +10,8 @@ import { TextField, Select } from "mui-rff";
 import arrayMutators from "final-form-arrays";
 import { FieldArray } from "react-final-form-arrays";
 import { useDispatch, useSelector } from "react-redux";
+import { diff } from "deep-object-diff";
+
 import profile from "../../../assets/images/profile.jpg";
 import { useCoWorkerFormSlice } from "./slice";
 import { selectRoles } from "./slice/selectors";
@@ -100,12 +102,6 @@ interface CoWorkerFormProps {
   coWorker: Partial<User>;
   onSubmit: (coWorker: User) => void;
 }
-// const defaultProps: CoWorkerFormProps = {
-//   coWorker: {
-//     roles: [""],
-//     nickname: "",
-//   },
-// };
 
 const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
   onSubmit,
@@ -120,11 +116,13 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
     dispatch(actions.getRoles());
   }, []);
 
-  console.log("Roles ", existingRoles, coWorker);
+  const handleOnSubmit = (values: any) => {
+    onSubmit(diff(coWorker, values) as User);
+  };
   return (
     <Container>
       <Form
-        onSubmit={onSubmit}
+        onSubmit={handleOnSubmit}
         mutators={{
           ...arrayMutators,
         }}

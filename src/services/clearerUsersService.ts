@@ -8,15 +8,10 @@ const getClearerUsers = (): Promise<PaginatedResponse<User>> => {
     axios
       .get(`/user`)
       .then((res: any) => {
-        res.data?.content?.map((u: any) => {
-          // eslint-disable-next-line no-param-reassign
-          u.roles = u.roles.map((r: any) => r.role);
-
-          return u;
-        });
         return resolve(res.data);
       })
       .catch((err) => {
+        console.error(err);
         return reject(err.response.data);
       });
   });
@@ -35,4 +30,40 @@ const createClearerUser = (user: User): Promise<ResourceCreatedResponse> => {
   });
 };
 
-export { createClearerUser, getClearerUsers as default };
+const getClearerUser = (id: string): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/user/${id}`)
+      .then((res: any) => {
+        console.log("map user ", res.data);
+        res.data.roles = res.data.roles?.map((r: any) => r.id);
+
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const updateClearerUser = (id: string, user: User): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/user/${id}`, user)
+      .then((res: any) => {
+        console.log(" user update response ", res.data);
+
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+export {
+  createClearerUser,
+  getClearerUsers as default,
+  getClearerUser,
+  updateClearerUser,
+};

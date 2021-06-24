@@ -39,7 +39,14 @@ export default [
     path: "/investors",
     exact: true,
     auth: true,
+    certicate: true,
     component: lazy(() => import("../components/Investors")),
+  },
+  {
+    path: "/investors/:investorId",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Investors/InvestorDetail")),
   },
   {
     path: "/trades",
