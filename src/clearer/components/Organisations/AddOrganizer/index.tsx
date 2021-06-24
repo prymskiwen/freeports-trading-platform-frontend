@@ -26,11 +26,6 @@ const useStyles = makeStyles((theme) => ({
 const onValidate = (values: any) => {
   const errors: {
     name?: string,
-    street1?: string,
-    street2?: string,
-    zip?: string,
-    city?: string,
-    country?: string,
     commission?: string,
     clearer?: string,
   } = {};
@@ -38,21 +33,21 @@ const onValidate = (values: any) => {
   if(!values.name){
     errors.name = "This Field Required";
   }
-  if(!values.street1){
-    errors.street1 = "This Field Required";
-  }
-  if(!values.street2){
-    errors.street2 = "This Field Required";
-  }
-  if(!values.zip){
-    errors.zip = "This Field Required";
-  }
-  if(!values.city){
-    errors.city = "This Field Required";
-  }
-  if(!values.country){
-    errors.country = "This Field Required";
-  }
+  // if(!values.street1){
+  //   errors.street1 = "This Field Required";
+  // }
+  // if(!values.street2){
+  //   errors.street2 = "This Field Required";
+  // }
+  // if(!values.zip){
+  //   errors.zip = "This Field Required";
+  // }
+  // if(!values.city){
+  //   errors.city = "This Field Required";
+  // }
+  // if(!values.country){
+  //   errors.country = "This Field Required";
+  // }
   if(!values.commission){
     errors.commission = "This Field Required";
   }
@@ -114,8 +109,6 @@ const AddOrganizer = (): React.ReactElement => {
 
   
  const onsubmit = async (values: any) => {
-  console.log(values);
-  alert(' work');
   const nowTime = new Date()
   await addOrganization(values.name, values.street1, values.street2, values.zip, values.city, values.country, logoImage, nowTime.getTime(), values.commission, values.clearer)
     .then((data: any) => {
@@ -176,7 +169,6 @@ const AddOrganizer = (): React.ReactElement => {
                 <Grid item xs={12}>
                   <FormControl fullWidth className={classes.margin} variant="outlined">
                     <TextField
-                      required
                       id="outlined-adornment-amount"
                       label="Street 1"
                       name="street1"
@@ -187,7 +179,6 @@ const AddOrganizer = (): React.ReactElement => {
                 <Grid item xs={12}>
                   <FormControl fullWidth className={classes.margin} variant="outlined">
                     <TextField
-                      required
                       id="outlined-adornment-amount"
                       label="Street 2"
                       name="street2"
@@ -198,7 +189,6 @@ const AddOrganizer = (): React.ReactElement => {
                 <Grid item xs={6}>
                   <FormControl fullWidth className={classes.margin} variant="outlined">
                     <TextField
-                      required
                       id="outlined-adornment-amount"
                       label="zip"
                       name="zip"
@@ -209,7 +199,6 @@ const AddOrganizer = (): React.ReactElement => {
                 <Grid item xs={6}>
                   <FormControl fullWidth className={classes.margin} variant="outlined">
                     <TextField
-                      required
                       id="outlined-adornment-amount"
                       label="City"
                       name="city"
@@ -220,7 +209,6 @@ const AddOrganizer = (): React.ReactElement => {
                 <Grid item xs={12}>
                   <FormControl fullWidth className={classes.margin} variant="outlined">
                     <TextField
-                      required
                       id="outlined-adornment-amount"
                       label="Country"
                       name="country"
