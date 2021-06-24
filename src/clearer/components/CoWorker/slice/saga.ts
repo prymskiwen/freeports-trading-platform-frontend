@@ -5,8 +5,12 @@ import { coWorkActions as actions } from ".";
 import getClearerUsers, {
   createClearerUser,
   getClearerUser,
+  updateClearerUser,
 } from "../../../../services/clearerUsersService";
-import { assignClearerRolesToUser } from "../../../../services/roleService";
+import {
+  assignClearerRolesToUser,
+  updateClearerRolesToUser,
+} from "../../../../services/roleService";
 import PaginatedResponse from "../../../../types/PaginatedResponse";
 import { ResourceCreatedResponse } from "../../../../types/ResourceCreatedResponse";
 import User from "../../../../types/User";
@@ -25,7 +29,7 @@ export function* getCoWorkers(): Generator<any> {
 
 export function* createCoWorker({
   payload,
-}: PayloadAction<{ user: User; history: any }>): Generator<any> {
+}: PayloadAction<{ user: User }>): Generator<any> {
   try {
     const response = yield call(createClearerUser, payload.user);
 
@@ -39,6 +43,38 @@ export function* createCoWorker({
     }
     yield put(
       actions.createCoWorkersSuccess(response as ResourceCreatedResponse)
+    );
+    yield put(actions.getCoWorkers());
+
+    yield take(actions.getCoWorkersSuccess);
+
+    const coWorkers = yield select(selectCoWorkers);
+    const selectedCoWorker = (coWorkers as Array<User>).find(
+      (c) => c.id === (response as ResourceCreatedResponse).id
+    );
+    if (selectedCoWorker) {
+      yield put(actions.selectCoWorker(selectedCoWorker));
+    }
+  } catch (error) {
+    console.log("error", error);
+  }
+}
+export function* updateCoWorker({
+  payload,
+}: PayloadAction<{ user: User; id: string }>): Generator<any> {
+  try {
+    console.log("update user saga ", payload);
+    const response = yield call(updateClearerUser, payload.id, payload.user);
+    if (payload.user.roles) {
+      yield call(
+        updateClearerRolesToUser,
+        (response as ResourceCreatedResponse).id,
+        payload.user.roles
+      );
+    }
+
+    yield put(
+      actions.updateCoWorkersSuccess(response as ResourceCreatedResponse)
     );
     yield put(actions.getCoWorkers());
 
@@ -73,4 +109,5 @@ export function* coWorkersSaga(): Generator<any> {
   yield takeEvery(actions.getCoWorkers, getCoWorkers);
   yield takeEvery(actions.createCoWorker, createCoWorker);
   yield takeEvery(actions.selectCoWorker, getCoWorker);
+  yield takeEvery(actions.updateCoWorker, updateCoWorker);
 }
