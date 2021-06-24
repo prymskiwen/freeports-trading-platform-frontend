@@ -14,4 +14,6 @@ export default interface User {
   jobTitle: string;
 
   roles?: string[];
+
+  suspended: boolean;
 }

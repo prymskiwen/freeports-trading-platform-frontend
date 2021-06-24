@@ -62,9 +62,41 @@ const updateClearerUser = (id: string, user: User): Promise<User> => {
   });
 };
 
+const suspendClearerUser = (id: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .put(`/user/${id}/suspend`)
+      .then((res: any) => {
+        console.log(" user update response ", res.data);
+
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const resumeClearerUser = (id: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .put(`/user/${id}/resume`)
+      .then((res: any) => {
+        console.log(" user update response ", res.data);
+
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 export {
   createClearerUser,
   getClearerUsers as default,
   getClearerUser,
   updateClearerUser,
+  suspendClearerUser,
+  resumeClearerUser,
 };

@@ -28,9 +28,12 @@ import {
   selectIsFormLoading,
   selectIsLoading,
   selectSelectedCoWorker,
+  selectShowSnackbar,
+  selectSuspendStateLoading,
 } from "./slice/selectors";
 
 import Loader from "../../../components/Loader";
+import Snackbar from "../../../components/Snackbar";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -41,9 +44,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   toolbar: theme.mixins.toolbar,
-  listTitle: {
-    display: "flex",
-  },
+
   main: {
     padding: theme.spacing(2),
   },
@@ -67,6 +68,9 @@ const useStyles = makeStyles((theme) => ({
   paddingSmall: {
     padding: theme.spacing(1),
   },
+  userStateLoader: {
+    maxHeight: 26,
+  },
 }));
 
 const defaultCoWorker = initialState.selectedCoWorker;
@@ -81,7 +85,8 @@ const CoWorker = (): React.ReactElement => {
   const formLoading = useSelector(selectIsFormLoading);
   const loading = useSelector(selectIsLoading);
   const selectedCoWorker: User = useSelector(selectSelectedCoWorker);
-
+  const suspendStateLoading: boolean = useSelector(selectSuspendStateLoading);
+  const showSnackbar: boolean = useSelector(selectShowSnackbar);
   const [coWorkerSearch, setCoWorkerSearch] = useState("");
   if (
     coWorkerId &&
@@ -144,6 +149,17 @@ const CoWorker = (): React.ReactElement => {
     setCoWorkerSearch(evt.target.value);
     dispatch(actions.getCoWorkers({ search: evt.target.value }));
   };
+
+  const handleOnSuspend = () => {
+    if (selectedCoWorker.id) {
+      dispatch(actions.suspendCoWorker({ id: selectedCoWorker.id }));
+    }
+  };
+  const handleOnResume = () => {
+    if (selectedCoWorker.id) {
+      dispatch(actions.resumeCoWorker({ id: selectedCoWorker.id }));
+    }
+  };
   return (
     <Grid>
       <Grid container className={classes.root}>
@@ -186,7 +202,7 @@ const CoWorker = (): React.ReactElement => {
                       selectedCoWorker && coWorker.id === selectedCoWorker.id
                     }
                   >
-                    <ListItemText primary={`${coWorker.nickname} ${i + 1}`} />
+                    <ListItemText primary={`${coWorker.nickname} `} />
                   </ListItem>
                 ))}
             </List>
@@ -212,7 +228,22 @@ const CoWorker = (): React.ReactElement => {
                   )}
                 </div>
 
-                <Button>Disable</Button>
+                {!selectedCoWorker.suspended && !suspendStateLoading && (
+                  <Button onClick={handleOnSuspend} color="secondary">
+                    Disable
+                  </Button>
+                )}
+                {selectedCoWorker.suspended && !suspendStateLoading && (
+                  <Button onClick={handleOnResume} color="primary">
+                    {" "}
+                    Activate
+                  </Button>
+                )}
+                {suspendStateLoading && (
+                  <Button className={classes.userStateLoader} disabled>
+                    <Loader />
+                  </Button>
+                )}
               </AccordionSummary>
               {formLoading && <Loader />}
               {!formLoading && selectedCoWorker && (
@@ -228,6 +259,9 @@ const CoWorker = (): React.ReactElement => {
             </Accordion>
           )}{" "}
         </Grid>
+        {showSnackbar && (
+          <Snackbar message={{ type: "success", message: "Success" }} open />
+        )}
       </Grid>
     </Grid>
   );

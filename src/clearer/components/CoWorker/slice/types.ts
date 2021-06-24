@@ -6,4 +6,6 @@ export interface CoWorkersState {
   selectedCoWorker: User;
   loading: boolean;
   formLoading: boolean;
+  suspendStateLoading: boolean;
+  showSnackbar: boolean;
 }
