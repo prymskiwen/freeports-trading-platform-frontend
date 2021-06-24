@@ -331,7 +331,7 @@ const Profile = (): React.ReactElement => {
                       );
                       const name = escapeHTML(listItem.name);
                       return (
-                        <Grid container xs={12}>
+                        <Grid container xs={12} key={listItem.id}>
                           <a download={`${name}.publicKey`} href={dataUrl}>
                             {name}
                           </a>
