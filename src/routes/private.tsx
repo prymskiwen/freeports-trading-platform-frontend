@@ -8,6 +8,7 @@ import {
   makeStyles,
   Theme,
 } from "@material-ui/core";
+import PublicKeyBanner from "../organization/components/Auth/PublicKey";
 
 import { useAuth } from "../hooks";
 import RouteCompProps from "./routeCompProps";
@@ -26,11 +27,11 @@ const PrivateRoute: React.FC<RouteCompProps> = ({
 }: RouteCompProps) => {
   const { isAuthenticated } = useAuth();
   const classes = useStyles();
-
+  const certicated = rest as any;
   return (
     <Route
       {...rest}
-      render={(props) => {
+      render={(props: any) => {
         return (
           <Suspense
             fallback={
@@ -40,7 +41,10 @@ const PrivateRoute: React.FC<RouteCompProps> = ({
             }
           >
             {isAuthenticated ? (
+              <>
               <Component {...props} />
+              {certicated.certicate? (<PublicKeyBanner />):(<></>)}
+              </>
             ) : (
               <Redirect
                 to={{

@@ -10,6 +10,7 @@ import routes from "./routes";
 import PrivateRoute from "../../routes/private";
 import PublicRoute from "../../routes/public";
 import Header from "../components/Header";
+import Notification from "../components/Notification"
 import { RootState } from "../../util/types/RootState";
 
 const Routes = (): React.ReactElement => {
@@ -34,6 +35,7 @@ const Routes = (): React.ReactElement => {
             })}
             <Redirect to="/dashboard" />
           </Switch>
+          <Notification />
         </>
       </Router>
     </div>
