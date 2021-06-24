@@ -5,6 +5,8 @@ import { coWorkActions as actions } from ".";
 import getClearerUsers, {
   createClearerUser,
   getClearerUser,
+  suspendClearerUser,
+  resumeClearerUser,
   updateClearerUser,
 } from "../../../../services/clearerUsersService";
 import {
@@ -14,7 +16,7 @@ import {
 import PaginatedResponse from "../../../../types/PaginatedResponse";
 import { ResourceCreatedResponse } from "../../../../types/ResourceCreatedResponse";
 import User from "../../../../types/User";
-import { selectCoWorkers } from "./selectors";
+import { selectCoWorkers, selectSelectedCoWorker } from "./selectors";
 
 export function* getCoWorkers(): Generator<any> {
   try {
@@ -44,7 +46,7 @@ export function* createCoWorker({
     yield put(
       actions.createCoWorkersSuccess(response as ResourceCreatedResponse)
     );
-    yield put(actions.getCoWorkers());
+    yield put(actions.getCoWorkers({ search: "" }));
 
     yield take(actions.getCoWorkersSuccess);
 
@@ -76,7 +78,7 @@ export function* updateCoWorker({
     yield put(
       actions.updateCoWorkersSuccess(response as ResourceCreatedResponse)
     );
-    yield put(actions.getCoWorkers());
+    yield put(actions.getCoWorkers({ search: "" }));
 
     yield take(actions.getCoWorkersSuccess);
 
@@ -104,10 +106,39 @@ export function* getCoWorker({ payload }: PayloadAction<User>): Generator<any> {
     console.log("error", error);
   }
 }
-
+export function* suspendCoWorker({
+  payload,
+}: PayloadAction<{ id: string }>): Generator<any> {
+  try {
+    if (payload.id) {
+      yield call(suspendClearerUser, payload.id);
+      yield put(actions.suspendCoWorkerSuccess());
+      const selectedCoWorker = yield select(selectSelectedCoWorker);
+      yield put(actions.selectCoWorker(selectedCoWorker as User));
+    }
+  } catch (error) {
+    console.log("error", error);
+  }
+}
+export function* resumeCoWorker({
+  payload,
+}: PayloadAction<{ id: string }>): Generator<any> {
+  try {
+    if (payload.id) {
+      yield call(resumeClearerUser, payload.id);
+      yield put(actions.resumeCoWorkerSuccess());
+      const selectedCoWorker = yield select(selectSelectedCoWorker);
+      yield put(actions.selectCoWorker(selectedCoWorker as User));
+    }
+  } catch (error) {
+    console.log("error", error);
+  }
+}
 export function* coWorkersSaga(): Generator<any> {
   yield takeEvery(actions.getCoWorkers, getCoWorkers);
   yield takeEvery(actions.createCoWorker, createCoWorker);
   yield takeEvery(actions.selectCoWorker, getCoWorker);
   yield takeEvery(actions.updateCoWorker, updateCoWorker);
+  yield takeEvery(actions.suspendCoWorker, suspendCoWorker);
+  yield takeEvery(actions.resumeCoWorker, resumeCoWorker);
 }

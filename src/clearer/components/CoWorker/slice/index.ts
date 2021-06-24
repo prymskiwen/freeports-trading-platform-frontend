@@ -17,19 +17,22 @@ const defaultCoWorker = {
   email: "",
   avatar: "",
   jobTitle: "",
+  suspended: false,
 };
 export const initialState: CoWorkersState = {
   coWorkers: [],
   selectedCoWorker: defaultCoWorker,
   loading: false,
   formLoading: false,
+  suspendStateLoading: false,
+  showSnackbar: false,
 };
 
 const slice = createSlice({
   name: "coWorkers",
   initialState,
   reducers: {
-    getCoWorkers(state) {
+    getCoWorkers(state, action?: PayloadAction<{ search?: string }>) {
       state.loading = true;
       state.coWorkers = [];
     },
@@ -46,12 +49,14 @@ const slice = createSlice({
       action: PayloadAction<ResourceCreatedResponse>
     ) {
       state.formLoading = false;
+      state.showSnackbar = true;
     },
     updateCoWorker(state, action: PayloadAction<{ user: User; id: string }>) {
       state.formLoading = true;
     },
     updateCoWorkersSuccess(state, action: any) {
       state.formLoading = false;
+      state.showSnackbar = true;
     },
     selectCoWorker(state, action: PayloadAction<User>) {
       state.formLoading = true;
@@ -59,6 +64,20 @@ const slice = createSlice({
     selectCoWorkerSuccess(state, action: PayloadAction<User>) {
       state.selectedCoWorker = action.payload;
       state.formLoading = false;
+    },
+    suspendCoWorker(state, action: PayloadAction<{ id: string }>) {
+      state.suspendStateLoading = true;
+    },
+    suspendCoWorkerSuccess(state) {
+      state.suspendStateLoading = false;
+      state.showSnackbar = true;
+    },
+    resumeCoWorker(state, action: PayloadAction<{ id: string }>) {
+      state.suspendStateLoading = true;
+    },
+    resumeCoWorkerSuccess(state) {
+      state.suspendStateLoading = false;
+      state.showSnackbar = true;
     },
   },
 });

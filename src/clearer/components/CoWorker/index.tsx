@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -28,9 +28,12 @@ import {
   selectIsFormLoading,
   selectIsLoading,
   selectSelectedCoWorker,
+  selectShowSnackbar,
+  selectSuspendStateLoading,
 } from "./slice/selectors";
 
 import Loader from "../../../components/Loader";
+import Snackbar from "../../../components/Snackbar";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -41,9 +44,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   toolbar: theme.mixins.toolbar,
-  listTitle: {
-    display: "flex",
-  },
+
   main: {
     padding: theme.spacing(2),
   },
@@ -67,6 +68,9 @@ const useStyles = makeStyles((theme) => ({
   paddingSmall: {
     padding: theme.spacing(1),
   },
+  userStateLoader: {
+    maxHeight: 26,
+  },
 }));
 
 const defaultCoWorker = initialState.selectedCoWorker;
@@ -81,7 +85,9 @@ const CoWorker = (): React.ReactElement => {
   const formLoading = useSelector(selectIsFormLoading);
   const loading = useSelector(selectIsLoading);
   const selectedCoWorker: User = useSelector(selectSelectedCoWorker);
-
+  const suspendStateLoading: boolean = useSelector(selectSuspendStateLoading);
+  const showSnackbar: boolean = useSelector(selectShowSnackbar);
+  const [coWorkerSearch, setCoWorkerSearch] = useState("");
   if (
     coWorkerId &&
     coWorkerId !== "new" &&
@@ -98,6 +104,8 @@ const CoWorker = (): React.ReactElement => {
       !formLoading
     ) {
       dispatch(actions.selectCoWorker(foundCoWorker));
+    } else if (!foundCoWorker) {
+      dispatch(actions.selectCoWorker(coWorkers[0]));
     }
   }
 
@@ -115,7 +123,7 @@ const CoWorker = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    window.store.dispatch(actions.getCoWorkers());
+    window.store.dispatch(actions.getCoWorkers({ search: coWorkerSearch }));
   }, []);
 
   const handleNewCoWorker = (coWorker: User) => {
@@ -135,35 +143,54 @@ const CoWorker = (): React.ReactElement => {
     dispatch(actions.selectCoWorker(defaultCoWorker));
     history.push("/co-workers/new");
   };
+
+  const handleSearchChange = (evt: any) => {
+    console.log("Event", evt.target.value);
+    setCoWorkerSearch(evt.target.value);
+    dispatch(actions.getCoWorkers({ search: evt.target.value }));
+  };
+
+  const handleOnSuspend = () => {
+    if (selectedCoWorker.id) {
+      dispatch(actions.suspendCoWorker({ id: selectedCoWorker.id }));
+    }
+  };
+  const handleOnResume = () => {
+    if (selectedCoWorker.id) {
+      dispatch(actions.resumeCoWorker({ id: selectedCoWorker.id }));
+    }
+  };
   return (
     <Grid>
-      {loading && <Loader />}
-      {!loading && (
-        <Grid container className={classes.root}>
-          <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
-            <Grid container justify="flex-start">
-              <Grid sm={8} item className={classes.accordionCoWorker}>
-                <Typography variant="h6">CO-WORKER</Typography>
-              </Grid>
-              <Grid xs={2} item>
-                <IconButton
-                  color="inherit"
-                  aria-label="Add Role"
-                  onClick={handleAddCoWorker}
-                >
-                  <AddCircleIcon fontSize="large" color="primary" />
-                </IconButton>
-              </Grid>
+      <Grid container className={classes.root}>
+        <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
+          <Grid container justify="flex-start">
+            <Grid sm={8} item className={classes.accordionCoWorker}>
+              <Typography variant="h6">CO-WORKER</Typography>
             </Grid>
-            <Grid container>
-              <Grid xs={2} item>
-                <SearchIcon />
-              </Grid>
-              <Grid sm={8} item>
-                <TextField id="input-with-icon-grid" />
-              </Grid>
+            <Grid xs={2} item>
+              <IconButton
+                color="inherit"
+                aria-label="Add Role"
+                onClick={handleAddCoWorker}
+              >
+                <AddCircleIcon fontSize="large" color="primary" />
+              </IconButton>
             </Grid>
-
+          </Grid>
+          <Grid container>
+            <Grid xs={2} item>
+              <SearchIcon />
+            </Grid>
+            <Grid sm={8} item>
+              <TextField
+                onChange={handleSearchChange}
+                id="input-with-icon-grid"
+              />
+            </Grid>
+          </Grid>
+          <>{loading && <Loader />}</>
+          {!loading && (
             <List>
               {coWorkers &&
                 coWorkers.map((coWorker: User, i: number) => (
@@ -175,49 +202,67 @@ const CoWorker = (): React.ReactElement => {
                       selectedCoWorker && coWorker.id === selectedCoWorker.id
                     }
                   >
-                    <ListItemText primary={`${coWorker.nickname} ${i + 1}`} />
+                    <ListItemText primary={`${coWorker.nickname} `} />
                   </ListItem>
                 ))}
             </List>
-          </Grid>
-          <Grid item className={classes.main} xs={12} sm={8} lg={9}>
-            {selectedCoWorker && (
-              <Accordion expanded>
-                <AccordionSummary
-                  classes={{ content: classes.accordionSummary }}
-                  aria-controls="panel1c-content"
-                >
-                  <div className={classes.accordionCoWorker}>
-                    <ExpandMoreIcon />
-                    <img
-                      className={`${classes.accordionProfile}
-                 ${classes.paddingSmall}`}
-                      src={profile}
-                      alt="Co-worker"
-                    />
-                    {selectedCoWorker && (
-                      <Typography>{selectedCoWorker.nickname}</Typography>
-                    )}
-                  </div>
-
-                  <Button>Disable</Button>
-                </AccordionSummary>
-                {formLoading && <Loader />}
-                {!formLoading && selectedCoWorker && (
-                  <CoWorkerForm
-                    onSubmit={
-                      selectedCoWorker.id
-                        ? handleCoWorkerUpdate
-                        : handleNewCoWorker
-                    }
-                    coWorker={selectedCoWorker}
-                  />
-                )}
-              </Accordion>
-            )}{" "}
-          </Grid>
+          )}
         </Grid>
-      )}
+        <Grid item className={classes.main} xs={12} sm={8} lg={9}>
+          {selectedCoWorker && (
+            <Accordion expanded>
+              <AccordionSummary
+                classes={{ content: classes.accordionSummary }}
+                aria-controls="panel1c-content"
+              >
+                <div className={classes.accordionCoWorker}>
+                  <ExpandMoreIcon />
+                  <img
+                    className={`${classes.accordionProfile}
+                    ${classes.paddingSmall}`}
+                    src={profile}
+                    alt="Co-worker"
+                  />
+                  {selectedCoWorker && (
+                    <Typography>{selectedCoWorker.nickname}</Typography>
+                  )}
+                </div>
+
+                {!selectedCoWorker.suspended && !suspendStateLoading && (
+                  <Button onClick={handleOnSuspend} color="secondary">
+                    Disable
+                  </Button>
+                )}
+                {selectedCoWorker.suspended && !suspendStateLoading && (
+                  <Button onClick={handleOnResume} color="primary">
+                    {" "}
+                    Activate
+                  </Button>
+                )}
+                {suspendStateLoading && (
+                  <Button className={classes.userStateLoader} disabled>
+                    <Loader />
+                  </Button>
+                )}
+              </AccordionSummary>
+              {formLoading && <Loader />}
+              {!formLoading && selectedCoWorker && (
+                <CoWorkerForm
+                  onSubmit={
+                    selectedCoWorker.id
+                      ? handleCoWorkerUpdate
+                      : handleNewCoWorker
+                  }
+                  coWorker={selectedCoWorker}
+                />
+              )}
+            </Accordion>
+          )}{" "}
+        </Grid>
+        {showSnackbar && (
+          <Snackbar message={{ type: "success", message: "Success" }} open />
+        )}
+      </Grid>
     </Grid>
   );
 };
