@@ -65,11 +65,7 @@ const open = (): Promise<any> => {
 // Promise is fulfilled with a copy of the object
 // that was saved. Otherwise, it is rejected with an Error.
 //
-const saveKey = (
-  publicKey: string,
-  privateKey: string,
-  name: string
-): Promise<any> => {
+const saveKey = (publicKey: any, privateKey: any, name: any): Promise<any> => {
   return new Promise((fulfill, reject) => {
     if (!db) {
       reject(new Error("KeyStore is not open."));
