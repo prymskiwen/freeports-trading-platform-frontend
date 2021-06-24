@@ -32,7 +32,7 @@ const addOrganizationManager = (
   email: string,
   password: string,
   phone: string,
-  avata: string,
+  avatar: string,
   ): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
@@ -41,7 +41,7 @@ const addOrganizationManager = (
         email,
         password,
         phone,
-        avata,
+        avatar,
       }).then((res: any) => {
         return resolve(res.data);
       }).catch((err) => {
@@ -66,7 +66,7 @@ const getOrganisationManagers = (id: string): Promise<any> => {
 const getOrganizerManager = (organizerId: string, managerid: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/${organizerId}/user/${managerid}`)
+      .get(`/organization/${organizerId}/manager/${managerid}`)
       .then((res) => {
         return resolve(res.data);
       })
@@ -76,14 +76,14 @@ const getOrganizerManager = (organizerId: string, managerid: string): Promise<an
   });
 };
 
-const updateOrganizerManager = (organizerId: string, managerId: string, nickname: string, email: string, phone: string, avata: string): Promise<any> => {
+const updateOrganizerManager = (organizerId: string, managerId: string, nickname: string, email: string, phone: string, avatar: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .patch(`/organization/${organizerId}/user/${managerId}`, {
+      .patch(`/organization/${organizerId}/manager/${managerId}`, {
         nickname,
         email,
         phone,
-        avata,
+        avatar,
       }).then((res) => {
         return resolve(res.data);
       }).catch((err) => {
@@ -99,10 +99,9 @@ const addOrganizer = (
   zip: string,
   city: string,
   country: string,
-  logofile: string,
-  createtime: Date,
-  сommission: string,
-  clearer: string,
+  logo: string,
+  commissionOrganization: string,
+  commissionClearer: string,
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
@@ -113,10 +112,9 @@ const addOrganizer = (
         zip,
         city,
         country,
-        logofile,
-        сommission,
-        clearer,
-        createtime,
+        logo,
+        commissionOrganization,
+        commissionClearer,
       }).then((res: any) => {
         return resolve(res.data);
       }).catch((err) => {
@@ -127,20 +125,20 @@ const addOrganizer = (
 
 const updateOrganizer = (
   organization: string,
-  createtime: Date,
+  createdAt: Date,
   name: string,
-  logofile: string,
-  сommission: string,
-  clearer: string,
+  logo: string,
+  commissionOrganization: string,
+  commissionClearer: string,
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .patch(`/organization/${organization}`, {
         name,
-        createtime,
-        logofile,
-        сommission,
-        clearer,
+        createdAt,
+        logo,
+        commissionOrganization,
+        commissionClearer,
       }).then((res: any) => {
         return resolve(res.data);
       }).catch((err) => {
@@ -175,7 +173,7 @@ const addAccount = (
 const suspendManager = (organizerId: string, managerId: string) :Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .put(`/organization/${organizerId}/user/${managerId}/suspend`)
+      .put(`/organization/${organizerId}/manager/${managerId}/suspend`)
       .then((res: any) => {
         return resolve(res.data);
       }).catch((err) => {
@@ -187,7 +185,7 @@ const suspendManager = (organizerId: string, managerId: string) :Promise<any> =>
 const resumeManager = (organizerId: string, managerId: string) :Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .put(`/organization/${organizerId}/user/${managerId}/resume`)
+      .put(`/organization/${organizerId}/manager/${managerId}/resume`)
       .then((res: any) => {
         return resolve(res.data);
       }).catch((err) => {

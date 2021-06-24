@@ -26,8 +26,8 @@ const useStyles = makeStyles((theme) => ({
 const onValidate = (values: any) => {
   const errors: {
     name?: string,
-    commission?: string,
-    clearer?: string,
+    commissionOrganization?: string,
+    commissionClearer?: string,
   } = {};
 
   if(!values.name){
@@ -48,11 +48,11 @@ const onValidate = (values: any) => {
   // if(!values.country){
   //   errors.country = "This Field Required";
   // }
-  if(!values.commission){
-    errors.commission = "This Field Required";
+  if(!values.commissionOrganization){
+    errors.commissionOrganization = "This Field Required";
   }
-  if(!values.clearer){
-    errors.clearer = "This Field Required";
+  if(!values.commissionClearer){
+    errors.commissionClearer = "This Field Required";
   }
   return errors;
 }
@@ -109,8 +109,7 @@ const AddOrganizer = (): React.ReactElement => {
 
   
  const onsubmit = async (values: any) => {
-  const nowTime = new Date()
-  await addOrganization(values.name, values.street1, values.street2, values.zip, values.city, values.country, logoImage, nowTime.getTime(), values.commission, values.clearer)
+  await addOrganization(values.name, values.street1, values.street2, values.zip, values.city, values.country, logoImage, values.commissionOrganization, values.commissionClearer)
     .then((data: any) => {
       const responseId = data.id;
         console.log(responseId)
@@ -145,8 +144,8 @@ const AddOrganizer = (): React.ReactElement => {
             zip: "",
             city: "",
             country: "",
-            commission: "",
-            clearer: "",
+            commissionOrganization: "",
+            commissionClearer: "",
           }}
           validate={onValidate}
           render={({ handleSubmit, values }) => (
@@ -258,8 +257,8 @@ const AddOrganizer = (): React.ReactElement => {
                       <TextField
                         required
                         id="outlined-adornment-amount"
-                        label="Set commission rate"
-                        name="commission"
+                        label="Set organization commission rate"
+                        name="commissionOrganization"
                         variant="outlined"
                       />
                     </FormControl>
@@ -270,7 +269,7 @@ const AddOrganizer = (): React.ReactElement => {
                         required
                         id="outlined-adornment-amount"
                         label="Set clearer commission rate"
-                        name="clearer"
+                        name="commissionClearer"
                         variant="outlined"
                       />
                     </FormControl>

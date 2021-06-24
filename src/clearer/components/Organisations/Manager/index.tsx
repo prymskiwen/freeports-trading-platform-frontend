@@ -66,7 +66,7 @@ interface managerType {
   nickname: string;
   email: string;
   phone: string;
-  avata: string;
+  avatar: string;
 }
 
 const Manager = (props: any): React.ReactElement => {
@@ -80,7 +80,7 @@ const Manager = (props: any): React.ReactElement => {
     nickname: 'string',
     email: 'string',
     phone: 'string',
-    avata: '/assets/user4.png',
+    avatar: '/assets/user4.png',
   });
   
   useEffect(() => {
@@ -95,7 +95,7 @@ const Manager = (props: any): React.ReactElement => {
           nickname: managerdata.nickname,
           email: managerdata.email,
           phone: managerdata.phone,
-          avata: managerdata.avata,
+          avatar: managerdata.avatar,
         });
         console.log(managerdata.suspended);
         if(managerdata.suspended === 'undefined'){
@@ -133,18 +133,18 @@ const Manager = (props: any): React.ReactElement => {
     setManager(newManager);
   } 
 
-  const ondropAvata = (avataImg: any) => {
+  const ondropAvatar = (avataImg: any) => {
     const reader = new FileReader();
     reader.onload = (event: any)=>{
       const newManager = { ...manager };
-      newManager.avata = event.target.result;
+      newManager.avatar = event.target.result;
       setManager(newManager);
     }
     reader.readAsDataURL(avataImg[0]);
   }
 
   const updateSubmit = async () => {
-    await updateOrganizationManager(organizerId, manager.id, manager.nickname, manager.email, manager.phone, manager.avata)
+    await updateOrganizationManager(organizerId, manager.id, manager.nickname, manager.email, manager.phone, manager.avatar)
       .then((data: any) => {
         console.log(data);
         alert("Saved");
@@ -178,7 +178,7 @@ const Manager = (props: any): React.ReactElement => {
           >
             <Grid container direction="row" alignItems="center" xs={12}>
               <Grid container direction="row" alignItems="center" justify="flex-start" xs={6}>
-                <Avatar alt="john" src={manager.avata} />
+                <Avatar alt="john" src={manager.avatar} />
                 <span className={classes.managerName} >{manager.nickname}</span>
               </Grid>
               <Grid container justify="flex-end" xs={6}>
@@ -192,7 +192,7 @@ const Manager = (props: any): React.ReactElement => {
                 <span style={{ fontSize: 18 }}>Status</span>
                 <Select className={classes.selectStyle} value={organizerStatus} onChange={onHandleStatus}>
                   <MenuItem value="true" selected>Active</MenuItem>
-                  <MenuItem value="false">Disactive</MenuItem>
+                  <MenuItem value="false">Suspended</MenuItem>
                 </Select>
               </Grid>
               <Grid item container direction="row" spacing={2} xs={12}>
@@ -233,7 +233,7 @@ const Manager = (props: any): React.ReactElement => {
                     style={{ marginTop: 20 }}
                     component="img"
                     height="140"
-                    image={manager.avata}
+                    image={manager.avatar}
                   />
                   <ImageUploader
                     withIcon={showingIcon}
@@ -245,7 +245,7 @@ const Manager = (props: any): React.ReactElement => {
                       background: "#fff0",
                       color: "#000",
                     }}
-                    onChange={(ChangeEvent) => ondropAvata(ChangeEvent)}
+                    onChange={(ChangeEvent) => ondropAvatar(ChangeEvent)}
                     fileContainerStyle={{
                       margin: 0,
                       padding: 0,

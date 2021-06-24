@@ -37,7 +37,7 @@ const Organisations = (): React.ReactElement => {
         },
       },
       {
-        field: "createtime",
+        field: "createdAt",
         title: "Create Date",
         type: 'date',
         dateSetting: { locale: "en-GB" },
@@ -46,14 +46,14 @@ const Organisations = (): React.ReactElement => {
         },
       },
       {
-        field: "acitveUser",
+        field: "userActive",
         title: "Active Users",
         cellStyle: {
           width: "25%",
         },
       },
       {
-        field: "discativeUser",
+        field: "userSuspended",
         title: "Disable Users",
         cellStyle: {
           width: "25%",

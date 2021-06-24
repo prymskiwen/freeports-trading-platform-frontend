@@ -51,19 +51,19 @@ const AddManager = (): React.ReactElement => {
 
   const { addManager } = useOrganization();
 
-  const [managerAvata, setManagerAvata] = useState('');
+  const [managerAvatar, setManagerAvatar] = useState('');
 
   const ondrop = (pic: any) => {
     const reader = new FileReader();
     reader.onload = (e: any)=>{
-      setManagerAvata(e.target.result);
+      setManagerAvatar(e.target.result);
     }
     reader.readAsDataURL(pic[0]);
-    // setLogofile(pic);
+    // setLogo(pic);
   }
 
   const onSubmit = async (values: any) => {
-    const additional = await addManager(orgaizationId, values.nickname, values.email, values.password, values.phone, managerAvata)
+    const additional = await addManager(orgaizationId, values.nickname, values.email, values.password, values.phone, managerAvatar)
       .then((res: any) =>{
         console.log(res);
         history.push(`/organisations/editOrganizer/${orgaizationId}`);
@@ -144,7 +144,7 @@ const AddManager = (): React.ReactElement => {
                       style={{ marginTop: 20 }}
                       component="img"
                       height="140"
-                      image={managerAvata}
+                      image={managerAvatar}
                     />
                     <ImageUploader
                       withIcon={showingIcon}

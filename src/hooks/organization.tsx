@@ -54,9 +54,9 @@ function useOrganization(): any {
     return managers;
   }
 
-  const addManager = async (organizerId: string, nickname: string, email: string, password: string, phone: string, avata: string) => {
+  const addManager = async (organizerId: string, nickname: string, email: string, password: string, phone: string, avatar: string) => {
     dispatch(clearError());
-    const manager = await addOrganizationManager(organizerId, nickname, email, password, phone, avata)
+    const manager = await addOrganizationManager(organizerId, nickname, email, password, phone, avatar)
       .then((data) => {
         return data;
       }).catch((err) => {
@@ -84,13 +84,12 @@ function useOrganization(): any {
     zip: string,
     city: string,
     country: string,
-    logofile: string,
-    createtime: Date,
-    сommission: string,
-    clearer: string,
+    logo: string,
+    commissionOrganization: string,
+    commissionClearer: string,
   ) => {
     dispatch(clearError());
-    const newOrganization = await addOrganizer(name, street, street1, zip, city, country, logofile, createtime, сommission, clearer)
+    const newOrganization = await addOrganizer(name, street, street1, zip, city, country, logo, commissionOrganization, commissionClearer)
       .then((data) => {
         return data;
       }).catch((err) => {
@@ -120,14 +119,14 @@ function useOrganization(): any {
 
   const updateOrganization = async (
     organizerId: string,
-    createtime: Date,
+    createdAt: Date,
     name: string,
-    logofile: string,
-    сommission: string,
-    clearer: string,
+    logo: string,
+    commissionOrganization: string,
+    commissionClearer: string,
   ) => {
     dispatch(clearError());
-    const updatedOrganization = await updateOrganizer(organizerId, createtime, name, logofile, сommission, clearer)
+    const updatedOrganization = await updateOrganizer(organizerId, createdAt, name, logo, commissionOrganization, commissionClearer)
       .then((data) => {
         return data;
       }).catch((err) => {
@@ -142,10 +141,10 @@ function useOrganization(): any {
     nickname: string,
     email: string,
     phone: string,
-    avata: string,
+    avatar: string,
   ) => {
     dispatch(clearError());
-    const updatedOrganizationManager = await updateOrganizerManager(organizerId, managerId, nickname, email, phone, avata)
+    const updatedOrganizationManager = await updateOrganizerManager(organizerId, managerId, nickname, email, phone, avatar)
       .then((data) => {
         return data;
       }).catch((err) => {

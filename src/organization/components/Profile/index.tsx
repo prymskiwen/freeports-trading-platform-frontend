@@ -62,7 +62,7 @@ const profileValidate = (values: any) => {
     nickname?: string;
     email?: string;
     phone?: string;
-    avata?: string;
+    avatar?: string;
   } = {};
   if (!values.nickname) {
     errors.nickname = "This Field Required";
