@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardContent,
   CardActions,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -21,8 +22,26 @@ import {
 
 import { useProfileSlice } from "./slice";
 import { selectProfile } from "./slice/selectors";
-import { encryptMegolmKeyFile } from "../../../util/keyStore/MegolmExportEncryption";
-import KeyStore from "../../../util/keyStore/keystore";
+import { keyPairType } from "./slice/types";
+import {
+  encryptMegolmKeyFile,
+  decryptMegolmKeyFile,
+  readFileAsArrayBuffer,
+} from "../../../util/keyStore/MegolmExportEncryption";
+import {
+  open,
+  saveKey,
+  getKey,
+  listKeys,
+  close,
+} from "../../../util/keyStore/keystore";
+import {
+  arrayBufferToBase64,
+  base64ToArrayBuffer,
+  createDataUrlFromByteArray,
+  downloadString,
+  escapeHTML,
+} from "../../../util/keyStore/functions";
 import defaultAvatar from "../../../assets/images/profile.jpg";
 
 const useStyles = makeStyles((theme) => ({
@@ -65,6 +84,19 @@ const useStyles = makeStyles((theme) => ({
   hiddenFileInput: {
     display: "none",
   },
+
+  progressButtonWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  progressButton: {
+    color: theme.palette.primary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 const Profile = (): React.ReactElement => {
@@ -74,13 +106,51 @@ const Profile = (): React.ReactElement => {
   const { profile } = useSelector(selectProfile);
   const [avatar, setAvatar] = useState(defaultAvatar);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [importKeyDialogOpen, setImportKeyDialogOpen] = useState(false);
+  const [importedFile, setImportedFile] = useState<File | null>(null);
   const keyfileRef = useRef<HTMLInputElement | null>(null);
   const [key, setKey] = useState("");
   const [passphrase, setPassPhrase] = useState("");
+  const [importKeyPassword, setImportKeyPassword] = useState("");
+  const [keyList, setKeyList] = useState<
+    Array<{
+      publicKey: CryptoKey | null;
+      privateKey: CryptoKey | null;
+      name: string;
+      spki: ArrayBuffer;
+    }>
+  >([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     dispatch(actions.getProfile());
+
+    const getKeyList = async () => {
+      await open();
+      await listKeys()
+        .then((list) => {
+          console.log("list ", list);
+          const storedKeyList: Array<keyPairType> = [];
+          list.forEach((item: { id: number; value: keyPairType }) =>
+            storedKeyList.push(item.value)
+          );
+          setKeyList(storedKeyList);
+        })
+        .catch((err) => {
+          alert(`Could not list keys: ${err.message}`);
+        });
+
+      await close();
+    };
+
+    getKeyList();
   }, []);
+
+  useEffect(() => {
+    if (importedFile !== null) {
+      setImportKeyDialogOpen(true);
+    }
+  }, [importedFile]);
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.currentTarget;
@@ -101,6 +171,17 @@ const Profile = (): React.ReactElement => {
     if (keyfileRef.current !== null) keyfileRef.current.click();
   };
 
+  const onFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.currentTarget;
+    if (files && files.length) {
+      setImportedFile(files[0]);
+    }
+  };
+
+  const handleImportKeyDialogClose = () => {
+    setImportKeyDialogOpen(false);
+  };
+
   const onKeyChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -115,76 +196,22 @@ const Profile = (): React.ReactElement => {
     setPassPhrase(value);
   };
 
-  const arrayBufferToBase64 = (arrayBuffer: any) => {
-    const byteArray = new Uint8Array(arrayBuffer);
-    let byteString = "";
-    for (let i = 0; i < byteArray.byteLength; i += 1) {
-      byteString += String.fromCharCode(byteArray[i]);
-    }
-    const b64 = window.btoa(byteString);
-
-    return b64;
-  };
-
-  const downloadString = (
-    text: ArrayBufferLike,
-    fileType: string,
-    fileName: string
+  const onImportKeyPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const blob = new Blob([text], { type: fileType });
-
-    const a = document.createElement("a");
-    a.download = fileName;
-    a.href = URL.createObjectURL(blob);
-    a.dataset.downloadurl = [fileType, a.download, a.href].join(":");
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => {
-      URL.revokeObjectURL(a.href);
-    }, 1500);
-  };
-
-  const createDataUrlFromByteArray = (byteArray: Uint8Array) => {
-    let binaryString = "";
-
-    for (let i = 0; i < byteArray.byteLength; i += 1) {
-      binaryString += String.fromCharCode(byteArray[i]);
-    }
-
-    return `data:application/octet-stream;base64,${btoa(binaryString)}`;
-  };
-
-  const escapeHTML = (s: string) => {
-    return s
-      .toString()
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&apos;");
+    const { value } = e.target;
+    setImportKeyPassword(value);
   };
 
   const addToKeyList = (savedObject: any) => {
-    const dataUrl = createDataUrlFromByteArray(
-      new Uint8Array(savedObject.spki)
-    );
-    const name = escapeHTML(savedObject.name);
+    const newList = [...keyList];
 
-    console.log(`${name}.publickey`);
-    console.log(dataUrl);
-
-    /* if (document.getElementById("list-keys"))
-      document
-        .getElementById("list-keys")
-        .insertAdjacentHTML(
-          "beforeEnd",
-          `<li><a download="${name}.publicKey" href="${dataUrl}">${name}</a></li>`
-        ); */
+    newList.push(savedObject);
+    setKeyList(newList);
   };
 
   const onCreateCertificate = async () => {
+    setLoading(true);
     const algorithmName = "RSASSA-PKCS1-v1_5";
     const usages: Array<KeyUsage> = ["sign", "verify"];
     const params = {
@@ -214,9 +241,49 @@ const Profile = (): React.ReactElement => {
       false,
       ["sign"]
     );
-    const results = await KeyStore.saveKey(keyPair.publicKey, privateKey, key);
+    await open();
+    const results = await saveKey(keyPair.publicKey, privateKey, key);
 
     addToKeyList(results);
+    await close();
+
+    setLoading(false);
+    setCreateDialogOpen(false);
+  };
+
+  const onImportKey = async () => {
+    setLoading(true);
+
+    const algorithmName = "RSASSA-PKCS1-v1_5";
+    const params = {
+      name: algorithmName,
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: { name: "SHA-256" },
+    };
+    if (importedFile !== null) {
+      const arrayBuffer = await readFileAsArrayBuffer(importedFile);
+      const decryptedKey = await decryptMegolmKeyFile(
+        arrayBuffer,
+        importKeyPassword
+      );
+      const keyArrayBuffer = base64ToArrayBuffer(decryptedKey);
+      const format = "pkcs8";
+      const privateKey = await window.crypto.subtle.importKey(
+        format,
+        keyArrayBuffer,
+        params,
+        false,
+        ["sign"]
+      );
+      await open();
+      const results = await saveKey(null, privateKey, importedFile.name);
+      addToKeyList(results);
+      await close();
+
+      setLoading(false);
+      setImportKeyDialogOpen(false);
+    }
   };
 
   return (
@@ -249,10 +316,33 @@ const Profile = (): React.ReactElement => {
                       id="keyfile"
                       name="keyfile"
                       className={classes.hiddenFileInput}
+                      onChange={onFileImport}
                     />
                   </>
                 }
               />
+              {keyList.length > 0 ? (
+                <>
+                  <Divider />
+                  <CardContent>
+                    {keyList.map((listItem: any) => {
+                      const dataUrl = createDataUrlFromByteArray(
+                        new Uint8Array(listItem.spki)
+                      );
+                      const name = escapeHTML(listItem.name);
+                      return (
+                        <Grid container xs={12}>
+                          <a download={`${name}.publicKey`} href={dataUrl}>
+                            {name}
+                          </a>
+                        </Grid>
+                      );
+                    })}
+                  </CardContent>
+                </>
+              ) : (
+                <></>
+              )}
             </Card>
           </Grid>
           <Grid item xs={12}>
@@ -430,13 +520,70 @@ const Profile = (): React.ReactElement => {
               <Button onClick={handleCreateDialogClose} variant="contained">
                 Cancel
               </Button>
-              <Button
-                onClick={onCreateCertificate}
-                color="primary"
-                variant="contained"
-              >
-                Create
+              <div className={classes.progressButtonWrapper}>
+                <Button
+                  onClick={onCreateCertificate}
+                  color="primary"
+                  variant="contained"
+                  disabled={loading}
+                >
+                  Create
+                </Button>
+                {loading && (
+                  <CircularProgress
+                    size={24}
+                    className={classes.progressButton}
+                  />
+                )}
+              </div>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={importKeyDialogOpen}
+            onClose={handleImportKeyDialogClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Enter Password</DialogTitle>
+            <Divider />
+            <DialogContent>
+              <Grid container>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    margin="dense"
+                    id="passphrase"
+                    name="passphrase"
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    value={importKeyPassword}
+                    onChange={onImportKeyPasswordChange}
+                  />
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <Divider />
+            <DialogActions>
+              <Button onClick={handleImportKeyDialogClose} variant="contained">
+                Cancel
               </Button>
+              <div className={classes.progressButtonWrapper}>
+                <Button
+                  onClick={onImportKey}
+                  color="primary"
+                  variant="contained"
+                  disabled={loading}
+                >
+                  Import Key
+                </Button>
+                {loading && (
+                  <CircularProgress
+                    size={24}
+                    className={classes.progressButton}
+                  />
+                )}
+              </div>
             </DialogActions>
           </Dialog>
         </Grid>

@@ -67,7 +67,7 @@ const open = (): Promise<any> => {
 // that was saved. Otherwise, it is rejected with an Error.
 //
 const saveKey = (
-  publicKey: CryptoKey,
+  publicKey: CryptoKey | null,
   privateKey: CryptoKey,
   name: any
 ): Promise<any> => {
