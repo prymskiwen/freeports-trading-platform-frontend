@@ -1,4 +1,5 @@
 import { takeEvery, call, put } from "redux-saga/effects";
+import { PayloadAction } from "@reduxjs/toolkit";
 import Lockr from "lockr";
 
 import { profileActions as actions } from ".";

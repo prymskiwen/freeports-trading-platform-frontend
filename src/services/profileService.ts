@@ -5,7 +5,6 @@ const getUserProfile = (orgId: string, userId: string): Promise<any> => {
     axios
       .get(`/organization/${orgId}/user/${userId}`)
       .then((res: any) => {
-        console.log(res.data);
         return resolve(res.data);
       })
       .catch((err) => {

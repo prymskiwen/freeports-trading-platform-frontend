@@ -7,8 +7,16 @@ export interface OrganizationProfileType {
   avatar?: string;
   suspended: boolean;
 }
+
 /* --- STATE --- */
 export interface ProfileState {
   profile: OrganizationProfileType;
   loading: boolean;
+}
+
+export interface keyPairType {
+  publicKey: CryptoKey | null;
+  privateKey: CryptoKey;
+  name: string;
+  spki: ArrayBuffer;
 }
