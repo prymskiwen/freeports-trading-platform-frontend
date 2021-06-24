@@ -97,6 +97,19 @@ const assignClearerRolesToUser = (userId: string, roles: string[]) => {
   });
 };
 
+const updateClearerRolesToUser = (userId: string, roles: string[]) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(`/user/${userId}/role`, { roles })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 export {
   getClearerRoles as default,
   addNewRole,
@@ -105,4 +118,5 @@ export {
   getClearerRoles,
   getClearerPermissions,
   assignClearerRolesToUser,
+  updateClearerRolesToUser,
 };

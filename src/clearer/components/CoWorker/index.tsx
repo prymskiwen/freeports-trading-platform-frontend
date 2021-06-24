@@ -91,8 +91,13 @@ const CoWorker = (): React.ReactElement => {
     const foundCoWorker = coWorkers.find(
       (coWorker) => coWorker.id === coWorkerId
     );
-    if (foundCoWorker) {
-      // dispatch(actions.selectCoWorker(foundCoWorker));
+    console.log("::found coworker ", foundCoWorker, selectedCoWorker);
+    if (
+      foundCoWorker &&
+      foundCoWorker.id !== selectedCoWorker.id &&
+      !formLoading
+    ) {
+      dispatch(actions.selectCoWorker(foundCoWorker));
     }
   }
 
@@ -114,12 +119,16 @@ const CoWorker = (): React.ReactElement => {
   }, []);
 
   const handleNewCoWorker = (coWorker: User) => {
-    // dispatch(actions.selectCoWorker(coWorker));
     dispatch(actions.createCoWorker({ user: coWorker }));
   };
 
   const handleCoWorkerUpdate = (coWorker: User) => {
-    return null;
+    console.log("CoWorker", coWorker, selectedCoWorker);
+    if (selectedCoWorker.id) {
+      dispatch(
+        actions.updateCoWorker({ user: coWorker, id: selectedCoWorker.id })
+      );
+    }
   };
 
   const handleAddCoWorker = () => {
