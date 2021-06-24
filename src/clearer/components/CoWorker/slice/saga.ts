@@ -1,5 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { takeEvery, call, put, select, take } from "redux-saga/effects";
+import {
+  takeEvery,
+  call,
+  put,
+  select,
+  take,
+  takeLatest,
+  delay,
+} from "redux-saga/effects";
 
 import { coWorkActions as actions } from ".";
 import getClearerUsers, {
@@ -16,9 +24,12 @@ import { ResourceCreatedResponse } from "../../../../types/ResourceCreatedRespon
 import User from "../../../../types/User";
 import { selectCoWorkers } from "./selectors";
 
-export function* getCoWorkers(): Generator<any> {
+export function* getCoWorkers({
+  payload,
+}: PayloadAction<{ search?: string }>): Generator<any> {
   try {
-    const response = yield call(getClearerUsers);
+    yield delay(300);
+    const response = yield call(getClearerUsers, payload.search);
     yield put(
       actions.getCoWorkersSuccess((response as PaginatedResponse<User>).content)
     );
@@ -44,7 +55,7 @@ export function* createCoWorker({
     yield put(
       actions.createCoWorkersSuccess(response as ResourceCreatedResponse)
     );
-    yield put(actions.getCoWorkers());
+    yield put(actions.getCoWorkers({}));
 
     yield take(actions.getCoWorkersSuccess);
 
@@ -76,7 +87,7 @@ export function* updateCoWorker({
     yield put(
       actions.updateCoWorkersSuccess(response as ResourceCreatedResponse)
     );
-    yield put(actions.getCoWorkers());
+    yield put(actions.getCoWorkers({}));
 
     yield take(actions.getCoWorkersSuccess);
 
@@ -106,7 +117,7 @@ export function* getCoWorker({ payload }: PayloadAction<User>): Generator<any> {
 }
 
 export function* coWorkersSaga(): Generator<any> {
-  yield takeEvery(actions.getCoWorkers, getCoWorkers);
+  yield takeLatest(actions.getCoWorkers, getCoWorkers);
   yield takeEvery(actions.createCoWorker, createCoWorker);
   yield takeEvery(actions.selectCoWorker, getCoWorker);
   yield takeEvery(actions.updateCoWorker, updateCoWorker);

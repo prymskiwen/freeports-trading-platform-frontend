@@ -3,10 +3,11 @@ import { ResourceCreatedResponse } from "../types/ResourceCreatedResponse";
 import User from "../types/User";
 import axios from "../util/axios";
 
-const getClearerUsers = (): Promise<PaginatedResponse<User>> => {
+const getClearerUsers = (search?: string): Promise<PaginatedResponse<User>> => {
+  console.log("Get clearer user s", search);
   return new Promise((resolve, reject) => {
     axios
-      .get(`/user`)
+      .get(`/user${search ? `?search=${search}` : ""}`)
       .then((res: any) => {
         return resolve(res.data);
       })

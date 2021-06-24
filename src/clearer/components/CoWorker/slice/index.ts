@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-param-reassign */
 import { PayloadAction } from "@reduxjs/toolkit";
 import { ResourceCreatedResponse } from "../../../../types/ResourceCreatedResponse";
@@ -29,7 +30,7 @@ const slice = createSlice({
   name: "coWorkers",
   initialState,
   reducers: {
-    getCoWorkers(state) {
+    getCoWorkers(state, action: PayloadAction<{ search?: string }>) {
       state.loading = true;
       state.coWorkers = [];
     },
