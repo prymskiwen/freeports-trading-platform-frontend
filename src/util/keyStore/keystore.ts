@@ -19,6 +19,7 @@
 // The key storage database name is hard coded as KeyStore. It
 // uses one object store, called keys.
 //
+
 let db: any = null;
 const dbName = "KeyStore";
 const objectStoreName = "keys";
@@ -65,7 +66,11 @@ const open = (): Promise<any> => {
 // Promise is fulfilled with a copy of the object
 // that was saved. Otherwise, it is rejected with an Error.
 //
-const saveKey = (publicKey: any, privateKey: any, name: any): Promise<any> => {
+const saveKey = (
+  publicKey: CryptoKey,
+  privateKey: CryptoKey,
+  name: any
+): Promise<any> => {
   return new Promise((fulfill, reject) => {
     if (!db) {
       reject(new Error("KeyStore is not open."));
