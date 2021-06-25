@@ -18,6 +18,7 @@ import {
   Grid,
   makeStyles,
   TextField,
+  Typography,
 } from "@material-ui/core";
 
 import { useProfileSlice } from "./slice";
@@ -286,6 +287,13 @@ const Profile = (): React.ReactElement => {
     }
   };
 
+  const onDownload = (name: string, dataUrl: string) => {
+    const link = document.createElement("a");
+    link.download = `${name}.publickey`;
+    link.href = dataUrl;
+    link.click();
+  };
+
   return (
     <div className="main-wrapper">
       <Container>
@@ -294,55 +302,52 @@ const Profile = (): React.ReactElement => {
             <Card>
               <CardHeader
                 className={classes.cardHeader}
+                title="Certificate"
                 action={
-                  <>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={handleCreateDialogOpen}
-                    >
-                      Create Certificate
-                    </Button>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      onClick={handleImportFileDialogOpen}
-                    >
-                      Import Key
-                    </Button>
-                    <input
-                      ref={keyfileRef}
-                      type="file"
-                      id="keyfile"
-                      name="keyfile"
-                      className={classes.hiddenFileInput}
-                      onChange={onFileImport}
-                    />
-                  </>
-                }
-              />
-              {keyList.length > 0 ? (
-                <>
-                  <Divider />
-                  <CardContent>
-                    {keyList.map((listItem: any) => {
+                  keyList.length > 0 ? (
+                    keyList.map((listItem: any) => {
                       const dataUrl = createDataUrlFromByteArray(
                         new Uint8Array(listItem.spki)
                       );
                       const name = escapeHTML(listItem.name);
                       return (
-                        <Grid container xs={12} key={listItem.id}>
-                          <a download={`${name}.publicKey`} href={dataUrl}>
-                            {name}
-                          </a>
-                        </Grid>
+                        <Button
+                          onClick={() => onDownload(name, dataUrl)}
+                          color="primary"
+                          variant="contained"
+                        >
+                          Download
+                        </Button>
                       );
-                    })}
-                  </CardContent>
-                </>
-              ) : (
-                <></>
-              )}
+                    })
+                  ) : (
+                    <>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={handleCreateDialogOpen}
+                      >
+                        Create Certificate
+                      </Button>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={handleImportFileDialogOpen}
+                      >
+                        Import Key
+                      </Button>
+                      <input
+                        ref={keyfileRef}
+                        type="file"
+                        id="keyfile"
+                        name="keyfile"
+                        className={classes.hiddenFileInput}
+                        onChange={onFileImport}
+                      />
+                    </>
+                  )
+                }
+              />
             </Card>
           </Grid>
           <Grid item xs={12}>
