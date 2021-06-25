@@ -28,12 +28,10 @@ import {
   selectIsFormLoading,
   selectIsLoading,
   selectSelectedCoWorker,
-  selectShowSnackbar,
   selectSuspendStateLoading,
 } from "./slice/selectors";
 
 import Loader from "../../../components/Loader";
-import Snackbar from "../../../components/Snackbar";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -86,7 +84,6 @@ const CoWorker = (): React.ReactElement => {
   const loading = useSelector(selectIsLoading);
   const selectedCoWorker: User = useSelector(selectSelectedCoWorker);
   const suspendStateLoading: boolean = useSelector(selectSuspendStateLoading);
-  const showSnackbar: boolean = useSelector(selectShowSnackbar);
   const [coWorkerSearch, setCoWorkerSearch] = useState("");
   if (
     coWorkerId &&
@@ -259,9 +256,6 @@ const CoWorker = (): React.ReactElement => {
             </Accordion>
           )}{" "}
         </Grid>
-        {showSnackbar && (
-          <Snackbar message={{ type: "success", message: "Success" }} open />
-        )}
       </Grid>
     </Grid>
   );

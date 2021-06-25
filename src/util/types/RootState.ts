@@ -2,6 +2,7 @@
 
 import { CoWorkersState } from "../../clearer/components/CoWorker/slice/types";
 import { CoWorkerFormState } from "../../clearer/components/CoWorkerForm/slice/types";
+import { SnackbarState } from "../../components/Snackbar/slice/types";
 import { ProfileState } from "../../organization/components/Profile/slice/types";
 
 /* 
@@ -18,6 +19,7 @@ export interface RootState {
   auth?: any;
   coWorkerForm: CoWorkerFormState;
   profileForm?: ProfileState;
+  snackbar: SnackbarState;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for
   // generating containers seamlessly
 }

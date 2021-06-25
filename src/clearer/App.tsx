@@ -10,6 +10,7 @@ import global from "../store/global/reducer";
 import { useInjectReducer } from "../util/redux-injectors";
 import "./App.css";
 import "./Custom.css";
+import Snackbar from "../components/Snackbar";
 
 const App = (): React.ReactElement => {
   const theme = createMuiTheme({
@@ -28,6 +29,7 @@ const App = (): React.ReactElement => {
   return (
     <ThemeProvider theme={theme}>
       <Routes />
+      <Snackbar />
     </ThemeProvider>
   );
 };

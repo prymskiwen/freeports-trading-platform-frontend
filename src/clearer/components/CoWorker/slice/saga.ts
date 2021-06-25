@@ -25,6 +25,7 @@ import PaginatedResponse from "../../../../types/PaginatedResponse";
 import { ResourceCreatedResponse } from "../../../../types/ResourceCreatedResponse";
 import User from "../../../../types/User";
 import { selectCoWorkers, selectSelectedCoWorker } from "./selectors";
+import { snackbarActions } from "../../../../components/Snackbar/slice";
 
 export function* getCoWorkers({
   payload,
@@ -55,7 +56,13 @@ export function* createCoWorker({
       );
     }
     yield put(
-      actions.createCoWorkersSuccess(response as ResourceCreatedResponse)
+      actions.createCoWorkerSuccess(response as ResourceCreatedResponse)
+    );
+    yield put(
+      snackbarActions.showSnackbar({
+        message: "Co-Worker Created",
+        type: "success",
+      })
     );
     yield put(actions.getCoWorkers({}));
 
@@ -87,7 +94,13 @@ export function* updateCoWorker({
     }
 
     yield put(
-      actions.updateCoWorkersSuccess(response as ResourceCreatedResponse)
+      actions.updateCoWorkerSuccess(response as ResourceCreatedResponse)
+    );
+    yield put(
+      snackbarActions.showSnackbar({
+        message: "Co-Worker updated",
+        type: "success",
+      })
     );
     yield put(actions.getCoWorkers({}));
 
@@ -126,6 +139,12 @@ export function* suspendCoWorker({
       yield put(actions.suspendCoWorkerSuccess());
       const selectedCoWorker = yield select(selectSelectedCoWorker);
       yield put(actions.selectCoWorker(selectedCoWorker as User));
+      yield put(
+        snackbarActions.showSnackbar({
+          message: "User Suspended",
+          type: "success",
+        })
+      );
     }
   } catch (error) {
     console.log("error", error);
@@ -140,11 +159,18 @@ export function* resumeCoWorker({
       yield put(actions.resumeCoWorkerSuccess());
       const selectedCoWorker = yield select(selectSelectedCoWorker);
       yield put(actions.selectCoWorker(selectedCoWorker as User));
+      yield put(
+        snackbarActions.showSnackbar({
+          message: "User reactivated",
+          type: "success",
+        })
+      );
     }
   } catch (error) {
     console.log("error", error);
   }
 }
+
 export function* coWorkersSaga(): Generator<any> {
   yield takeLatest(actions.getCoWorkers, getCoWorkers);
   yield takeEvery(actions.createCoWorker, createCoWorker);

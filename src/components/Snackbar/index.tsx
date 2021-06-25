@@ -1,29 +1,35 @@
 import { Snackbar as MUISnackbar } from "@material-ui/core";
 import React from "react";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectShowSnackbar,
+  selectSnackbarType,
+  selectSnackbarMessage,
+} from "./slice/selectors";
+import { useSnackbarSlice } from "./slice";
 
 const Alert = (props: AlertProps) => {
   // eslint-disable-next-line react/jsx-props-no-spreading
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
 
-const Snackbar = ({
-  handleAlertClose,
-  open,
-  message,
-}: any): React.ReactElement => {
+const Snackbar = (): React.ReactElement => {
+  const dispatch = useDispatch();
+  const showSnackbar = useSelector(selectShowSnackbar);
+  const message = useSelector(selectSnackbarMessage);
+  const type = useSelector(selectSnackbarType);
+  const { actions } = useSnackbarSlice();
+  console.log("::snackbar", message, type, showSnackbar);
   return (
     <MUISnackbar
       autoHideDuration={2000}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      open={open}
-      onClose={handleAlertClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      open={showSnackbar}
+      onClose={() => dispatch(actions.hideSnackbar())}
     >
-      <Alert
-        onClose={handleAlertClose}
-        severity={message.type === "success" ? "success" : "error"}
-      >
-        {message.message}
+      <Alert severity={type === "success" ? "success" : "error"}>
+        {message}
       </Alert>
     </MUISnackbar>
   );

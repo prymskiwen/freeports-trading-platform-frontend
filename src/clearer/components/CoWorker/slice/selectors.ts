@@ -29,8 +29,3 @@ export const selectSuspendStateLoading = createSelector(
   [selectDomain],
   (coWorkerState) => coWorkerState.suspendStateLoading
 );
-
-export const selectShowSnackbar = createSelector(
-  [selectDomain],
-  (coWorkerState) => coWorkerState.showSnackbar
-);

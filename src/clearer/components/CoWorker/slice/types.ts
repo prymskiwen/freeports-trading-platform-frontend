@@ -7,5 +7,4 @@ export interface CoWorkersState {
   loading: boolean;
   formLoading: boolean;
   suspendStateLoading: boolean;
-  showSnackbar: boolean;
 }
