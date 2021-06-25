@@ -47,7 +47,7 @@ const getClearerUser = (id: string): Promise<User> => {
   });
 };
 
-const updateClearerUser = (id: string, user: User): Promise<User> => {
+const updateClearerUser = (id: string, user: Partial<User>): Promise<User> => {
   return new Promise((resolve, reject) => {
     axios
       .patch(`/user/${id}`, user)

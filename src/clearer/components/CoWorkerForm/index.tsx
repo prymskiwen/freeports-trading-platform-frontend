@@ -61,6 +61,13 @@ const useStyles = makeStyles((theme) => ({
     bottom: 45,
     left: 0,
   },
+  fixSelectLabel: {
+    color: "red",
+    "& fieldset>legend ": {
+      maxWidth: 1000,
+      transition: "max-width 100ms cubic-bezier(0.0, 0, 0.2, 1) 50ms",
+    },
+  },
 }));
 
 const validate = (values: any) => {
@@ -112,12 +119,16 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
   const { actions } = useCoWorkerFormSlice();
   const existingRoles = useSelector(selectRoles);
 
+  console.log("Coworkerform ", coWorker);
   useEffect(() => {
     dispatch(actions.getRoles());
   }, []);
 
   const handleOnSubmit = (values: any) => {
-    onSubmit(diff(coWorker, values) as User);
+    console.log("calculate diff ", values);
+    const updates: Partial<User> = diff(coWorker, values);
+    updates.roles = values.roles;
+    onSubmit(updates as User);
   };
   return (
     <Container>
@@ -144,7 +155,14 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                   {({ fields }) =>
                     fields.map((name, i) => (
                       <Grid container key={name} spacing={2}>
-                        <Grid item sm={10} md={8}>
+                        <Grid
+                          item
+                          sm={10}
+                          md={8}
+                          className={
+                            values.roles[i] ? classes.fixSelectLabel : ""
+                          }
+                        >
                           <Select
                             native
                             name={name}
@@ -155,8 +173,10 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                             autoWidth
                             label="Role"
                             variant="outlined"
-                            value={values.roles ? values.roles[i] : false}
-                            inputLabelProps={{ shrink: !!values.roles[i] }}
+                            inputLabelProps={{
+                              shrink: !!values.roles[i],
+                              filled: true,
+                            }}
                           >
                             <option aria-label="None" value="" />
 
@@ -179,7 +199,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                         {i !== 0 && (
                           <Grid item xs={1}>
                             <IconButton
-                              onClick={() => pop("roles")}
+                              onClick={() => fields.remove(i)}
                               aria-label="Add role"
                             >
                               <DeleteForeverIcon />
@@ -191,7 +211,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                           (fields.length || 0) < existingRoles.length && (
                             <Grid item xs={1}>
                               <IconButton
-                                onClick={() => push("roles", "")}
+                                onClick={() => push("roles", undefined)}
                                 aria-label="Add role"
                               >
                                 <AddCircleOutlineIcon />

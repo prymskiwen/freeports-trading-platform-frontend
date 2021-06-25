@@ -81,16 +81,12 @@ export function* createCoWorker({
 }
 export function* updateCoWorker({
   payload,
-}: PayloadAction<{ user: User; id: string }>): Generator<any> {
+}: PayloadAction<{ updates: Partial<User>; id: string }>): Generator<any> {
   try {
-    console.log("update user saga ", payload);
-    const response = yield call(updateClearerUser, payload.id, payload.user);
-    if (payload.user.roles) {
-      yield call(
-        updateClearerRolesToUser,
-        (response as ResourceCreatedResponse).id,
-        payload.user.roles
-      );
+    const response = yield call(updateClearerUser, payload.id, payload.updates);
+    if (payload.updates.roles) {
+      console.log("Update ");
+      yield call(updateClearerRolesToUser, payload.id, payload.updates.roles);
     }
 
     yield put(
@@ -122,6 +118,10 @@ export function* getCoWorker({ payload }: PayloadAction<User>): Generator<any> {
   try {
     if (payload.id) {
       const response = yield call(getClearerUser, payload.id);
+
+      if (!(response as User).roles || !(response as User).roles?.length) {
+        (response as User).roles = [""];
+      }
       yield put(actions.selectCoWorkerSuccess(response as User));
     } else {
       yield put(actions.selectCoWorkerSuccess(payload));
