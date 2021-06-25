@@ -50,7 +50,10 @@ const slice = createSlice({
     ) {
       state.formLoading = false;
     },
-    updateCoWorker(state, action: PayloadAction<{ user: User; id: string }>) {
+    updateCoWorker(
+      state,
+      action: PayloadAction<{ updates: Partial<User>; id: string }>
+    ) {
       state.formLoading = true;
     },
     updateCoWorkerSuccess(state, action: any) {
