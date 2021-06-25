@@ -156,6 +156,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                             label="Role"
                             variant="outlined"
                             value={values.roles ? values.roles[i] : false}
+                            inputLabelProps={{ shrink: !!values.roles[i] }}
                           >
                             <option aria-label="None" value="" />
 
