@@ -4,7 +4,7 @@ import Lockr from "lockr";
 
 import { profileActions as actions } from ".";
 
-import { getUserProfile } from "../../../../services/profileService";
+import { getUserProfile } from "../../../services/profileService";
 
 export function* getProfile(): Generator<any> {
   try {

@@ -91,6 +91,12 @@ export default [
     auth: true,
     component: lazy(() => import("../components/CoWorker")),
   },
+  {
+    path: "/profile",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../../components/Profile")),
+  },
   /* {
     path: "/error",
     exact: true,

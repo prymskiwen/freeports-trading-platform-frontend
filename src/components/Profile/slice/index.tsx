@@ -1,11 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { PayloadAction } from "@reduxjs/toolkit";
 
-import { createSlice } from "../../../../util/@reduxjs/toolkit";
-import {
-  useInjectReducer,
-  useInjectSaga,
-} from "../../../../util/redux-injectors";
+import { createSlice } from "../../../util/@reduxjs/toolkit";
+import { useInjectReducer, useInjectSaga } from "../../../util/redux-injectors";
 import { profileSaga } from "./saga";
 import { ProfileState } from "./types";
 

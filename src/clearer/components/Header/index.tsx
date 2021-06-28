@@ -19,6 +19,7 @@ import {
   EmojiEmotions,
   ExpandMore,
   Home,
+  Person,
   Settings,
 } from "@material-ui/icons";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
@@ -122,6 +123,12 @@ const Header = (): React.ReactElement => {
                   horizontal: "center",
                 }}
               >
+                <MenuItem onClick={() => redirect("/profile")}>
+                  <ListItemIcon>
+                    <Person fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Profile" />
+                </MenuItem>
                 <MenuItem onClick={() => redirect("/roles")}>
                   <ListItemIcon>
                     <SendIcon fontSize="small" />
