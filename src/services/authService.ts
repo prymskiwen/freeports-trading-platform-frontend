@@ -8,6 +8,7 @@ interface LoginUserResponseType {
   id: string;
   nickname: string;
   email: string;
+  organization?: string;
 }
 interface LoginTokenResponseType {
   tokenType: string;
@@ -74,8 +75,8 @@ const publicKey = (): Promise<any> => {
       })
       .catch((err) => {
         return reject(err.response.data);
-      })
-  })
-}
+      });
+  });
+};
 
 export { login as default, login, qrCodeGen, otpCheck, publicKey };

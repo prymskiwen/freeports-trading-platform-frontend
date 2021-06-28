@@ -36,7 +36,29 @@ function useAuth(): any {
 
     await login(credentials)
       .then((data) => {
-        dispatch(authLoginSuccess(data));
+        if (process.env.REACT_APP_INTERFACE === "CLEARER") {
+          if (data.user.organization) {
+            dispatch(
+              setError({
+                errorType: "NOT FOUND",
+                message: "User doesn't exist",
+              })
+            );
+            dispatch(authLoginFailed());
+          } else dispatch(authLoginSuccess(data));
+        } else if (process.env.REACT_APP_INTERFACE === "ORGANIZATION") {
+          if (data.user.organization) {
+            dispatch(authLoginSuccess(data));
+          } else {
+            dispatch(
+              setError({
+                errorType: "NOT FOUND",
+                message: "User doesn't exist",
+              })
+            );
+            dispatch(authLoginFailed());
+          }
+        }
       })
       .catch((err) => {
         dispatch(setError(err));
@@ -78,26 +100,26 @@ function useAuth(): any {
 
   const checkPublicKey = async () => {
     const result: {
-      success?: boolean,
-      data?: string,
+      success?: boolean;
+      data?: string;
     } = {};
 
     await publicKey()
-    .then((data) => {
-      console.log(data);
-      if(data.publickey.length > 0){
-        result.success = false;
-        result.data = "Your local key dont correspond with server Key";
-      }else{
-        result.success = false;
-        result.data = "You dont have any key yet";
-      }
-    })
-    .catch((err) => {
-      dispatch(setError(err));
-    })
+      .then((data) => {
+        console.log(data);
+        if (data.publickey.length > 0) {
+          result.success = false;
+          result.data = "Your local key dont correspond with server Key";
+        } else {
+          result.success = false;
+          result.data = "You dont have any key yet";
+        }
+      })
+      .catch((err) => {
+        dispatch(setError(err));
+      });
     return result;
-  }
+  };
 
   return {
     authStep,

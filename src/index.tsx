@@ -4,10 +4,10 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import authActions from "./store/auth/actions";
 import reportWebVitals from "./reportWebVitals";
-
-import "./index.css";
 import configureAppStore from "./store";
 import Loader from "./components/Loader";
+
+import "./index.css";
 
 const App = React.lazy(
   () =>

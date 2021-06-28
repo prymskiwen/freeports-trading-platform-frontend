@@ -1,13 +1,13 @@
 import React from "react";
-import { Provider } from "react-redux";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import purple from "@material-ui/core/colors/purple";
 import green from "@material-ui/core/colors/green";
 
 import Routes from "./routes";
-// import store from "../store";
+
 import auth from "../store/auth/reducer";
 import global from "../store/global/reducer";
+import Snackbar from "../components/Snackbar";
 import { useInjectReducer } from "../util/redux-injectors";
 import "./App.css";
 import "./Custom.css";
@@ -29,6 +29,7 @@ const App = (): React.ReactElement => {
   return (
     <ThemeProvider theme={theme}>
       <Routes />
+      <Snackbar />
     </ThemeProvider>
   );
 };

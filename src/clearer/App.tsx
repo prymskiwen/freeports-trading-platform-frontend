@@ -7,10 +7,10 @@ import Routes from "./routes";
 
 import auth from "../store/auth/reducer";
 import global from "../store/global/reducer";
+import Snackbar from "../components/Snackbar";
 import { useInjectReducer } from "../util/redux-injectors";
 import "./App.css";
 import "./Custom.css";
-import Snackbar from "../components/Snackbar";
 
 const App = (): React.ReactElement => {
   const theme = createMuiTheme({
