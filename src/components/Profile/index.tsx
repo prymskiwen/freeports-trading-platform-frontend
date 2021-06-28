@@ -25,14 +25,14 @@ import { useProfileSlice } from "./slice";
 import { selectProfile } from "./slice/selectors";
 import { keyPairType } from "./slice/types";
 
-import { open, listKeys, close } from "../../../util/keyStore/keystore";
+import { open, listKeys, close } from "../../util/keyStore/keystore";
 import {
   createDataUrlFromByteArray,
   escapeHTML,
   generateAndSaveKeyPair,
   importPrivateKeyFromFile,
-} from "../../../util/keyStore/functions";
-import defaultAvatar from "../../../assets/images/profile.jpg";
+} from "../../util/keyStore/functions";
+import defaultAvatar from "../../assets/images/profile.jpg";
 
 const useStyles = makeStyles((theme) => ({
   saveBtn: {
