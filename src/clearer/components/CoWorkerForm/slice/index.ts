@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import { PayloadAction } from "@reduxjs/toolkit";
-import User from "../../../../types/User";
 import { createSlice } from "../../../../util/@reduxjs/toolkit";
 import {
   useInjectReducer,
@@ -25,7 +24,6 @@ const slice = createSlice({
     },
     getRolesSuccess(state, action: PayloadAction<RoleType[]>) {
       state.loading = true;
-      console.log("got roles successfully ", action.payload);
       state.roles = action.payload;
     },
   },

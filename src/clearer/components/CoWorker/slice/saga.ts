@@ -85,7 +85,6 @@ export function* updateCoWorker({
   try {
     const response = yield call(updateClearerUser, payload.id, payload.updates);
     if (payload.updates.roles) {
-      console.log("Update ");
       yield call(updateClearerRolesToUser, payload.id, payload.updates.roles);
     }
 

@@ -86,6 +86,6 @@ export const { actions: coWorkActions, reducer } = slice;
 export const useCoWorkersSlice = () => {
   useInjectReducer({ key: slice.name, reducer: slice.reducer });
   useInjectSaga({ key: slice.name, saga: coWorkersSaga });
-  (window as any).action = slice.actions;
+
   return { actions: slice.actions };
 };
