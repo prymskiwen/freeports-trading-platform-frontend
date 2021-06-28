@@ -1,3 +1,13 @@
+import {
+  decryptMegolmKeyFile,
+  encryptMegolmKeyFile,
+  readFileAsArrayBuffer,
+} from "./MegolmExportEncryption";
+import { open, saveKey, getKey, listKeys, close } from "./keystore";
+
+const algorithmName = "ECDSA";
+const usages: Array<KeyUsage> = ["sign", "verify"];
+const params = { name: algorithmName, namedCurve: "P-256" };
 const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
   const byteArray = new Uint8Array(arrayBuffer);
   let byteString = "";
@@ -25,9 +35,27 @@ const createDataUrlFromByteArray = (byteArray: Uint8Array): string => {
   for (let i = 0; i < byteArray.byteLength; i += 1) {
     binaryString += String.fromCharCode(byteArray[i]);
   }
+  const exportedAsBase64 = window.btoa(binaryString);
 
-  return `data:application/octet-stream;base64,${btoa(binaryString)}`;
+  const pemExported = `-----BEGIN PUBLIC KEY-----\n${exportedAsBase64}\n-----END PUBLIC KEY-----`;
+
+  console.log("binaryString ", exportedAsBase64);
+  return `data:application/octet-stream;base64,${btoa(pemExported)}`;
 };
+
+/*
+Convert a string into an ArrayBuffer
+from https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+*/
+function str2ab(str: string) {
+  const buf = new ArrayBuffer(str.length);
+  const bufView = new Uint8Array(buf);
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0, strLen = str.length; i < strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+}
 
 const downloadString = (
   text: ArrayBufferLike,
@@ -49,6 +77,99 @@ const downloadString = (
   }, 1500);
 };
 
+const generatePublicKeyFromPrivateKey = async (
+  privateKey: CryptoKey
+): Promise<CryptoKey> => {
+  // export private key to JWK
+  const jwk = await crypto.subtle.exportKey("jwk", privateKey);
+
+  // remove private data from JWK
+  delete jwk.d;
+  delete jwk.dp;
+  delete jwk.dq;
+  delete jwk.q;
+  delete jwk.qi;
+  jwk.key_ops = ["verify"];
+
+  // import public key
+  const publicKey = await crypto.subtle.importKey("jwk", jwk, params, true, [
+    "verify",
+  ]);
+  console.log("derived public key ", publicKey);
+
+  return publicKey;
+};
+const importPrivateKeyFromFile = async (
+  importedFile: File,
+  importKeyPassword: string
+) => {
+  const arrayBuffer = await readFileAsArrayBuffer(importedFile);
+  const decryptedKey = await decryptMegolmKeyFile(
+    arrayBuffer,
+    importKeyPassword
+  );
+  console.log("decrypted key", decryptedKey);
+  const keyArrayBuffer = base64ToArrayBuffer(decryptedKey);
+  const format = "pkcs8";
+
+  const privateKeyExtractable = await window.crypto.subtle.importKey(
+    format,
+    keyArrayBuffer,
+    params,
+    true,
+    ["sign"]
+  );
+
+  const publicKey = await generatePublicKeyFromPrivateKey(
+    privateKeyExtractable
+  );
+
+  const privateKey = await window.crypto.subtle.importKey(
+    format,
+    keyArrayBuffer,
+    params,
+    true,
+    ["sign"]
+  );
+
+  await open();
+  const results = await saveKey(publicKey, privateKey, importedFile.name);
+
+  await close();
+  return results;
+};
+
+const generateAndSaveKeyPair = async (name: string, passphrase: string) => {
+  const keyPair = await crypto.subtle.generateKey(params, true, usages);
+  const keyArrayBuffer = await window.crypto.subtle.exportKey(
+    "pkcs8",
+    keyPair.privateKey
+  );
+  const exportedAsBase64 = arrayBufferToBase64(keyArrayBuffer);
+  console.log("exported key ", exportedAsBase64, passphrase);
+  const encryptedKey = await encryptMegolmKeyFile(
+    exportedAsBase64,
+    passphrase,
+    {}
+  );
+
+  downloadString(encryptedKey, "pem", name);
+
+  const privateKey = await window.crypto.subtle.importKey(
+    "pkcs8",
+    keyArrayBuffer,
+    params,
+    false,
+    ["sign"]
+  );
+  await open();
+  console.log("generated public key ", keyPair.publicKey);
+  const results = await saveKey(keyPair.publicKey, privateKey, name);
+
+  await close();
+  return results;
+};
+
 const escapeHTML = (s: string): string => {
   return s
     .toString()
@@ -66,4 +187,7 @@ export {
   createDataUrlFromByteArray,
   downloadString,
   escapeHTML,
+  importPrivateKeyFromFile,
+  generateAndSaveKeyPair,
+  generatePublicKeyFromPrivateKey,
 };

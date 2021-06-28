@@ -24,24 +24,13 @@ import {
 import { useProfileSlice } from "./slice";
 import { selectProfile } from "./slice/selectors";
 import { keyPairType } from "./slice/types";
+
+import { open, listKeys, close } from "../../../util/keyStore/keystore";
 import {
-  encryptMegolmKeyFile,
-  decryptMegolmKeyFile,
-  readFileAsArrayBuffer,
-} from "../../../util/keyStore/MegolmExportEncryption";
-import {
-  open,
-  saveKey,
-  getKey,
-  listKeys,
-  close,
-} from "../../../util/keyStore/keystore";
-import {
-  arrayBufferToBase64,
-  base64ToArrayBuffer,
   createDataUrlFromByteArray,
-  downloadString,
   escapeHTML,
+  generateAndSaveKeyPair,
+  importPrivateKeyFromFile,
 } from "../../../util/keyStore/functions";
 import defaultAvatar from "../../../assets/images/profile.jpg";
 
@@ -213,40 +202,10 @@ const Profile = (): React.ReactElement => {
 
   const onCreateCertificate = async () => {
     setLoading(true);
-    const algorithmName = "RSASSA-PKCS1-v1_5";
-    const usages: Array<KeyUsage> = ["sign", "verify"];
-    const params = {
-      name: algorithmName,
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([1, 0, 1]),
-      hash: { name: "SHA-256" },
-    };
-    const keyPair = await window.crypto.subtle.generateKey(
-      params,
-      true,
-      usages
-    );
-    const keyArrayBuffer = await window.crypto.subtle.exportKey(
-      "pkcs8",
-      keyPair.privateKey
-    );
-    const keyPem = arrayBufferToBase64(keyArrayBuffer);
-    const encryptedKey = await encryptMegolmKeyFile(keyPem, passphrase, {});
 
-    downloadString(encryptedKey, "pem", key);
-
-    const privateKey = await window.crypto.subtle.importKey(
-      "pkcs8",
-      keyArrayBuffer,
-      params,
-      false,
-      ["sign"]
-    );
-    await open();
-    const results = await saveKey(keyPair.publicKey, privateKey, key);
+    const results = await generateAndSaveKeyPair(key, passphrase);
 
     addToKeyList(results);
-    await close();
 
     setLoading(false);
     setCreateDialogOpen(false);
@@ -255,32 +214,12 @@ const Profile = (): React.ReactElement => {
   const onImportKey = async () => {
     setLoading(true);
 
-    const algorithmName = "RSASSA-PKCS1-v1_5";
-    const params = {
-      name: algorithmName,
-      modulusLength: 2048,
-      publicExponent: new Uint8Array([1, 0, 1]),
-      hash: { name: "SHA-256" },
-    };
     if (importedFile !== null) {
-      const arrayBuffer = await readFileAsArrayBuffer(importedFile);
-      const decryptedKey = await decryptMegolmKeyFile(
-        arrayBuffer,
+      const results = await importPrivateKeyFromFile(
+        importedFile,
         importKeyPassword
       );
-      const keyArrayBuffer = base64ToArrayBuffer(decryptedKey);
-      const format = "pkcs8";
-      const privateKey = await window.crypto.subtle.importKey(
-        format,
-        keyArrayBuffer,
-        params,
-        false,
-        ["sign"]
-      );
-      await open();
-      const results = await saveKey(null, privateKey, importedFile.name);
       addToKeyList(results);
-      await close();
 
       setLoading(false);
       setImportKeyDialogOpen(false);
@@ -312,6 +251,7 @@ const Profile = (): React.ReactElement => {
                       const name = escapeHTML(listItem.name);
                       return (
                         <Button
+                          key={name}
                           onClick={() => onDownload(name, dataUrl)}
                           color="primary"
                           variant="contained"
