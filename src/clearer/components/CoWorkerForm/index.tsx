@@ -100,7 +100,6 @@ const validate = (values: any) => {
   ) {
     errors.phone = "Please enter a valid Phone number";
   }
-  console.log("errors ", errors);
   return errors;
 };
 
@@ -119,13 +118,11 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
   const { actions } = useCoWorkerFormSlice();
   const existingRoles = useSelector(selectRoles);
 
-  console.log("Coworkerform ", coWorker);
   useEffect(() => {
     dispatch(actions.getRoles());
   }, []);
 
   const handleOnSubmit = (values: any) => {
-    console.log("calculate diff ", values);
     const updates: Partial<User> = diff(coWorker, values);
     updates.roles = values.roles;
     onSubmit(updates as User);
@@ -144,7 +141,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
           submitting,
           pristine,
           form: {
-            mutators: { push, pop },
+            mutators: { push },
           },
           values,
         }) => (
