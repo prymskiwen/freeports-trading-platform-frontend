@@ -2,7 +2,7 @@ import ReduxAction from "../redux-action";
 import { CLEAR_ERROR, SET_ERROR, SET_THEME } from "./action-types";
 
 export const initialState = {
-  theme: "light",
+  theme: "dark",
   error: { errorType: "", message: "" },
 };
 
