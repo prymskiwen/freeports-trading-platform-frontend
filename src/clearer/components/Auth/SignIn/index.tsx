@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 
-import useAuth from "../../../../hooks";
+import { useAuth } from "../../../../hooks";
 
 const Copyright = (): React.ReactElement => {
   return (

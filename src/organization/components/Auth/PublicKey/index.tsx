@@ -3,13 +3,13 @@ import { useHistory } from "react-router";
 import { Snackbar, Slide } from "@material-ui/core";
 import { TransitionProps } from "@material-ui/core/transitions";
 
-import useAuth from "../../../../hooks";
+import { useAuth } from "../../../../hooks";
 
 // function TransitionDown(props: TransitionProps) {
 //   return <Slide {...props} direction="down" />;
 // }
 
-const PublicKeyBanner = (): React.ReactElement =>{
+const PublicKeyBanner = (): React.ReactElement => {
   const history = useHistory();
   const [opened, setOpened] = useState(false);
   const [alertText, setAlertText] = useState("");
@@ -20,9 +20,9 @@ const PublicKeyBanner = (): React.ReactElement =>{
 
     const checkKey = async () => {
       const getResult = await checkPublicKey();
-      if(!getResult.success){
+      if (!getResult.success) {
         setAlertText(getResult.data);
-        setOpened(true)
+        setOpened(true);
       }
     };
 
@@ -33,25 +33,25 @@ const PublicKeyBanner = (): React.ReactElement =>{
     };
   }, []);
 
-  const vertical = 'top';
-  const horizontal = 'center';
-  const messageInfo = 'snaxBar';
+  const vertical = "top";
+  const horizontal = "center";
+  const messageInfo = "snaxBar";
   const handleClose = () => {
     setOpened(false);
     history.push(`/profile`);
-  }
+  };
   return (
     <div>
       <Snackbar
         key={messageInfo}
         open={opened}
         autoHideDuration={2000}
-        anchorOrigin={{vertical, horizontal}}
+        anchorOrigin={{ vertical, horizontal }}
         onClose={handleClose}
         message={alertText}
       />
     </div>
-  )
-}
+  );
+};
 
 export default PublicKeyBanner;
