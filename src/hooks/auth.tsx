@@ -107,12 +107,9 @@ function useAuth(): any {
     await publicKey()
       .then((data) => {
         console.log(data);
-        if (data.publickey.length > 0) {
+        if (data.length === 0) {
           result.success = false;
-          result.data = "Your local key dont correspond with server Key";
-        } else {
-          result.success = false;
-          result.data = "You dont have any key yet";
+          result.data = "You don't have any key yet";
         }
       })
       .catch((err) => {

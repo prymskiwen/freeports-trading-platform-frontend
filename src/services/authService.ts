@@ -69,7 +69,7 @@ const otpCheck = (otpCode: string): Promise<LoginResponseType> => {
 const publicKey = (): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get("auth/publicKey")
+      .get("my/public-Key")
       .then((res: any) => {
         return resolve(res.data);
       })
