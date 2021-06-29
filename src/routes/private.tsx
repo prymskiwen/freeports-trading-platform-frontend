@@ -27,7 +27,7 @@ const PrivateRoute: React.FC<RouteCompProps> = ({
 }: RouteCompProps) => {
   const { isAuthenticated } = useAuth();
   const classes = useStyles();
-  const certicated = rest as any;
+  const certified = rest as any;
   return (
     <Route
       {...rest}
@@ -42,8 +42,8 @@ const PrivateRoute: React.FC<RouteCompProps> = ({
           >
             {isAuthenticated ? (
               <>
-              <Component {...props} />
-              {certicated.certicate? (<PublicKeyBanner />):(<></>)}
+                <Component {...props} />
+                {certified.certificate ? <PublicKeyBanner /> : <></>}
               </>
             ) : (
               <Redirect
