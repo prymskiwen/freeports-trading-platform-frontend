@@ -1,6 +1,6 @@
 import ReduxAction from "../redux-action";
 
-import { CLEAR_ERROR, SET_ERROR } from "./action-types";
+import { CLEAR_ERROR, SET_ERROR, SET_THEME } from "./action-types";
 
 interface ErrorResponseType {
   errorType: string;
@@ -20,7 +20,15 @@ function setError(payload: ErrorResponseType): ReduxAction {
   };
 }
 
+function setTheme(payload: string): ReduxAction {
+  return {
+    type: SET_THEME,
+    payload,
+  };
+}
+
 export default {
   clearError,
   setError,
+  setTheme,
 };

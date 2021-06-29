@@ -1,7 +1,8 @@
 import ReduxAction from "../redux-action";
-import { CLEAR_ERROR, SET_ERROR } from "./action-types";
+import { CLEAR_ERROR, SET_ERROR, SET_THEME } from "./action-types";
 
 export const initialState = {
+  theme: "light",
   error: { errorType: "", message: "" },
 };
 
@@ -19,6 +20,11 @@ const reducer = (
       return {
         ...state,
         error: payload,
+      };
+    case SET_THEME:
+      return {
+        ...state,
+        theme: payload,
       };
     default:
       return state;
