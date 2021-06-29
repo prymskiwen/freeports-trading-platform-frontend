@@ -1,37 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import {  Container,
-          Grid,
-          IconButton,
-          Icon,
-          TextField,
+import {
+  Container,
+  Grid,
+  IconButton,
+  Icon,
+  TextField,
 } from "@material-ui/core";
 import MaterialTable from "material-table";
-
 
 import axios from "../../../util/axios";
 
 interface rowfield {
-  id: string,
-  organisation: string,
-  createdate: string,
-  activeusers: string,
-  disableusers: string,
+  id: string;
+  organization: string;
+  createdate: string;
+  activeusers: string;
+  disableusers: string;
 }
 
-const Organisations = (): React.ReactElement => {
+const Organizations = (): React.ReactElement => {
   const history = useHistory();
 
   const newOrganizer = () => {
-    history.push("/organisations/addOrganization");
+    history.push("/organizations/addOrganization");
   };
 
   const [state, setState] = useState({
-    
-    column : [
+    column: [
       {
         field: "name",
-        title: "Organisation",
+        title: "Organization",
         cellStyle: {
           width: "25%",
         },
@@ -39,7 +38,7 @@ const Organisations = (): React.ReactElement => {
       {
         field: "createdAt",
         title: "Create Date",
-        type: 'date',
+        type: "date",
         dateSetting: { locale: "en-GB" },
         cellStyle: {
           width: "25%",
@@ -59,10 +58,8 @@ const Organisations = (): React.ReactElement => {
           width: "25%",
         },
       },
-    ] as any[]
-  })
-
-
+    ] as any[],
+  });
 
   return (
     <div className="main-wrapper">
@@ -71,36 +68,47 @@ const Organisations = (): React.ReactElement => {
           <Grid container>
             <Grid item xs={12}>
               <MaterialTable
-              title={<h2>Organisation <IconButton onClick={newOrganizer}>
-              <Icon style={{ fontSize: 45 }} color="primary">
-                add_circle
-              </Icon>
-            </IconButton></h2> }
-              columns={state.column}
-              data={query => new Promise((resolve, reject) =>{
-                axios
-                  .get(`/organization?page=${(query.page + 1)}&limit=${query.pageSize}&search=${query.search}`)
-                  .then((res: any) => {
-                    return resolve({
-                      data: res.data.content,
-                      page: res.data.currentPage - 1,
-                      totalCount:res.data.totalRecords,
-                    })
+                title={
+                  <h2>
+                    Organization{" "}
+                    <IconButton onClick={newOrganizer}>
+                      <Icon style={{ fontSize: 45 }} color="primary">
+                        add_circle
+                      </Icon>
+                    </IconButton>
+                  </h2>
+                }
+                columns={state.column}
+                data={(query) =>
+                  new Promise((resolve, reject) => {
+                    axios
+                      .get(
+                        `/organization?page=${query.page + 1}&limit=${
+                          query.pageSize
+                        }&search=${query.search}`
+                      )
+                      .then((res: any) => {
+                        return resolve({
+                          data: res.data.content,
+                          page: res.data.currentPage - 1,
+                          totalCount: res.data.totalRecords,
+                        });
+                      });
                   })
-              })}
-              actions={[
-                {
-                  icon: 'edit',
-                  tooltip: 'edit',
-                  onClick: ((event, item:any)=>{
-                    console.log(item);
-                    if (item && item.name) {
-                      console.log(item.name);
-                      history.push(`/organisations/editOrganizer/${item.id}`)
-                    }
-                  }),
-                },
-              ]}
+                }
+                actions={[
+                  {
+                    icon: "edit",
+                    tooltip: "edit",
+                    onClick: (event, item: any) => {
+                      console.log(item);
+                      if (item && item.name) {
+                        console.log(item.name);
+                        history.push(`/organizations/editOrganizer/${item.id}`);
+                      }
+                    },
+                  },
+                ]}
               />
             </Grid>
           </Grid>
@@ -110,4 +118,4 @@ const Organisations = (): React.ReactElement => {
   );
 };
 
-export default Organisations;
+export default Organizations;

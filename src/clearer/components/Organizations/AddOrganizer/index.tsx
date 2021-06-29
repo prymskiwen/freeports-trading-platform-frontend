@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {  Container,
-          Grid,
-          FormControl,
-          Select,
-          MenuItem,
-          Button,
-          makeStyles,
+import {
+  Container,
+  Grid,
+  FormControl,
+  Select,
+  MenuItem,
+  Button,
+  makeStyles,
 } from "@material-ui/core";
-import ImageUploader from 'react-images-upload';
+import ImageUploader from "react-images-upload";
 import { Form } from "react-final-form";
 import { TextField } from "mui-rff";
 import { useHistory } from "react-router";
 import { useOrganization, useAccounts } from "../../../../hooks";
-
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -21,16 +21,16 @@ const useStyles = makeStyles((theme) => ({
   marginL10: {
     marginLeft: 10,
   },
-}))
+}));
 
 const onValidate = (values: any) => {
   const errors: {
-    name?: string,
-    commissionOrganization?: string,
-    commissionClearer?: string,
+    name?: string;
+    commissionOrganization?: string;
+    commissionClearer?: string;
   } = {};
 
-  if(!values.name){
+  if (!values.name) {
     errors.name = "This Field Required";
   }
   // if(!values.street1){
@@ -48,14 +48,14 @@ const onValidate = (values: any) => {
   // if(!values.country){
   //   errors.country = "This Field Required";
   // }
-  if(!values.commissionOrganization){
+  if (!values.commissionOrganization) {
     errors.commissionOrganization = "This Field Required";
   }
-  if(!values.commissionClearer){
+  if (!values.commissionClearer) {
     errors.commissionClearer = "This Field Required";
   }
   return errors;
-}
+};
 
 interface accountType {
   id: string;
@@ -71,7 +71,7 @@ const AddOrganizer = (): React.ReactElement => {
   const showingIcon = false;
   const showingLogo = true;
   const [logoImage, setLogoImage] = useState();
-  
+
   const [accounts, setAccounts] = useState([] as accountType[]);
   const [selectedAccounts, setSelectedAccounts] = useState([] as string[]);
 
@@ -82,60 +82,67 @@ const AddOrganizer = (): React.ReactElement => {
     let mounted = false;
     const init = async () => {
       const getaccounts = await allAccounts();
-      if(!mounted){
+      if (!mounted) {
         setAccounts(getaccounts);
       }
-    }
+    };
 
     init();
     return () => {
       mounted = true;
-    }
+    };
   }, []);
-
 
   const onPicker = (pic: any) => {
     const reader = new FileReader();
-    reader.onload = (e: any)=>{
+    reader.onload = (e: any) => {
       setLogoImage(e.target.result);
-    }
+    };
     reader.readAsDataURL(pic[0]);
-  }
+  };
 
   const onHanelsetAccount = (event: React.ChangeEvent<{ value: unknown }>) => {
     const { value } = event.target;
     setSelectedAccounts(value as string[]);
-  }
+  };
 
-  
- const onsubmit = async (values: any) => {
-  await addOrganization(values.name, values.street1, values.street2, values.zip, values.city, values.country, logoImage, values.commissionOrganization, values.commissionClearer)
-    .then((data: any) => {
-      const responseId = data.id;
-        console.log(responseId)
-      if(selectedAccounts.length > 0){
-        selectedAccounts.map(async (accountItem, key) => {
-          await assignAccount(responseId, accountItem)
-            .then((res: any) => {
+  const onsubmit = async (values: any) => {
+    await addOrganization(
+      values.name,
+      values.street1,
+      values.street2,
+      values.zip,
+      values.city,
+      values.country,
+      logoImage,
+      values.commissionOrganization,
+      values.commissionClearer
+    )
+      .then((data: any) => {
+        const responseId = data.id;
+        console.log(responseId);
+        if (selectedAccounts.length > 0) {
+          selectedAccounts.map(async (accountItem, key) => {
+            await assignAccount(responseId, accountItem).then((res: any) => {
               console.log(res);
-              if(key === (selectedAccounts.length - 1)){
-                history.push('/organisations');
+              if (key === selectedAccounts.length - 1) {
+                history.push("/organizations");
               }
-            })
-        })
-      }else{
-        history.push('/organisations');
-      }
-    }).catch((err: any) => {
-      console.log(err);
-    })
- }
+            });
+          });
+        } else {
+          history.push("/organizations");
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };
 
-
-  return(
+  return (
     <div className="main-wrapper">
       <Container>
-        <Form 
+        <Form
           onSubmit={onsubmit}
           initialValues={{
             name: "",
@@ -152,21 +159,29 @@ const AddOrganizer = (): React.ReactElement => {
             <form onSubmit={handleSubmit} noValidate>
               <Grid container item spacing={1} xs={6}>
                 <Grid item xs={12}>
-                  <h2>CREAETE NEW ORGANISATION</h2>
+                  <h2>CREATE NEW ORGANIZATION</h2>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       required
                       id="outlined-adornment-amount"
-                      label="Orgainisation name"
+                      label="Organization name"
                       name="name"
                       variant="outlined"
                     />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       id="outlined-adornment-amount"
                       label="Street 1"
@@ -176,7 +191,11 @@ const AddOrganizer = (): React.ReactElement => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       id="outlined-adornment-amount"
                       label="Street 2"
@@ -186,7 +205,11 @@ const AddOrganizer = (): React.ReactElement => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={6}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       id="outlined-adornment-amount"
                       label="zip"
@@ -196,7 +219,11 @@ const AddOrganizer = (): React.ReactElement => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={6}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       id="outlined-adornment-amount"
                       label="City"
@@ -206,7 +233,11 @@ const AddOrganizer = (): React.ReactElement => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       id="outlined-adornment-amount"
                       label="Country"
@@ -216,26 +247,31 @@ const AddOrganizer = (): React.ReactElement => {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-
                   <span style={{ fontWeight: "bold" }}>Nostro Accounts</span>
-                  
+
                   <FormControl fullWidth>
                     <Select
                       multiple
                       value={selectedAccounts}
                       onChange={onHanelsetAccount}
                     >
-                      {accounts.map((item)=><MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>)}
+                      {accounts.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} style={{padding: 10}}>
-                  <span style={{fontWeight: "bold"}}>Add Organisation logo</span>
-                  <FormControl fullWidth style={{marginTop: 5}}>
+                <Grid item xs={12} style={{ padding: 10 }}>
+                  <span style={{ fontWeight: "bold" }}>
+                    Add Organization logo
+                  </span>
+                  <FormControl fullWidth style={{ marginTop: 5 }}>
                     <ImageUploader
                       withIcon={showingIcon}
                       withLabel={showingIcon}
-                      buttonText='Choose Image'
+                      buttonText="Choose Image"
                       onChange={(ChangeEvent) => onPicker(ChangeEvent)}
                       buttonStyles={{
                         width: "100%",
@@ -251,9 +287,21 @@ const AddOrganizer = (): React.ReactElement => {
                     />
                   </FormControl>
                 </Grid>
-                <Grid item container direction="row" justify="flex-start" spacing={3} xs={12} style={{padding: 10}}>
+                <Grid
+                  item
+                  container
+                  direction="row"
+                  justify="flex-start"
+                  spacing={3}
+                  xs={12}
+                  style={{ padding: 10 }}
+                >
                   <Grid item xs={6}>
-                    <FormControl fullWidth className={classes.margin} variant="outlined">
+                    <FormControl
+                      fullWidth
+                      className={classes.margin}
+                      variant="outlined"
+                    >
                       <TextField
                         required
                         id="outlined-adornment-amount"
@@ -264,7 +312,11 @@ const AddOrganizer = (): React.ReactElement => {
                     </FormControl>
                   </Grid>
                   <Grid item xs={6}>
-                    <FormControl fullWidth className={classes.margin} variant="outlined">
+                    <FormControl
+                      fullWidth
+                      className={classes.margin}
+                      variant="outlined"
+                    >
                       <TextField
                         required
                         id="outlined-adornment-amount"
@@ -275,24 +327,24 @@ const AddOrganizer = (): React.ReactElement => {
                     </FormControl>
                   </Grid>
                 </Grid>
-                <Grid item container justify="flex-end" xs={12} style={{padding: 10}}>
-                  <Button 
-                    variant="contained"
-                    color="secondary"
-                    type="submit"
-                  >
-                    SAVE NEW ORGANISATION
+                <Grid
+                  item
+                  container
+                  justify="flex-end"
+                  xs={12}
+                  style={{ padding: 10 }}
+                >
+                  <Button variant="contained" color="secondary" type="submit">
+                    SAVE NEW ORGANIZATION
                   </Button>
                 </Grid>
               </Grid>
             </form>
           )}
         />
-        
       </Container>
     </div>
   );
 };
-
 
 export default AddOrganizer;

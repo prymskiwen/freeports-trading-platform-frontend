@@ -1,9 +1,15 @@
 import axios from "../util/axios";
 
-const getOrganizations = (pageNum: number, pagelimit: number, searchVal: string): Promise<Array<any>> => {
+const getOrganizations = (
+  pageNum: number,
+  pagelimit: number,
+  searchVal: string
+): Promise<Array<any>> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization?page=${pageNum}&limit=${pagelimit}&search=${searchVal}`)
+      .get(
+        `/organization?page=${pageNum}&limit=${pagelimit}&search=${searchVal}`
+      )
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -32,8 +38,8 @@ const addOrganizationManager = (
   email: string,
   password: string,
   phone: string,
-  avatar: string,
-  ): Promise<any> => {
+  avatar: string
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .post(`/organization/${organizationId}/manager`, {
@@ -42,15 +48,17 @@ const addOrganizationManager = (
         password,
         phone,
         avatar,
-      }).then((res: any) => {
-        return resolve(res.data);
-      }).catch((err) => {
-        return reject(err.response);
       })
-  })
-}
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
 
-const getOrganisationManagers = (id: string): Promise<any> => {
+const getOrganizationManagers = (id: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .get(`/organization/${id}/manager`)
@@ -63,7 +71,10 @@ const getOrganisationManagers = (id: string): Promise<any> => {
   });
 };
 
-const getOrganizerManager = (organizerId: string, managerid: string): Promise<any> => {
+const getOrganizerManager = (
+  organizerId: string,
+  managerid: string
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .get(`/organization/${organizerId}/manager/${managerid}`)
@@ -76,7 +87,14 @@ const getOrganizerManager = (organizerId: string, managerid: string): Promise<an
   });
 };
 
-const updateOrganizerManager = (organizerId: string, managerId: string, nickname: string, email: string, phone: string, avatar: string): Promise<any> => {
+const updateOrganizerManager = (
+  organizerId: string,
+  managerId: string,
+  nickname: string,
+  email: string,
+  phone: string,
+  avatar: string
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .patch(`/organization/${organizerId}/manager/${managerId}`, {
@@ -84,9 +102,11 @@ const updateOrganizerManager = (organizerId: string, managerId: string, nickname
         email,
         phone,
         avatar,
-      }).then((res) => {
+      })
+      .then((res) => {
         return resolve(res.data);
-      }).catch((err) => {
+      })
+      .catch((err) => {
         return reject(err.response);
       });
   });
@@ -101,7 +121,7 @@ const addOrganizer = (
   country: string,
   logo: string,
   commissionOrganization: string,
-  commissionClearer: string,
+  commissionClearer: string
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
@@ -115,13 +135,15 @@ const addOrganizer = (
         logo,
         commissionOrganization,
         commissionClearer,
-      }).then((res: any) => {
-        return resolve(res.data);
-      }).catch((err) => {
-        return reject(err.response.data);
       })
-  })
-}
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
 
 const updateOrganizer = (
   organization: string,
@@ -129,7 +151,7 @@ const updateOrganizer = (
   name: string,
   logo: string,
   commissionOrganization: string,
-  commissionClearer: string,
+  commissionClearer: string
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
@@ -139,13 +161,15 @@ const updateOrganizer = (
         logo,
         commissionOrganization,
         commissionClearer,
-      }).then((res: any) => {
-        return resolve(res.data);
-      }).catch((err) => {
-        return reject(err.repsonse);
       })
-  })
-}
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.repsonse);
+      });
+  });
+};
 
 const addAccount = (
   organizerId: string,
@@ -154,51 +178,64 @@ const addAccount = (
   type: string,
   iban: string,
   publicAddress: string,
-  vaultWalletId: string,
+  vaultWalletId: string
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .post(`/organization/${organizerId}/account`, {
-        name, currency, type, iban, publicAddress, vaultWalletId
+        name,
+        currency,
+        type,
+        iban,
+        publicAddress,
+        vaultWalletId,
       })
       .then((res: any) => {
         return resolve(res.data);
       })
       .catch((err) => {
         return reject(err.response.data);
-      })
-  })
-}
+      });
+  });
+};
 
-const suspendManager = (organizerId: string, managerId: string) :Promise<any> => {
+const suspendManager = (
+  organizerId: string,
+  managerId: string
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .put(`/organization/${organizerId}/manager/${managerId}/suspend`)
       .then((res: any) => {
         return resolve(res.data);
-      }).catch((err) => {
-        return reject(err.response);
       })
-  })
-}
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
 
-const resumeManager = (organizerId: string, managerId: string) :Promise<any> => {
+const resumeManager = (
+  organizerId: string,
+  managerId: string
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .put(`/organization/${organizerId}/manager/${managerId}/resume`)
       .then((res: any) => {
         return resolve(res.data);
-      }).catch((err) => {
-        return reject(err.response);
       })
-  })
-}
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
 
 export {
   getOrganizations as default,
   getOrganizations,
   getOrganizationDetail,
-  getOrganisationManagers,
+  getOrganizationManagers,
   getOrganizerManager,
   addOrganizationManager,
   addOrganizer,
@@ -207,4 +244,4 @@ export {
   updateOrganizerManager,
   suspendManager,
   resumeManager,
-}
+};

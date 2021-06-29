@@ -186,7 +186,7 @@ const AddRole = (): React.ReactElement => {
       <Container>
         <Grid container spacing={2}>
           <Grid container item xs={12}>
-            <Typography variant="h4">Create new Organisation role</Typography>
+            <Typography variant="h4">Create new Organization role</Typography>
           </Grid>
           <Grid container item xs={12}>
             <Grid item xs={4}>
