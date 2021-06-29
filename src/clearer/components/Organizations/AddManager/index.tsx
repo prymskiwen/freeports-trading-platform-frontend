@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useParams, useHistory } from "react-router";
-import { 
-    Container,
-    Grid,
-    FormControl,
-    makeStyles,
-    CardMedia,
-    Button,
- } from "@material-ui/core";
- import ImageUploader from 'react-images-upload';
+import {
+  Container,
+  Grid,
+  FormControl,
+  makeStyles,
+  CardMedia,
+  Button,
+} from "@material-ui/core";
+import ImageUploader from "react-images-upload";
 import { Form } from "react-final-form";
 import { TextField, Select } from "mui-rff";
 import arrayMutators from "final-form-arrays";
@@ -19,61 +19,67 @@ const useStyle = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
   },
-}))
+}));
 
 const validate = (values: any) => {
   const errors: {
-    nickname?: string,
-    email?: string,
-    password?: string,
-    phone?: string,
+    nickname?: string;
+    email?: string;
+    password?: string;
+    phone?: string;
   } = {};
-  if(!values.nickname){
+  if (!values.nickname) {
     errors.nickname = "This Field Required";
   }
-  if(!values.email){
+  if (!values.email) {
     errors.email = "This Field Required";
   }
-  if(!values.password){
+  if (!values.password) {
     errors.password = "This Field Required";
   }
-  if(!values.phone){
+  if (!values.phone) {
     errors.phone = "This Field Required";
   }
   return errors;
-}
+};
 
 const AddManager = (): React.ReactElement => {
-  const { orgaizationId } : any = useParams();
+  const { organizationId }: any = useParams();
   const classes = useStyle();
   const showingIcon = false;
   const history = useHistory();
 
   const { addManager } = useOrganization();
 
-  const [managerAvatar, setManagerAvatar] = useState('');
+  const [managerAvatar, setManagerAvatar] = useState("");
 
   const ondrop = (pic: any) => {
     const reader = new FileReader();
-    reader.onload = (e: any)=>{
+    reader.onload = (e: any) => {
       setManagerAvatar(e.target.result);
-    }
+    };
     reader.readAsDataURL(pic[0]);
     // setLogo(pic);
-  }
+  };
 
   const onSubmit = async (values: any) => {
-    const additional = await addManager(orgaizationId, values.nickname, values.email, values.password, values.phone, managerAvatar)
-      .then((res: any) =>{
-        console.log(res);
-        history.push(`/organisations/editOrganizer/${orgaizationId}`);
-      })
-  }
+    const additional = await addManager(
+      organizationId,
+      values.nickname,
+      values.email,
+      values.password,
+      values.phone,
+      managerAvatar
+    ).then((res: any) => {
+      console.log(res);
+      history.push(`/organizations/editOrganizer/${organizationId}`);
+    });
+  };
 
   return (
     <div className="main-wrapper">
       <Container>
-        <Form 
+        <Form
           onSubmit={onSubmit}
           initialValues={{
             nickname: "",
@@ -85,14 +91,24 @@ const AddManager = (): React.ReactElement => {
             ...arrayMutators,
           }}
           validate={validate}
-          render={({ handleSubmit, form: { mutators: {push, pop },}, values, }) => (
+          render={({
+            handleSubmit,
+            form: {
+              mutators: { push, pop },
+            },
+            values,
+          }) => (
             <form onSubmit={handleSubmit} noValidate>
               <Grid container item spacing={1} xs={6}>
                 <Grid item xs={12}>
                   <h2>Add New Manager</h2>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       required
                       id="outlined-adornment-amount"
@@ -101,10 +117,14 @@ const AddManager = (): React.ReactElement => {
                       variant="outlined"
                     />
                   </FormControl>
-                </Grid>  
+                </Grid>
                 <Grid item container spacing={1} xs={12}>
                   <Grid item xs={6}>
-                    <FormControl fullWidth className={classes.margin} variant="outlined">
+                    <FormControl
+                      fullWidth
+                      className={classes.margin}
+                      variant="outlined"
+                    >
                       <TextField
                         required
                         id="outlined-adornment-amount"
@@ -115,7 +135,11 @@ const AddManager = (): React.ReactElement => {
                     </FormControl>
                   </Grid>
                   <Grid item xs={6}>
-                    <FormControl fullWidth className={classes.margin} variant="outlined">
+                    <FormControl
+                      fullWidth
+                      className={classes.margin}
+                      variant="outlined"
+                    >
                       <TextField
                         required
                         id="outlined-adornment-amount"
@@ -125,9 +149,13 @@ const AddManager = (): React.ReactElement => {
                       />
                     </FormControl>
                   </Grid>
-                </Grid>   
+                </Grid>
                 <Grid item xs={12}>
-                  <FormControl fullWidth className={classes.margin} variant="outlined">
+                  <FormControl
+                    fullWidth
+                    className={classes.margin}
+                    variant="outlined"
+                  >
                     <TextField
                       required
                       type="password"
@@ -140,7 +168,7 @@ const AddManager = (): React.ReactElement => {
                 </Grid>
                 <Grid item container spacing={1} xs={12}>
                   <Grid item xs={6}>
-                    <CardMedia 
+                    <CardMedia
                       style={{ marginTop: 20 }}
                       component="img"
                       height="140"
@@ -149,7 +177,7 @@ const AddManager = (): React.ReactElement => {
                     <ImageUploader
                       withIcon={showingIcon}
                       withLabel={showingIcon}
-                      buttonText='Choose Image'
+                      buttonText="Choose Image"
                       buttonStyles={{
                         width: "100%",
                       }}
@@ -160,8 +188,18 @@ const AddManager = (): React.ReactElement => {
                       }}
                     />
                   </Grid>
-                  <Grid item container xs={6} style={{padding: 15}} direction="row" justify="flex-end" alignItems="flex-end">
-                    <Button variant="contained" color="secondary" type="submit">ADD</Button>
+                  <Grid
+                    item
+                    container
+                    xs={6}
+                    style={{ padding: 15 }}
+                    direction="row"
+                    justify="flex-end"
+                    alignItems="flex-end"
+                  >
+                    <Button variant="contained" color="secondary" type="submit">
+                      ADD
+                    </Button>
                   </Grid>
                 </Grid>
               </Grid>
@@ -170,7 +208,7 @@ const AddManager = (): React.ReactElement => {
         />
       </Container>
     </div>
-  )
-}
+  );
+};
 
 export default AddManager;
