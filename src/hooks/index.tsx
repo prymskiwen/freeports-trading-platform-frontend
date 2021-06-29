@@ -1,6 +1,14 @@
-import useAuth from "./auth";
-import useRole from "./role";
-import useOrganization from "./organization"
 import useAccounts from "./account";
+import useAuth from "./auth";
+import useOrganization from "./organization";
+import useRole from "./role";
+import useTheme from "./theme";
 
-export { useAuth as default, useAuth, useRole, useOrganization, useAccounts };
+export {
+  useAccounts as default,
+  useAccounts,
+  useAuth,
+  useOrganization,
+  useRole,
+  useTheme,
+};
