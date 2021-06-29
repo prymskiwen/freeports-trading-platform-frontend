@@ -1,5 +1,6 @@
 import React from "react";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 
 import Routes from "./routes";
 
@@ -32,6 +33,7 @@ const App = (): React.ReactElement => {
     palette: {
       background: {
         default: "#1D1E3C",
+        paper: "#303655",
       },
       primary: {
         main: "#006BDE",
@@ -44,10 +46,11 @@ const App = (): React.ReactElement => {
   });
 
   return (
-    <ThemeProvider theme={theme === "light" ? themeLight : themeDark}>
+    <MuiThemeProvider theme={theme === "light" ? themeLight : themeDark}>
+      <CssBaseline />
       <Routes />
       <Snackbar />
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 };
 
