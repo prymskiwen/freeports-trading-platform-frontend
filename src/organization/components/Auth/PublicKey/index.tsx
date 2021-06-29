@@ -10,10 +10,12 @@ import { useAuth } from "../../../../hooks";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    errorSnackbar: {
-      backgroundColor: theme.palette.secondary.main,
-      color: "white",
+    anchorOriginTopCenter: {
       top: "75px",
+      "& .MuiSnackbarContent-root": {
+        backgroundColor: theme.palette.secondary.main,
+        color: "white",
+      },
     },
   })
 );
@@ -53,17 +55,17 @@ const PublicKeyBanner = (): React.ReactElement => {
     history.push(`/profile`);
   };
   return (
-    <div>
-      <Snackbar
-        key={messageInfo}
-        open={opened}
-        autoHideDuration={3000}
-        anchorOrigin={{ vertical, horizontal }}
-        ContentProps={{ className: classes.errorSnackbar }}
-        onClose={handleClose}
-        message={alertText}
-      />
-    </div>
+    <Snackbar
+      key={messageInfo}
+      open={opened}
+      autoHideDuration={2000}
+      anchorOrigin={{ vertical, horizontal }}
+      classes={{
+        anchorOriginTopCenter: classes.anchorOriginTopCenter,
+      }}
+      onClose={handleClose}
+      message={alertText}
+    />
   );
 };
 
