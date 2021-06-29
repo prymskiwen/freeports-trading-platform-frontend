@@ -25,11 +25,11 @@ import {
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SendIcon from "@material-ui/icons/Send";
 import GroupIcon from "@material-ui/icons/Group";
-import useAuth from "../../../hooks";
+import { useAuth } from "../../../hooks";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
-  { title: `Organisations`, path: `/organisations`, hasChildren: false },
+  { title: `Organizations`, path: `/organizations`, hasChildren: false },
   { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
   { title: `Tracking`, path: `/tracking`, hasChildren: true },
 ];
