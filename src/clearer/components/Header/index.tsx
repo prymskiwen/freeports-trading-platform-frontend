@@ -4,6 +4,7 @@ import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 import {
   AppBar,
+  Badge,
   Container,
   IconButton,
   List,
@@ -15,7 +16,13 @@ import {
   MenuItem,
   Toolbar,
 } from "@material-ui/core";
-import { ChevronRight, ExpandMore, Home, Person } from "@material-ui/icons";
+import {
+  ChevronRight,
+  ExpandMore,
+  Home,
+  Notifications,
+  Person,
+} from "@material-ui/icons";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import ContactsIcon from "@material-ui/icons/Contacts";
@@ -43,7 +50,16 @@ const useStyles = makeStyles({
     },
   },
 });
-const Header = (): React.ReactElement => {
+
+interface headerProps {
+  notificationDrawerOpen: boolean;
+  handleNotificationDrawerOpen: () => void;
+}
+
+const Header = ({
+  notificationDrawerOpen,
+  handleNotificationDrawerOpen,
+}: headerProps): React.ReactElement<headerProps> => {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -112,6 +128,18 @@ const Header = (): React.ReactElement => {
             </IconButton>
             {isAuthenticated ? (
               <>
+                <IconButton
+                  aria-controls="settings-menu"
+                  aria-haspopup="true"
+                  edge="start"
+                  color="inherit"
+                  aria-label="settings"
+                  onClick={handleNotificationDrawerOpen}
+                >
+                  <Badge badgeContent={4} color="error">
+                    <Notifications fontSize="large" />
+                  </Badge>
+                </IconButton>
                 <IconButton
                   aria-controls="settings-menu"
                   aria-haspopup="true"
