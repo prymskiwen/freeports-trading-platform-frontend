@@ -20,7 +20,6 @@ const Snackbar = (): React.ReactElement => {
   const message = useSelector(selectSnackbarMessage);
   const type = useSelector(selectSnackbarType);
   const { actions } = useSnackbarSlice();
-  console.log("::snackbar", message, type, showSnackbar);
   return (
     <MUISnackbar
       autoHideDuration={2000}
