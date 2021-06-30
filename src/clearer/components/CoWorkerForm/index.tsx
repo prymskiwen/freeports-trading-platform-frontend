@@ -283,7 +283,7 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                       <Grid item sm={12} md={6}>
                         <TextField
                           id="job-title"
-                          label="Jub title"
+                          label="Job title"
                           name="jobTitle"
                           variant="outlined"
                         />
