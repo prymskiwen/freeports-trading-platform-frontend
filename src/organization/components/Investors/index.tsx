@@ -15,7 +15,7 @@ import {
   Chip,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import MaterialTable, {MTableHeader, MTableToolbar} from 'material-table';
+import MaterialTable, { MTableHeader, MTableToolbar } from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -101,7 +101,9 @@ const Investors = (): React.ReactElement => {
             >
               <Select value="usd">
                 {currencyOptions.map((opt) => (
-                  <MenuItem value={opt.value}>{opt.name}</MenuItem>
+                  <MenuItem key={opt.value} value={opt.value}>
+                    {opt.name}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>

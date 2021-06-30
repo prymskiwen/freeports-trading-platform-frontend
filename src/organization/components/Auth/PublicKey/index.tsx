@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { Snackbar, Slide } from "@material-ui/core";
-import { TransitionProps } from "@material-ui/core/transitions";
+import { Snackbar, createStyles, makeStyles, Theme } from "@material-ui/core";
 
 import { useAuth } from "../../../../hooks";
 
@@ -9,8 +8,21 @@ import { useAuth } from "../../../../hooks";
 //   return <Slide {...props} direction="down" />;
 // }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    anchorOriginTopCenter: {
+      top: "75px",
+      "& .MuiSnackbarContent-root": {
+        backgroundColor: theme.palette.secondary.main,
+        color: "white",
+      },
+    },
+  })
+);
+
 const PublicKeyBanner = (): React.ReactElement => {
   const history = useHistory();
+  const classes = useStyles();
   const [opened, setOpened] = useState(false);
   const [alertText, setAlertText] = useState("");
   const { checkPublicKey } = useAuth();
@@ -21,8 +33,10 @@ const PublicKeyBanner = (): React.ReactElement => {
     const checkKey = async () => {
       const getResult = await checkPublicKey();
       if (!getResult.success) {
-        setAlertText(getResult.data);
-        setOpened(true);
+        if (!unmounted) {
+          setAlertText(getResult.data);
+          setOpened(true);
+        }
       }
     };
 
@@ -41,16 +55,17 @@ const PublicKeyBanner = (): React.ReactElement => {
     history.push(`/profile`);
   };
   return (
-    <div>
-      <Snackbar
-        key={messageInfo}
-        open={opened}
-        autoHideDuration={2000}
-        anchorOrigin={{ vertical, horizontal }}
-        onClose={handleClose}
-        message={alertText}
-      />
-    </div>
+    <Snackbar
+      key={messageInfo}
+      open={opened}
+      autoHideDuration={2000}
+      anchorOrigin={{ vertical, horizontal }}
+      classes={{
+        anchorOriginTopCenter: classes.anchorOriginTopCenter,
+      }}
+      onClose={handleClose}
+      message={alertText}
+    />
   );
 };
 
