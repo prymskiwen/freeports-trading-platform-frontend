@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Button,
   Container,
+  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,9 +13,9 @@ import {
   makeStyles,
   MenuItem,
   TextField,
+  Theme,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import purple from "@material-ui/core/colors/purple";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -32,9 +33,7 @@ const columns = [
     render: (rowData: any) => {
       const { name: names } = rowData;
 
-      return (
-        <Link to="/nostro-accounts/details">{names}</Link>
-      );
+      return <Link to="/nostro-accounts/details">{names}</Link>;
     },
   },
   {
@@ -73,12 +72,14 @@ const columns = [
     },
   },
 ];
-const useStyles = makeStyles({
-  tableButton: {
-    color: purple[500],
-    fontWeight: "bold",
-  },
-});
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    tableButton: {
+      color: theme.palette.primary.main,
+      fontWeight: "bold",
+    },
+  })
+);
 const NostroAccounts = (): React.ReactElement => {
   const classes = useStyles();
   const [declareAccountModalOpen, setDeclareAccountModalOpen] =
