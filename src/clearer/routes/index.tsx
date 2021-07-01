@@ -3,6 +3,7 @@
 // import libs
 import React, { useState } from "react";
 import { BrowserRouter as Router, Redirect, Switch } from "react-router-dom";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
 // import components
 import routes from "./routes";
@@ -11,7 +12,15 @@ import PublicRoute from "../../routes/public";
 import Header from "../components/Header";
 import NotificationCenter from "../../components/NotificationCenter";
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    main: {
+      padding: theme.spacing(4),
+    },
+  })
+);
 const Routes = (): React.ReactElement => {
+  const classes = useStyles();
   const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
 
   const handleNotificationDrawerOpen = () => {
@@ -32,7 +41,7 @@ const Routes = (): React.ReactElement => {
       <Router>
         <>
           <Header {...headerProps} />
-          <main>
+          <main className={classes.main}>
             <Switch>
               {routes.map((route, i) => {
                 if (route.auth) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import {
   Container,
   Grid,
@@ -33,6 +34,11 @@ const Organizations = (): React.ReactElement => {
         title: "Organization",
         cellStyle: {
           width: "25%",
+        },
+        render: (rowData: any) => {
+          const { id, name: names } = rowData;
+
+          return <Link to={`organizations/editOrganizer/${id}`}>{names}</Link>;
         },
       },
       {
@@ -96,19 +102,6 @@ const Organizations = (): React.ReactElement => {
                       });
                   })
                 }
-                actions={[
-                  {
-                    icon: "edit",
-                    tooltip: "edit",
-                    onClick: (event, item: any) => {
-                      console.log(item);
-                      if (item && item.name) {
-                        console.log(item.name);
-                        history.push(`/organizations/editOrganizer/${item.id}`);
-                      }
-                    },
-                  },
-                ]}
               />
             </Grid>
           </Grid>
