@@ -111,6 +111,9 @@ const Profile = (): React.ReactElement => {
     }>
   >([]);
   const [loading, setLoading] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   useEffect(() => {
     dispatch(actions.getProfile());
@@ -231,6 +234,31 @@ const Profile = (): React.ReactElement => {
     link.download = `${name}.publickey`;
     link.href = dataUrl;
     link.click();
+  };
+
+  const onResetPassword = () => {
+    console.log(currentPassword, newPassword, confirmNewPassword);
+  };
+
+  const onCurrentPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    setCurrentPassword(value);
+  };
+
+  const onNewPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    setNewPassword(value);
+  };
+
+  const onConfirmNewPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = e.target;
+    setConfirmNewPassword(value);
   };
 
   return (
@@ -381,11 +409,12 @@ const Profile = (): React.ReactElement => {
                         <Grid container spacing={3}>
                           <Grid item sm={12}>
                             <TextField
+                              onChange={onCurrentPasswordChange}
                               required
-                              id="password"
-                              name="password"
+                              id="currentPassword"
+                              name="currentPassword"
                               type="password"
-                              label="Password"
+                              label="Current Password"
                               variant="outlined"
                               fullWidth
                             />
@@ -394,11 +423,26 @@ const Profile = (): React.ReactElement => {
                         <Grid container spacing={3}>
                           <Grid item sm={12}>
                             <TextField
+                              onChange={onNewPasswordChange}
                               required
-                              id="confirmPassword"
-                              name="confirmPassword"
+                              id="newPassword"
+                              name="newPassword"
                               type="password"
-                              label="Confirm Password"
+                              label="New Password"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={3}>
+                          <Grid item sm={12}>
+                            <TextField
+                              onChange={onConfirmNewPasswordChange}
+                              required
+                              id="confirmNewPassword"
+                              name="confirmNewPassword"
+                              type="password"
+                              label="Confirm New Password"
                               variant="outlined"
                               fullWidth
                             />
@@ -412,7 +456,12 @@ const Profile = (): React.ReactElement => {
               <Divider />
               <CardActions>
                 <Grid container direction="row-reverse">
-                  <Button color="primary" variant="contained" type="submit">
+                  <Button
+                    onClick={onResetPassword}
+                    color="primary"
+                    variant="contained"
+                    type="submit"
+                  >
                     Reset
                   </Button>
                 </Grid>
