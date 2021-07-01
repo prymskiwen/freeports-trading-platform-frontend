@@ -2,6 +2,7 @@ import React from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 
+import { useDispatch } from "react-redux";
 import Routes from "./routes";
 
 import auth from "../store/auth/reducer";
@@ -12,11 +13,14 @@ import { useInjectReducer } from "../util/redux-injectors";
 
 import "./App.css";
 import "./Custom.css";
+import authActions from "../store/auth/actions";
 
 const App = (): React.ReactElement => {
   useInjectReducer({ key: "auth", reducer: auth });
   useInjectReducer({ key: "global", reducer: global });
-
+  const dispatch = useDispatch();
+  const { authCheck } = authActions;
+  dispatch(authCheck());
   const { theme } = useTheme();
   const themeLight = createMuiTheme({
     palette: {
