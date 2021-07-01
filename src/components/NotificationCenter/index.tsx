@@ -1,7 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import {
-  Badge,
   Button,
   createStyles,
   Divider,
@@ -11,16 +9,14 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   makeStyles,
   MenuItem,
   Theme,
   Select,
-  Toolbar,
   Typography,
 } from "@material-ui/core";
-import { ChevronRight, Notifications, Person } from "@material-ui/icons";
+import { ChevronRight } from "@material-ui/icons";
 
 import data from "./data";
 
@@ -101,7 +97,7 @@ const NotificationCenter = ({
       }}
     >
       <div className={classes.drawerHeader}>
-        <Grid container xs={12} justify="space-between">
+        <Grid container justify="space-between">
           <Grid item xs={2}>
             <IconButton onClick={handleNotificationDrawerOpen}>
               <ChevronRight />
@@ -116,7 +112,7 @@ const NotificationCenter = ({
         </Grid>
       </div>
       <div className={classes.drawerBody}>
-        <Grid container xs={12}>
+        <Grid container>
           <Grid item xs={2}>
             <Typography
               variant="h5"
@@ -147,11 +143,7 @@ const NotificationCenter = ({
                   <ListItemText
                     primary={
                       <>
-                        <Typography
-                          component="p"
-                          variant="body2"
-                          color="textPrimary"
-                        >
+                        <Typography variant="body2" color="textPrimary">
                           {`${item.type} / ${item.dateTime}`}
                         </Typography>
                         <Typography variant="h6" color="textPrimary">
@@ -161,18 +153,10 @@ const NotificationCenter = ({
                     }
                     secondary={
                       <>
-                        <Typography
-                          component="p"
-                          variant="body2"
-                          color="textPrimary"
-                        >
+                        <Typography variant="body2" color="textPrimary">
                           From: name
                         </Typography>
-                        <Typography
-                          component="p"
-                          variant="body2"
-                          color="textSecondary"
-                        >
+                        <Typography variant="body2" color="textSecondary">
                           {item.content}
                         </Typography>
                       </>

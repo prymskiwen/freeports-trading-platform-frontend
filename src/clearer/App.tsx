@@ -18,9 +18,12 @@ import authActions from "../store/auth/actions";
 const App = (): React.ReactElement => {
   useInjectReducer({ key: "auth", reducer: auth });
   useInjectReducer({ key: "global", reducer: global });
+
   const dispatch = useDispatch();
   const { authCheck } = authActions;
+
   dispatch(authCheck());
+
   const { theme } = useTheme();
   const themeLight = createMuiTheme({
     palette: {
