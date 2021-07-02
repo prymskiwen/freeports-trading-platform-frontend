@@ -9,24 +9,24 @@ const getAllAccounts = (): Promise<any> => {
       })
       .catch((err) => {
         return reject(err.response.data);
-      })
-  })
-}
+      });
+  });
+};
 
-const assignOrganizationAccount = (organizerId: string, accountId: string): Promise<any> => {
+const assignOrganizationAccount = (
+  organizerId: string,
+  accountId: string
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .put(`/account/${accountId}/${organizerId}`)
       .then((res: any) => {
         return resolve(res.data);
-      }).catch((err) => {
-        return reject(err.response);
       })
-  })
-}
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
 
-export {
-  getAllAccounts as default,
-  getAllAccounts,
-  assignOrganizationAccount,
-}
+export { getAllAccounts as default, getAllAccounts, assignOrganizationAccount };
