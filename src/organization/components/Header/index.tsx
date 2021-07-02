@@ -6,6 +6,7 @@ import {
   AppBar,
   Badge,
   Container,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -173,6 +174,7 @@ const Header = ({
                     </ListItemIcon>
                     <ListItemText primary="Profile" />
                   </MenuItem>
+                  <Divider />
                   <MenuItem onClick={() => redirect("/roles")}>
                     <ListItemIcon>
                       <SendIcon fontSize="small" />
@@ -183,16 +185,15 @@ const Header = ({
                     <ListItemIcon>
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
-
                     <ListItemText primary="Co-workers" />
                   </MenuItem>
                   <MenuItem onClick={() => redirect("/desks")}>
                     <ListItemIcon>
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
-
                     <ListItemText primary="Desks" />
                   </MenuItem>
+                  <Divider />
                   <MenuItem onClick={signOut}>
                     <ListItemIcon>
                       <ExitToAppIcon fontSize="small" />
