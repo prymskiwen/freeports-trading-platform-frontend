@@ -24,19 +24,19 @@ export default [
     component: lazy(() => import("../components/Organizations")),
   },
   {
-    path: "/organizations/addOrganization",
+    path: "/organizations/add",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Organizations/AddOrganizer")),
   },
   {
-    path: "/organizations/editOrganizer/:id",
+    path: "/organizations/edit/:id",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Organizations/EditOrganizer")),
   },
   {
-    path: "/organizations/:organizationId/addmanager",
+    path: "/organizations/:organizationId/managers/add",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Organizations/AddManager")),

@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  CardMedia,
   Container,
+  Divider,
   Grid,
   IconButton,
-  Button,
-  Icon,
-  Divider,
   List,
   ListItem,
-  CardMedia,
-  Card,
   Input,
   InputAdornment,
+  TextField,
+  Typography,
 } from "@material-ui/core";
+import { AddCircle, RemoveCircle } from "@material-ui/icons";
 import ImageUploader from "react-images-upload";
 import { useParams, useHistory } from "react-router";
-import Manager from "../Manager";
 
+import Manager from "../Manager";
 import { useOrganization } from "../../../../hooks";
 
-interface ibantype {
+interface accountType {
   currency: string;
   iban: string;
   account: string;
@@ -34,7 +39,7 @@ const useStyle = makeStyles((theme) => ({
   root: {
     width: "100%",
   },
-  boldspanMarginL: {
+  boldSpanMarginL: {
     fontWeight: "bold",
     marginLeft: 25,
   },
@@ -46,7 +51,7 @@ const useStyle = makeStyles((theme) => ({
     fontSize: 20,
     marginLeft: 15,
   },
-  logotext: {
+  logoText: {
     fontSize: 20,
     fontWeight: "bold",
   },
@@ -56,31 +61,11 @@ const useStyle = makeStyles((theme) => ({
     fontWeight: "initial",
     marginLeft: 15,
   },
-  profilBtn: {
-    position: "relative",
-    height: 150,
-    width: "100%",
-    [theme.breakpoints.down("xs")]: {
-      width: "100% !important", // Overrides inline-style
-      height: 100,
-    },
+  fullCard: {
+    height: "100%",
   },
-  profilImage: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center 40%",
-  },
-  profiltext: {
-    position: "absolute",
-    left: 0,
-    bottom: 0,
-    backgroundColor: "#fff9",
-    width: "100%",
-    textAlign: "center",
+  iconButton: {
+    padding: 0,
   },
 }));
 
@@ -92,35 +77,38 @@ const EditOrganizer = (): React.ReactElement => {
   const { getOrganizerdetail, getManagers, updateOrganization } =
     useOrganization();
   const [isEditable, setIsEditable] = useState(false);
-  const [organizereddetail, setOrganizereddetail] = useState({
-    id: "string",
-    name: "string",
-    createdAt: "string",
-    commissionOrganization: "string",
-    commissionClearer: "string",
-    logo: "string",
-    userActive: "string",
-    userSuspended: "string",
+  const [orgDetail, setOrgDetail] = useState({
+    id: "",
+    name: "",
+    createdAt: "",
+    commissionOrganization: "",
+    commissionClearer: "",
+    logo: "",
+    userActive: "",
+    userSuspended: "",
+    accountList: [],
   });
   const [managers, setManagers] = useState([] as managerType[]);
-  const [iban, setIban] = useState([] as ibantype[]);
+  const [accounts, setAccounts] = useState<Array<accountType>>([]);
+
   useEffect(() => {
     let mounted = false;
     const init = async () => {
       const detail = await getOrganizerdetail(id);
       const managerList = await getManagers(id);
       if (!mounted) {
-        setOrganizereddetail({
+        setOrgDetail({
           id: detail.id,
           name: detail.name,
           createdAt: new Date(detail.createdAt).toDateString(),
           logo: detail.logo,
           commissionOrganization: detail.commissionOrganization,
           commissionClearer: detail.commissionClearer,
-          userActive: detail.acitveUser,
-          userSuspended: detail.discativeUser,
+          userActive: detail.userActive,
+          userSuspended: detail.userSuspended,
+          accountList: detail.clearing,
         });
-        setIban(detail.clearing);
+        setAccounts(detail.clearing);
         setManagers(managerList);
       }
     };
@@ -130,46 +118,42 @@ const EditOrganizer = (): React.ReactElement => {
     };
   }, []);
 
-  const ondrop = (pic: any) => {
+  const onDrop = (pic: any) => {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const newOrganizereddetail = { ...organizereddetail };
-      newOrganizereddetail.logo = e.target.result;
-      setOrganizereddetail(newOrganizereddetail);
+      const newOrgDetail = { ...orgDetail };
+      newOrgDetail.logo = e.target.result;
+      setOrgDetail(newOrgDetail);
     };
     reader.readAsDataURL(pic[0]);
     // setLogo(pic);
   };
 
-  const onHandlename = (
+  const onHandleNameChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { value } = event.target;
-    const newOrganizereddetail = { ...organizereddetail };
-    newOrganizereddetail.name = value;
-    setOrganizereddetail(newOrganizereddetail);
+    const newOrgDetail = { ...orgDetail };
+    newOrgDetail.name = value;
+    setOrgDetail(newOrgDetail);
   };
 
-  const onHandleclearer = (
+  const onHandleClearerCommission = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { value } = event.target;
-    const newOrganizereddetail = { ...organizereddetail };
-    newOrganizereddetail.commissionClearer = value;
-    setOrganizereddetail(newOrganizereddetail);
+    const newOrgDetail = { ...orgDetail };
+    newOrgDetail.commissionClearer = value;
+    setOrgDetail(newOrgDetail);
   };
 
-  const onHandlecommission = (
+  const onHandleOrganizationCommission = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { value } = event.target;
-    const newOrganizereddetail = { ...organizereddetail };
-    newOrganizereddetail.commissionOrganization = value;
-    setOrganizereddetail(newOrganizereddetail);
-  };
-
-  const onhandledialog = () => {
-    console.log(organizereddetail);
+    const newOrgDetail = { ...orgDetail };
+    newOrgDetail.commissionOrganization = value;
+    setOrgDetail(newOrgDetail);
   };
 
   const onStartEdit = () => {
@@ -183,11 +167,11 @@ const EditOrganizer = (): React.ReactElement => {
   const onHandleUpdate = async () => {
     await updateOrganization(
       id,
-      organizereddetail.createdAt,
-      organizereddetail.name,
-      organizereddetail.logo,
-      organizereddetail.commissionOrganization,
-      organizereddetail.commissionClearer
+      orgDetail.createdAt,
+      orgDetail.name,
+      orgDetail.logo,
+      orgDetail.commissionOrganization,
+      orgDetail.commissionClearer
     )
       .then((data: any) => {
         const responseId = data.id;
@@ -200,174 +184,231 @@ const EditOrganizer = (): React.ReactElement => {
   };
 
   const newManager = async () => {
-    history.push(`/organizations/${id}/addmanager`);
+    history.push(`/organizations/${id}/managers/add`);
   };
 
   return (
     <div className="main-wrapper">
       <Container>
-        <div style={{ width: "100%", display: "flex" }}>
+        <Grid container spacing={4}>
           <Grid item xs={6}>
-            <Grid container direction="row">
-              {isEditable ? (
-                <Input
-                  type="text"
-                  value={organizereddetail.name}
-                  onChange={onHandlename}
-                  style={{ fontSize: 25, fontWeight: "bold" }}
-                />
-              ) : (
-                <h2> {organizereddetail.name}</h2>
-              )}
-
-              <IconButton onClick={onStartEdit}>
-                {isEditable ? (
-                  <Icon style={{ fontSize: 35 }}>save</Icon>
-                ) : (
-                  <Icon style={{ fontSize: 35 }}>mode</Icon>
-                )}
-              </IconButton>
-            </Grid>
-            <Grid item xs={12}>
-              <List>
-                <ListItem>
-                  <span>Creation Date:</span>
-                  <span className={classes.boldspanMarginL}>
-                    {organizereddetail.createdAt}
-                  </span>
-                </ListItem>
-              </List>
+            <Card className={classes.fullCard}>
+              <CardHeader
+                title={
+                  <Grid container justify="space-between" alignItems="center">
+                    <Grid item>
+                      <Typography variant="h5">Edit Organization</Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="body2" color="textSecondary">
+                        {`Creation Date: ${orgDetail.createdAt}`}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                }
+              />
               <Divider />
-              <List>
-                {iban.map((ibanItem) => (
-                  <ListItem>
-                    <Icon color="error">remove_circle</Icon>
-                    <span className={classes.marginL10}>IBAN: </span>
-                    <span className={classes.boldspanMarginL}>
-                      {ibanItem.iban}
-                    </span>
-                  </ListItem>
-                ))}
-              </List>
-              <List>
-                <ListItem onClick={onhandledialog}>
-                  <Icon style={{ fontSize: 35 }}>add_circle</Icon>
-                  <span className={classes.marginL10}>Add IBAN</span>
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid item xs={6}>
-                <span className={classes.logotext}>Logo</span>
-                <Grid item container xs={12} justify="center">
-                  <CardMedia
-                    style={{ marginTop: 20 }}
-                    component="img"
-                    height="140"
-                    image={organizereddetail.logo}
-                  />
-                  <ImageUploader
-                    withIcon={showingIcon}
-                    withLabel={showingIcon}
-                    buttonText="Choose Image"
-                    onChange={(ChangeEvent) => ondrop(ChangeEvent)}
-                    buttonStyles={{
-                      width: "100%",
-                    }}
-                    fileContainerStyle={{
-                      margin: 0,
-                      padding: 0,
-                    }}
+              <CardContent>
+                <Grid container direction="row">
+                  <TextField
+                    type="text"
+                    value={orgDetail.name}
+                    label="Nickname"
+                    variant="outlined"
+                    onChange={onHandleNameChange}
+                    fullWidth
                   />
                 </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Card variant="outlined">
-                <Grid container xs={12}>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <span style={{ fontWeight: "bold" }}>Commission rates</span>
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <span style={{ fontWeight: "bold" }}>
-                      Clear Commission rates
-                    </span>
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <Input
-                      endAdornment={
-                        <InputAdornment position="end">%</InputAdornment>
-                      }
-                      value={organizereddetail.commissionOrganization}
-                      onChange={onHandlecommission}
-                    />
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <Input
-                      endAdornment={
-                        <InputAdornment position="end">%</InputAdornment>
-                      }
-                      value={organizereddetail.commissionClearer}
-                      onChange={onHandleclearer}
-                    />
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <span style={{ fontWeight: "bold" }}>Active Users</span>
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <span style={{ fontWeight: "bold" }}>Disabled Users</span>
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <span style={{ fontWeight: "bold" }}>
-                      {organizereddetail.userActive}
-                    </span>
-                  </Grid>
-                  <Grid item xs={6} style={{ padding: 15 }}>
-                    <span style={{ fontWeight: "bold" }}>
-                      {organizereddetail.userSuspended}
-                    </span>
+                <Grid item xs={12}>
+                  <List>
+                    {accounts.map((account) => (
+                      <ListItem>
+                        <IconButton
+                          color="primary"
+                          aria-label="Unassign account"
+                          component="span"
+                        >
+                          <RemoveCircle />
+                        </IconButton>
+                        <Typography variant="body2">{`Account: ${account.iban}`}</Typography>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h6">Logo</Typography>
+                  <Grid container justify="center">
+                    <Grid item xs={6}>
+                      <CardMedia
+                        style={{ marginTop: 20 }}
+                        component="img"
+                        height="140"
+                        image={orgDetail.logo}
+                      />
+                      <ImageUploader
+                        withIcon={showingIcon}
+                        withLabel={showingIcon}
+                        buttonText="Choose Image"
+                        onChange={(ChangeEvent) => onDrop(ChangeEvent)}
+                        buttonStyles={{
+                          width: "100%",
+                        }}
+                        fileContainerStyle={{
+                          margin: 0,
+                          padding: 0,
+                        }}
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Card>
-            </Grid>
-            <Grid
-              container
-              item
-              justify="flex-end"
-              xs={12}
-              style={{ marginTop: 5 }}
-            >
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={onHandleUpdate}
-              >
-                SAVE CHANGES
-              </Button>
-            </Grid>
+                <Grid container spacing={4}>
+                  <Grid item xs={12}>
+                    <Card variant="outlined">
+                      <CardContent>
+                        <Grid container spacing={4}>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Commission rates
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Input
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  }
+                                  value={orgDetail.commissionOrganization}
+                                  onChange={onHandleOrganizationCommission}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Clear Commission rates
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Input
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  }
+                                  value={orgDetail.commissionClearer}
+                                  onChange={onHandleClearerCommission}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Active Users
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  {orgDetail.userActive}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Disabled Users
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  {orgDetail.userSuspended}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </CardContent>
+              <Divider />
+              <CardActions>
+                <Grid container item justify="flex-end" xs={12}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={onHandleUpdate}
+                  >
+                    SAVE CHANGES
+                  </Button>
+                </Grid>
+              </CardActions>
+            </Card>
           </Grid>
           <Grid item xs={6}>
-            <Grid container direction="row">
-              <h2>
-                Organization managers
-                <IconButton onClick={newManager}>
-                  <Icon style={{ fontSize: 45 }} color="primary">
-                    add_circle
-                  </Icon>
-                </IconButton>
-              </h2>
-            </Grid>
-            <Grid item xs={12}>
-              <List>
-                {managers.map((managerItem) => (
-                  <ListItem>
-                    <Manager organizerid={id} managerid={managerItem.id} />
-                  </ListItem>
-                ))}
-              </List>
-            </Grid>
+            <Card className={classes.fullCard}>
+              <CardHeader
+                title={
+                  <Grid container alignItems="center" spacing={2}>
+                    <Grid item>
+                      <Typography variant="h5">
+                        Organization Managers
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <IconButton
+                        aria-label="Add manager"
+                        onClick={newManager}
+                        className={classes.iconButton}
+                      >
+                        <AddCircle fontSize="large" color="primary" />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container>
+                  <List>
+                    {managers.map((managerItem) => (
+                      <ListItem key={managerItem.id}>
+                        <Manager organizerid={id} managerid={managerItem.id} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Grid>
+              </CardContent>
+            </Card>
           </Grid>
-        </div>
+        </Grid>
       </Container>
     </div>
   );
