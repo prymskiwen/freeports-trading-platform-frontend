@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { useParams, useHistory } from "react-router";
 import {
+  Avatar,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  CardMedia,
   Container,
+  Divider,
   Grid,
   FormControl,
   makeStyles,
-  CardMedia,
-  Button,
+  Typography,
 } from "@material-ui/core";
 import ImageUploader from "react-images-upload";
 import { Form } from "react-final-form";
@@ -18,6 +25,31 @@ import { useOrganization } from "../../../../hooks";
 const useStyle = makeStyles((theme) => ({
   margin: {
     margin: theme.spacing(1),
+  },
+  profileImageContainer: {
+    position: "relative",
+    width: 150,
+    height: 150,
+    margin: 20,
+    "&:hover, &:focus": {
+      "& $profileImage": {
+        opacity: 0.5,
+      },
+    },
+  },
+  profileImage: {
+    width: "100%",
+    height: "100%",
+    opacity: 1,
+  },
+  profileFileInput: {
+    opacity: 0,
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    cursor: "pointer",
   },
 }));
 
@@ -53,13 +85,15 @@ const AddManager = (): React.ReactElement => {
 
   const [managerAvatar, setManagerAvatar] = useState("");
 
-  const ondrop = (pic: any) => {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      setManagerAvatar(e.target.result);
-    };
-    reader.readAsDataURL(pic[0]);
-    // setLogo(pic);
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.currentTarget;
+    if (files && files.length) {
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        setManagerAvatar(event.target.result);
+      };
+      reader.readAsDataURL(files[0]);
+    }
   };
 
   const onSubmit = async (values: any) => {
@@ -99,110 +133,108 @@ const AddManager = (): React.ReactElement => {
             values,
           }) => (
             <form onSubmit={handleSubmit} noValidate>
-              <Grid container item spacing={1} xs={6}>
-                <Grid item xs={12}>
-                  <h2>Add New Manager</h2>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      required
-                      id="outlined-adornment-amount"
-                      label="Manager name"
-                      name="nickname"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item container spacing={1} xs={12}>
-                  <Grid item xs={6}>
-                    <FormControl
-                      fullWidth
-                      className={classes.margin}
-                      variant="outlined"
-                    >
-                      <TextField
-                        required
-                        id="outlined-adornment-amount"
-                        label="Email"
-                        name="email"
-                        variant="outlined"
-                      />
-                    </FormControl>
+              <Card>
+                <CardHeader title="Add New Manager" />
+                <Divider />
+                <CardContent>
+                  <Grid container spacing={4}>
+                    <Grid item xs={6}>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <FormControl
+                            fullWidth
+                            className={classes.margin}
+                            variant="outlined"
+                          >
+                            <TextField
+                              required
+                              id="outlined-adornment-amount"
+                              label="Manager name"
+                              name="nickname"
+                              variant="outlined"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <FormControl
+                                fullWidth
+                                className={classes.margin}
+                                variant="outlined"
+                              >
+                                <TextField
+                                  required
+                                  id="outlined-adornment-amount"
+                                  label="Email"
+                                  name="email"
+                                  variant="outlined"
+                                />
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <FormControl
+                                fullWidth
+                                className={classes.margin}
+                                variant="outlined"
+                              >
+                                <TextField
+                                  required
+                                  id="outlined-adornment-amount"
+                                  label="Phone"
+                                  name="phone"
+                                  variant="outlined"
+                                />
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl
+                            fullWidth
+                            className={classes.margin}
+                            variant="outlined"
+                          >
+                            <TextField
+                              required
+                              type="password"
+                              id="outlined-adornment-amount"
+                              label="Password"
+                              name="password"
+                              variant="outlined"
+                            />
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Grid container justify="center" alignItems="center">
+                        <div className={classes.profileImageContainer}>
+                          <Avatar
+                            src={managerAvatar}
+                            alt="Avatar"
+                            className={classes.profileImage}
+                          />
+                          <input
+                            type="file"
+                            name="avatar"
+                            className={classes.profileFileInput}
+                            onChange={onAvatarChange}
+                          />
+                        </div>
+                      </Grid>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <FormControl
-                      fullWidth
-                      className={classes.margin}
-                      variant="outlined"
-                    >
-                      <TextField
-                        required
-                        id="outlined-adornment-amount"
-                        label="Phone"
-                        name="phone"
-                        variant="outlined"
-                      />
-                    </FormControl>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      required
-                      type="password"
-                      id="outlined-adornment-amount"
-                      label="Password"
-                      name="password"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item container spacing={1} xs={12}>
-                  <Grid item xs={6}>
-                    <CardMedia
-                      style={{ marginTop: 20 }}
-                      component="img"
-                      height="140"
-                      image={managerAvatar}
-                    />
-                    <ImageUploader
-                      withIcon={showingIcon}
-                      withLabel={showingIcon}
-                      buttonText="Choose Image"
-                      buttonStyles={{
-                        width: "100%",
-                      }}
-                      onChange={(ChangeEvent) => ondrop(ChangeEvent)}
-                      fileContainerStyle={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                    />
-                  </Grid>
-                  <Grid
-                    item
-                    container
-                    xs={6}
-                    style={{ padding: 15 }}
-                    direction="row"
-                    justify="flex-end"
-                    alignItems="flex-end"
-                  >
-                    <Button variant="contained" color="secondary" type="submit">
-                      ADD
+                </CardContent>
+                <Divider />
+                <CardActions>
+                  <Grid item container xs={12} justify="flex-end">
+                    <Button variant="contained" color="primary" type="submit">
+                      Submit
                     </Button>
                   </Grid>
-                </Grid>
-              </Grid>
+                </CardActions>
+              </Card>
             </form>
           )}
         />

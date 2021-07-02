@@ -27,7 +27,7 @@ import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
 import { useOrganization } from "../../../hooks";
 
-interface ibantype {
+interface accountType {
   currency: string;
   iban: string;
   account: string;
@@ -105,16 +105,17 @@ const Settings = (): React.ReactElement => {
   const classes = useStyle();
   const { getOrganizerdetail, updateOrganization } = useOrganization();
   const [orgDetail, setOrgDetail] = useState({
-    id: "string",
-    name: "string",
-    createdAt: "string",
-    commissionOrganization: "string",
-    commissionClearer: "string",
-    logo: "string",
-    userActive: "string",
-    userSuspended: "string",
+    id: "",
+    name: "",
+    createdAt: "",
+    commissionOrganization: "",
+    commissionClearer: "",
+    logo: "",
+    userActive: 0,
+    userSuspended: 0,
+    accountList: [],
   });
-  const [iban, setIban] = useState([] as ibantype[]);
+  const [accounts, setAccounts] = useState<Array<accountType>>([]);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [submitResponse, setSubmitResponse] = useState({
@@ -126,6 +127,7 @@ const Settings = (): React.ReactElement => {
     let mounted = false;
     const init = async () => {
       const detail = await getOrganizerdetail(organizationId);
+
       if (!mounted) {
         if (detail) {
           setOrgDetail({
@@ -135,10 +137,11 @@ const Settings = (): React.ReactElement => {
             logo: detail.logo,
             commissionOrganization: detail.commissionOrganization,
             commissionClearer: detail.commissionClearer,
-            userActive: detail.acitveUser,
-            userSuspended: detail.discativeUser,
+            userActive: detail.userActive,
+            userSuspended: detail.userSuspended,
+            accountList: detail.clearing,
           });
-          setIban(detail.clearing);
+          setAccounts(detail.clearing);
         }
       }
     };
@@ -151,9 +154,13 @@ const Settings = (): React.ReactElement => {
   const onLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.currentTarget;
     if (files && files.length) {
-      const newOrgDetail = { ...orgDetail };
-      newOrgDetail.logo = URL.createObjectURL(files[0]);
-      setOrgDetail(newOrgDetail);
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        const newOrgDetail = { ...orgDetail };
+        newOrgDetail.logo = event.target.result;
+        setOrgDetail(newOrgDetail);
+      };
+      reader.readAsDataURL(files[0]);
     }
   };
 
@@ -233,9 +240,17 @@ const Settings = (): React.ReactElement => {
           <CardContent>
             <Grid container spacing={4}>
               <Grid item xs={6}>
-                <Grid container justify="space-between" alignItems="center">
+                <Grid
+                  container
+                  justify="space-between"
+                  alignItems="center"
+                  spacing={4}
+                >
                   <Grid item xs={12}>
                     <TextField
+                      InputProps={{
+                        readOnly: true,
+                      }}
                       label="Nickname"
                       variant="outlined"
                       value={orgDetail.name}
@@ -244,76 +259,117 @@ const Settings = (): React.ReactElement => {
                     />
                   </Grid>
                 </Grid>
-                <Grid container>
-                  <List>
-                    {iban.map((ibanItem) => (
-                      <ListItem>
-                        <Icon color="error">remove_circle</Icon>
-                        <Typography>IBAN: </Typography>
-                        <Typography>{ibanItem.iban}</Typography>
-                      </ListItem>
-                    ))}
-                  </List>
-                  <List>
-                    <ListItem onClick={handleDialog}>
-                      <Icon style={{ fontSize: 35 }}>add_circle</Icon>
-                      <span className={classes.marginL10}>Add IBAN</span>
-                    </ListItem>
-                  </List>
-                </Grid>
+                {accounts.length > 0 ? (
+                  <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                      <List>
+                        {accounts.map((account) => (
+                          <ListItem>
+                            <Icon color="error">remove_circle</Icon>
+                            <Typography>{`Account: ${account.iban}`}</Typography>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Grid>
+                  </Grid>
+                ) : (
+                  <></>
+                )}
                 <Grid container spacing={4}>
                   <Grid item xs={12}>
                     <Card variant="outlined">
-                      <Grid container xs={12}>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <span style={{ fontWeight: "bold" }}>
-                            Commission rates
-                          </span>
+                      <CardContent>
+                        <Grid container spacing={4}>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Commission rates
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Input
+                                  readOnly
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  }
+                                  value={orgDetail.commissionOrganization}
+                                  onChange={handleCommission}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Clear Commission rates
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Input
+                                  readOnly
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  }
+                                  value={orgDetail.commissionClearer}
+                                  onChange={handleClearer}
+                                />
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Active Users
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  {orgDetail.userActive}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Grid container spacing={1}>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  Disabled Users
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12}>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontWeight: "bold" }}
+                                >
+                                  {orgDetail.userSuspended}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>
                         </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <span style={{ fontWeight: "bold" }}>
-                            Clear Commission rates
-                          </span>
-                        </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <Input
-                            endAdornment={
-                              <InputAdornment position="end">%</InputAdornment>
-                            }
-                            value={orgDetail.commissionOrganization}
-                            onChange={handleCommission}
-                          />
-                        </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <Input
-                            endAdornment={
-                              <InputAdornment position="end">%</InputAdornment>
-                            }
-                            value={orgDetail.commissionClearer}
-                            onChange={handleClearer}
-                          />
-                        </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <span style={{ fontWeight: "bold" }}>
-                            Active Users
-                          </span>
-                        </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <span style={{ fontWeight: "bold" }}>
-                            Disabled Users
-                          </span>
-                        </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <span style={{ fontWeight: "bold" }}>
-                            {orgDetail.userActive}
-                          </span>
-                        </Grid>
-                        <Grid item xs={6} style={{ padding: 15 }}>
-                          <span style={{ fontWeight: "bold" }}>
-                            {orgDetail.userSuspended}
-                          </span>
-                        </Grid>
-                      </Grid>
+                      </CardContent>
                     </Card>
                   </Grid>
                 </Grid>

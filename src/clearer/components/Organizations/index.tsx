@@ -24,7 +24,7 @@ const Organizations = (): React.ReactElement => {
   const history = useHistory();
 
   const newOrganizer = () => {
-    history.push("/organizations/addOrganization");
+    history.push("/organizations/add");
   };
 
   const [state, setState] = useState({
@@ -38,7 +38,7 @@ const Organizations = (): React.ReactElement => {
         render: (rowData: any) => {
           const { id, name: names } = rowData;
 
-          return <Link to={`organizations/editOrganizer/${id}`}>{names}</Link>;
+          return <Link to={`organizations/edit/${id}`}>{names}</Link>;
         },
       },
       {
