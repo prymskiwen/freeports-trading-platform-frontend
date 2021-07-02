@@ -66,6 +66,12 @@ export default [
     auth: true,
     component: lazy(() => import("../../components/Profile")),
   },
+  {
+    path: "/settings",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Settings")),
+  },
   /* {
     path: "/error",
     exact: true,l

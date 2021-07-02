@@ -6,6 +6,7 @@ import {
   AppBar,
   Badge,
   Container,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -22,6 +23,7 @@ import {
   Home,
   Notifications,
   Person,
+  Settings,
 } from "@material-ui/icons";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
@@ -173,6 +175,7 @@ const Header = ({
                     </ListItemIcon>
                     <ListItemText primary="Profile" />
                   </MenuItem>
+                  <Divider />
                   <MenuItem onClick={() => redirect("/roles")}>
                     <ListItemIcon>
                       <SendIcon fontSize="small" />
@@ -183,16 +186,21 @@ const Header = ({
                     <ListItemIcon>
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
-
                     <ListItemText primary="Co-workers" />
                   </MenuItem>
                   <MenuItem onClick={() => redirect("/desks")}>
                     <ListItemIcon>
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
-
                     <ListItemText primary="Desks" />
                   </MenuItem>
+                  <MenuItem onClick={() => redirect("/settings")}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" />
+                  </MenuItem>
+                  <Divider />
                   <MenuItem onClick={signOut}>
                     <ListItemIcon>
                       <ExitToAppIcon fontSize="small" />
