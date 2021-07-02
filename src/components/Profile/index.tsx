@@ -33,10 +33,14 @@ import {
   importPrivateKeyFromFile,
 } from "../../util/keyStore/functions";
 import defaultAvatar from "../../assets/images/profile.jpg";
+<<<<<<< HEAD
 <<<<<<< HEAD:src/components/Profile/index.tsx
 =======
 import { Vault } from "../../vault";
 >>>>>>> VAULT INCOMPLETE:src/organization/components/Profile/index.tsx
+=======
+import { Vault } from "../../vault";
+>>>>>>> VAULT INCOMPLETE
 
 const useStyles = makeStyles((theme) => ({
   saveBtn: {
