@@ -24,7 +24,7 @@ import data from "./data";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     addButton: {
-      color: theme.palette.primary.main,
+      // color: theme.palette.primary.main,
       fontWeight: "bold",
       marginRight: theme.spacing(2),
       marginLeft: theme.spacing(2),
@@ -79,16 +79,14 @@ const Investors = (): React.ReactElement => {
         <Grid container spacing={2}>
           <Grid container item alignItems="center" xs={12}>
             <Typography variant="h4">Investors</Typography>
-            <Button className={classes.addButton}>
-              <Fab
-                className="mr-10"
-                color="primary"
-                aria-label="Add"
-                size="small"
-              >
-                <AddIcon fontSize="small" />
-              </Fab>
-            </Button>
+            <Fab
+              className={`${classes.addButton} mr-10`}
+              color="primary"
+              aria-label="Add"
+              size="small"
+            >
+              <AddIcon fontSize="small" />
+            </Fab>
           </Grid>
           <Grid container item alignItems="center" justify="flex-end" xs={12}>
             <Typography variant="subtitle1">
