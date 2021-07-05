@@ -1,27 +1,38 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
-import { VaultResourceCreatedResponseDto } from "./dto/vault-resource-created.dto";
-import { GetVaultOrganizationResponseDto } from "./dto/get-vault-organizations.dto";
-import { GetVaultUsersResponseDto } from "./dto/get-vault-users.dto";
 import { VaultAccountType } from "./enum/vault-account-type";
 import { PermissionOwnerType } from "./enum/permission-owner-type";
-import sendRequest, { Method } from "../services/vaultService";
-import arrayBufferToBase64, {
-  base64ToArrayBuffer,
-} from "../util/keyStore/functions";
+import sendRequest, { Method, VaultRequestDto } from "../services/vaultService";
+import arrayBufferToBase64 from "../util/keyStore/functions";
 
 // eslint-disable-next-line no-shadow
 export enum VaultPermissions {
-  "GrantRevokePermission" = "GrantRevokePermission",
-  "CreateOrganizationUser" = "CreateOrganizationUser",
   "CreateDeleteOrganization" = "CreateDeleteOrganization",
-  "CreateDeleteUser" = "CreateDeleteUser",
-  "GetUserPermissions" = "GetUserPermissions",
-  "JoinOrganizationUser" = "JoinOrganizationUser",
-  "GetUsers" = "GetUsers",
   "GetOrganizations" = "GetOrganizations",
+  "GrantRevokeVaultPermission" = "GrantRevokeVaultPermission",
+  "AddRemoveAddress" = "AddRemoveAddress",
+  "CreateDeleteAddressBook" = "CreateDeleteAddressBook",
+  "GetAddressBookDetails" = "GetAddressBookDetails",
+  "GetAddressBooks" = "GetAddressBooks",
+  "AddRemoveUser" = "AddRemoveUser",
   "CreateDeleteGroup" = "CreateDeleteGroup",
   "GetGroups" = "GetGroups",
+  "BackupMnemonic" = "BackupMnemonic",
+  "RestoreMnemonic" = "RestoreMnemonic",
+  "GetUserPermissions" = "GetUserPermissions",
+  "GrantRevokePermission" = "GrantRevokePermission",
+  "GetPublicKey" = "GetPublicKey",
+  "CreateDeleteUser" = "CreateDeleteUser",
+  "GetUsers" = "GetUsers",
+  "GetOrganizationUsers" = "GetOrganizationUsers",
+  "WalletExecution" = "WalletExecution",
+  "Transaction" = "Transaction",
+  "CreateWallet" = "CreateWallet",
+  "DeleteWallet" = "DeleteWallet",
+  "GetWallets" = "GetWallets",
+  "GetWalletDetails" = "GetWalletDetails",
+  "CreateOrganizationUser" = "CreateOrganizationUser",
+  "JoinOrganizationUser" = "JoinOrganizationUser",
   "CreateAccount" = "CreateAccount",
   // 'Wipe' = 'Wipe',
 }
@@ -46,88 +57,56 @@ export class Vault {
 
   publicKey: string;
 
+  accessToken: string | undefined;
+
+  tokenObtainedAt = 0;
+
   private hashingAlgorithm = "SHA-256";
 
   // eslint-disable-next-line no-useless-constructor
   constructor(private privateKey: CryptoKey, private spki: ArrayBuffer) {
     this.publicKey = this.spki2String(new Uint8Array(spki));
-    console.log("publicKey", this.publicKey, privateKey);
+    (window as any).privateKey = privateKey;
   }
 
-  public async createOrganization(): Promise<VaultResourceCreatedResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.CreateDeleteOrganization,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
+  public async createOrganization(): Promise<VaultRequestDto> {
+    const request = await this.createRequest(
       Method.POST,
-      "/vault/organization",
-      true
+      "/vault/organization"
     );
-    return data;
+
+    return request;
   }
 
-  public async createVaultUser(
-    publicKey: string
-  ): Promise<VaultResourceCreatedResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.CreateDeleteUser,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
-      Method.POST,
-      "/vault/user",
-      true,
-      { publicKey }
-    );
-    return data;
+  public async createVaultUser(publicKey: string): Promise<VaultRequestDto> {
+    const request = await this.createRequest(Method.POST, "/vault/user", {
+      publicKey,
+    });
+    return request;
   }
 
   public async createOrganizationUser(
     publicKey: string
-  ): Promise<VaultResourceCreatedResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.CreateDeleteUser,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
+  ): Promise<VaultRequestDto> {
+    const request = await this.createRequest(
       Method.POST,
       "/organization/user",
-      true,
       { publicKey }
     );
-    return data;
+    return request;
   }
 
-  public async deleteVaultUser(id: string): Promise<any> {
-    await this.grantPermission(
-      VaultPermissions.CreateDeleteUser,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
-      Method.POST,
-      `/vault/user/${id}`,
-      true
-    );
-    return data;
+  public async deleteVaultUser(id: string): Promise<VaultRequestDto> {
+    const request = await this.createRequest(Method.POST, `/vault/user/${id}`);
+    return request;
   }
 
-  public async deleteOrganizationUser(id: string): Promise<any> {
-    await this.grantPermission(
-      VaultPermissions.CreateDeleteUser,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
+  public async deleteOrganizationUser(id: string): Promise<VaultRequestDto> {
+    const request = await this.createRequest(
       Method.POST,
-      `/organization/user/${id}`,
-      true
+      `/organization/user/${id}`
     );
-    return data;
+    return request;
   }
 
   public async grantAllPermissions(
@@ -150,124 +129,89 @@ export class Vault {
     );
   }
 
-  public async getAllOrganizations(): Promise<GetVaultOrganizationResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.GetOrganizations,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<GetVaultOrganizationResponseDto>(
-      Method.GET,
-      "/vault/organization",
-      true
-    );
-    return data;
+  public async getAllOrganizations(): Promise<VaultRequestDto> {
+    const request = await this.createRequest(Method.GET, "/vault/organization");
+    return request;
   }
 
-  public async getAllVaultUsers(): Promise<GetVaultUsersResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.GetUsers,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<GetVaultUsersResponseDto>(
-      Method.GET,
-      "/vault/user",
-      true
-    );
-    return data;
+  public async getAllVaultUsers(): Promise<VaultRequestDto> {
+    const request = await this.createRequest(Method.GET, "/vault/user");
+    return request;
   }
 
-  public async getAllOrganizationUsers(): Promise<GetVaultUsersResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.GetUsers,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<GetVaultUsersResponseDto>(
-      Method.GET,
-      `/organization/user`,
-      true
-    );
-    return data;
+  public async getAllOrganizationUsers(): Promise<VaultRequestDto> {
+    const request = await this.createRequest(Method.GET, `/organization/user`);
+    return request;
   }
 
   public async joinOrganizationUser(
     organization: string,
     publicKey: string
-  ): Promise<VaultResourceCreatedResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.JoinOrganizationUser,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
+  ): Promise<VaultRequestDto> {
+    const request = await this.createRequest(
       Method.POST,
       `/vault/organization/${organization}/user`,
-      true,
       { publicKey }
     );
-    return data;
+    return request;
   }
 
-  public async createAccount(
-    type: VaultAccountType
-  ): Promise<VaultResourceCreatedResponseDto> {
-    await this.grantPermission(
-      VaultPermissions.CreateAccount,
-      PermissionOwnerType.user,
-      "1"
-    );
-    const { data } = await this.sendRequest<VaultResourceCreatedResponseDto>(
+  public async createAccount(type: VaultAccountType): Promise<VaultRequestDto> {
+    const request = await this.createRequest(
       Method.POST,
       "/vault/organization/account",
-      true,
+
       { type }
     );
-    return data;
+    return request;
   }
 
   public async authenticate() {
     const {
       data: { tokenString },
     } = await this.createToken("0");
-    // this.accessToken = tokenString;
-    // axios.defaults.headers.common.authorization = tokenString;
+    this.accessToken = tokenString;
+    this.tokenObtainedAt = Date.now();
     return tokenString;
   }
 
-  private async sendRequest<T>(
+  private async createRequest(
     method: Method,
     path: string,
-    shouldHash = true,
     body?: any,
-    headers = {}
+    headers: any = {}
+  ): Promise<VaultRequestDto> {
+    if (
+      !this.accessToken ||
+      Date.now() - this.tokenObtainedAt > 14 * 60 * 60 * 1000
+    ) {
+      await this.authenticate();
+    }
+    const signature = await this.hashRequest(method, path, body);
+    return {
+      method,
+      path,
+      body,
+      headers: {
+        ...headers,
+        authorization: this.accessToken,
+        signature,
+      },
+    };
+  }
+
+  private async sendRequest<T>(
+    request: VaultRequestDto
   ): Promise<AxiosResponse<T> | any> {
     try {
-      if (shouldHash) {
-        const signature = await this.hashRequest(method, path, body);
-        console.log("signature", signature);
-        return await sendRequest({
-          method,
-          path,
-          signature,
-          body,
-          headers: { ...headers, signature },
-        });
-      }
-      return await sendRequest({
-        method,
-        path,
-        headers,
-        body,
-      });
+      return await sendRequest(request);
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error)) {
         if (error?.response?.data.message === "ExpiredToken") {
           try {
             await this.authenticate();
-            return this.sendRequest<T>(method, path, shouldHash, body, headers);
+            return this.sendRequest<T>(request);
           } catch (err) {
             console.error(err);
           }
@@ -309,14 +253,16 @@ export class Vault {
         path +
         (body ? JSON.stringify(this.orderObject(body)) : "")
     );
+    let messageString = method.toUpperCase() + this.API_PREFIX + path;
+    if (body) {
+      messageString += JSON.stringify(this.orderObject(body));
+    }
     const enc = new TextEncoder();
-    const message = enc.encode(
-      method.toUpperCase() +
-        this.API_PREFIX +
-        path +
-        (body ? JSON.stringify(this.orderObject(body)) : "")
-    );
 
+    const message = enc.encode(messageString);
+    // const message = await this.string2ArrayBuffer(messageString);
+
+    console.log("encode message", message);
     const signature = await this.signMessage(message);
 
     return signature;
@@ -330,24 +276,24 @@ export class Vault {
       organizationId,
     };
 
-    return this.sendRequest<AuthenticateResponse>(
-      Method.POST,
-      "/token",
-      true,
-      reqBody
-    );
+    return this.sendRequest<AuthenticateResponse>({
+      method: Method.POST,
+      path: "/token",
+      body: reqBody,
+    });
   }
 
-  private grantPermission(
+  private async grantPermission(
     permissionType: VaultPermissions,
     ownerType: PermissionOwnerType,
     ownerId: string
   ) {
-    return this.sendRequest(Method.POST, "/vault/permission", true, {
+    const request = await this.createRequest(Method.POST, "/vault/permission", {
       permissionType,
       ownerType,
       ownerId,
     });
+    return request;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -363,7 +309,7 @@ export class Vault {
 
   private async signMessage(message: ArrayBuffer): Promise<string> {
     console.log("sign message ", message);
-    let signature = await window.crypto.subtle.sign(
+    const signature = await window.crypto.subtle.sign(
       {
         name: "ECDSA",
         hash: { name: this.hashingAlgorithm },
@@ -372,9 +318,33 @@ export class Vault {
       message
     );
 
-    signature = new Uint8Array(signature);
+    const byteArray = new Uint8Array(signature);
+    let byteString = "";
+    for (let i = 0; i < byteArray.byteLength; i += 1) {
+      byteString += String.fromCharCode(byteArray[i]);
+    }
+    const b64Signature = window.btoa(byteString);
 
-    console.log("Signture ", arrayBufferToBase64(signature));
-    return arrayBufferToBase64(signature);
+    console.log(
+      "Signture ",
+      arrayBufferToBase64(signature),
+      signature,
+      b64Signature
+    );
+    return b64Signature;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  string2ArrayBuffer(string: string): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const bb = new Blob([string], {
+        type: "text/plain",
+      });
+      const f = new FileReader();
+      f.onload = function (e) {
+        resolve(e.target?.result as ArrayBuffer);
+      };
+      f.readAsArrayBuffer(bb);
+    });
   }
 }

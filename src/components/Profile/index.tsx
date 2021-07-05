@@ -33,14 +33,7 @@ import {
   importPrivateKeyFromFile,
 } from "../../util/keyStore/functions";
 import defaultAvatar from "../../assets/images/profile.jpg";
-<<<<<<< HEAD
-<<<<<<< HEAD:src/components/Profile/index.tsx
-=======
 import { Vault } from "../../vault";
->>>>>>> VAULT INCOMPLETE:src/organization/components/Profile/index.tsx
-=======
-import { Vault } from "../../vault";
->>>>>>> VAULT INCOMPLETE
 
 const useStyles = makeStyles((theme) => ({
   saveBtn: {
@@ -124,13 +117,11 @@ const Profile = (): React.ReactElement => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   useEffect(() => {
-    console.log("key list effect");
     if (keyList[0] && keyList[0].privateKey) {
       const vault = new Vault(keyList[0].privateKey, keyList[0].spki);
-      console.log("vault ", vault);
+
       const getToken = async () => {
         const results = await vault.authenticate();
-        console.log("resutls ", results);
       };
 
       getToken();

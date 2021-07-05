@@ -39,7 +39,6 @@ const createDataUrlFromByteArray = (byteArray: Uint8Array): string => {
 
   const pemExported = `-----BEGIN PUBLIC KEY-----\n${exportedAsBase64}\n-----END PUBLIC KEY-----`;
 
-  console.log("binaryString ", exportedAsBase64);
   return `data:application/octet-stream;base64,${btoa(pemExported)}`;
 };
 
@@ -190,4 +189,5 @@ export {
   importPrivateKeyFromFile,
   generateAndSaveKeyPair,
   generatePublicKeyFromPrivateKey,
+  str2ab,
 };
