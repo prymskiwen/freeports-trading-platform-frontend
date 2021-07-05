@@ -240,12 +240,7 @@ const Settings = (): React.ReactElement => {
           <CardContent>
             <Grid container spacing={4}>
               <Grid item xs={6}>
-                <Grid
-                  container
-                  justify="space-between"
-                  alignItems="center"
-                  spacing={4}
-                >
+                <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField
                       InputProps={{
@@ -258,24 +253,19 @@ const Settings = (): React.ReactElement => {
                       fullWidth
                     />
                   </Grid>
-                </Grid>
-                {accounts.length > 0 ? (
-                  <Grid container spacing={4}>
-                    <Grid item xs={12}>
-                      <List>
-                        {accounts.map((account) => (
-                          <ListItem>
-                            <Icon color="error">remove_circle</Icon>
+                  <Grid item xs={12}>
+                    {accounts.length > 0 ? (
+                      <Grid container spacing={1}>
+                        <Grid item xs={12}>
+                          {accounts.map((account) => (
                             <Typography>{`Account: ${account.iban}`}</Typography>
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Grid>
+                          ))}
+                        </Grid>
+                      </Grid>
+                    ) : (
+                      <></>
+                    )}
                   </Grid>
-                ) : (
-                  <></>
-                )}
-                <Grid container spacing={4}>
                   <Grid item xs={12}>
                     <Card variant="outlined">
                       <CardContent>

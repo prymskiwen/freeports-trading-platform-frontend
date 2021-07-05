@@ -102,7 +102,7 @@ function useOrganization(): any {
   const addOrganization = async (
     name: string,
     street: string,
-    street1: string,
+    street2: string,
     zip: string,
     city: string,
     country: string,
@@ -114,7 +114,7 @@ function useOrganization(): any {
     const newOrganization = await addOrganizer(
       name,
       street,
-      street1,
+      street2,
       zip,
       city,
       country,

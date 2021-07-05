@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -7,25 +8,38 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
+  CircularProgress,
   Container,
   Divider,
+  FormControl,
   Grid,
   IconButton,
-  List,
-  ListItem,
   Input,
   InputAdornment,
+  List,
+  ListItem,
+  MenuItem,
+  Select,
+  Snackbar,
   TextField,
   Typography,
 } from "@material-ui/core";
 import { AddCircle, RemoveCircle } from "@material-ui/icons";
+import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import ImageUploader from "react-images-upload";
 import { useParams, useHistory } from "react-router";
 
 import Manager from "../Manager";
-import { useOrganization } from "../../../../hooks";
+import { useAccounts, useOrganization } from "../../../../hooks";
 
 interface accountType {
+  id: string;
+  name: string;
+  currency: string;
+  type: string;
+  iban: string;
+}
+interface assignedAccountType {
   currency: string;
   iban: string;
   account: string;
@@ -67,16 +81,32 @@ const useStyle = makeStyles((theme) => ({
   iconButton: {
     padding: 0,
   },
+  progressButtonWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  progressButton: {
+    color: theme.palette.primary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
+
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+};
 
 const EditOrganizer = (): React.ReactElement => {
   const { id }: any = useParams();
   const history = useHistory();
   const classes = useStyle();
+  const { allAccounts, assignAccount, unassignAccount } = useAccounts();
   const showingIcon = false;
   const { getOrganizerdetail, getManagers, updateOrganization } =
     useOrganization();
-  const [isEditable, setIsEditable] = useState(false);
   const [orgDetail, setOrgDetail] = useState({
     id: "",
     name: "",
@@ -89,14 +119,27 @@ const EditOrganizer = (): React.ReactElement => {
     accountList: [],
   });
   const [managers, setManagers] = useState([] as managerType[]);
-  const [accounts, setAccounts] = useState<Array<accountType>>([]);
+  const [assignedAccounts, setAssignedAccounts] = useState<
+    Array<assignedAccountType>
+  >([]);
+  const [selectedAccounts, setSelectedAccounts] = useState([] as string[]);
+  const [accounts, setAccounts] = useState([] as accountType[]);
+  const [loading, setLoading] = useState(false);
+  const [submitResponse, setSubmitResponse] = useState({
+    type: "success",
+    message: "",
+  });
+  const [showAlert, setShowAlert] = useState(false);
+  const timer = React.useRef<number>();
 
   useEffect(() => {
     let mounted = false;
     const init = async () => {
+      const all = await allAccounts(); // get all clearer accounts
       const detail = await getOrganizerdetail(id);
       const managerList = await getManagers(id);
       if (!mounted) {
+        setAccounts(all);
         setOrgDetail({
           id: detail.id,
           name: detail.name,
@@ -108,7 +151,7 @@ const EditOrganizer = (): React.ReactElement => {
           userSuspended: detail.userSuspended,
           accountList: detail.clearing,
         });
-        setAccounts(detail.clearing);
+        setAssignedAccounts(detail.clearing);
         setManagers(managerList);
       }
     };
@@ -156,15 +199,10 @@ const EditOrganizer = (): React.ReactElement => {
     setOrgDetail(newOrgDetail);
   };
 
-  const onStartEdit = () => {
-    if (isEditable) {
-      setIsEditable(false);
-    } else {
-      setIsEditable(true);
-    }
-  };
-
   const onHandleUpdate = async () => {
+    setLoading(true);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
     await updateOrganization(
       id,
       orgDetail.createdAt,
@@ -175,8 +213,15 @@ const EditOrganizer = (): React.ReactElement => {
     )
       .then((data: any) => {
         const responseId = data.id;
-        console.log(responseId);
-        history.push("/organizations");
+        setSubmitResponse({
+          type: "success",
+          message: "Organization has been updated successfully.",
+        });
+        setShowAlert(true);
+        timer.current = window.setTimeout(() => {
+          setLoading(false);
+          history.push("/organizations");
+        }, 2000);
       })
       .catch((err: any) => {
         console.log(err);
@@ -185,6 +230,85 @@ const EditOrganizer = (): React.ReactElement => {
 
   const newManager = async () => {
     history.push(`/organizations/${id}/managers/add`);
+  };
+
+  const onHandleAccountSelect = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    const { value } = event.target;
+    setSelectedAccounts(value as string[]);
+  };
+
+  const onHandleAccountsAssign = async () => {
+    const newAccounts = [...assignedAccounts];
+
+    setLoading(true);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
+    selectedAccounts.map(async (item) => {
+      await assignAccount(id, item)
+        .then((data: string) => {
+          const itemObjects = accounts.filter(
+            (acc: accountType) => acc.id === item
+          );
+          if (itemObjects.length) {
+            newAccounts.push({
+              account: itemObjects[0].id,
+              iban: itemObjects[0].iban,
+              currency: itemObjects[0].currency,
+            });
+          }
+        })
+        .catch((err: any) => {
+          setLoading(false);
+          setSubmitResponse({
+            type: "error",
+            message: err.message,
+          });
+          setShowAlert(true);
+        });
+    });
+    setLoading(false);
+    setSubmitResponse({
+      type: "success",
+      message: "Accounts has been assigned successfully.",
+    });
+    setShowAlert(true);
+    setAssignedAccounts(newAccounts);
+    setSelectedAccounts([]);
+  };
+
+  const onHandleAccountUnassign = async (accountId: string) => {
+    setLoading(true);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
+    await unassignAccount(id, accountId)
+      .then(() => {
+        setLoading(false);
+        setSubmitResponse({
+          type: "success",
+          message: "Account has been unassigned successfully.",
+        });
+        setShowAlert(true);
+        const newAccounts = assignedAccounts.filter(
+          (item: assignedAccountType) => item.account !== accountId
+        );
+        setAssignedAccounts(newAccounts);
+      })
+      .catch((err: any) => {
+        setLoading(false);
+        setSubmitResponse({
+          type: "error",
+          message: err.message,
+        });
+        setShowAlert(true);
+      });
+
+    setSelectedAccounts([]);
+  };
+
+  const handleAlertClose = () => {
+    setShowAlert(false);
   };
 
   return (
@@ -209,165 +333,248 @@ const EditOrganizer = (): React.ReactElement => {
               />
               <Divider />
               <CardContent>
-                <Grid container direction="row">
-                  <TextField
-                    type="text"
-                    value={orgDetail.name}
-                    label="Nickname"
-                    variant="outlined"
-                    onChange={onHandleNameChange}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <List>
-                    {accounts.map((account) => (
-                      <ListItem>
-                        <IconButton
-                          color="primary"
-                          aria-label="Unassign account"
-                          component="span"
-                        >
-                          <RemoveCircle />
-                        </IconButton>
-                        <Typography variant="body2">{`Account: ${account.iban}`}</Typography>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Logo</Typography>
-                  <Grid container justify="center">
-                    <Grid item xs={6}>
-                      <CardMedia
-                        style={{ marginTop: 20 }}
-                        component="img"
-                        height="140"
-                        image={orgDetail.logo}
-                      />
-                      <ImageUploader
-                        withIcon={showingIcon}
-                        withLabel={showingIcon}
-                        buttonText="Choose Image"
-                        onChange={(ChangeEvent) => onDrop(ChangeEvent)}
-                        buttonStyles={{
-                          width: "100%",
-                        }}
-                        fileContainerStyle={{
-                          margin: 0,
-                          padding: 0,
-                        }}
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Grid container direction="row">
+                      <TextField
+                        type="text"
+                        value={orgDetail.name}
+                        label="Nickname"
+                        variant="outlined"
+                        onChange={onHandleNameChange}
+                        fullWidth
                       />
                     </Grid>
                   </Grid>
-                </Grid>
-                <Grid container spacing={4}>
                   <Grid item xs={12}>
-                    <Card variant="outlined">
-                      <CardContent>
-                        <Grid container spacing={4}>
-                          <Grid item xs={6}>
-                            <Grid container spacing={1}>
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  style={{ fontWeight: "bold" }}
-                                >
-                                  Commission rates
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <Input
-                                  endAdornment={
-                                    <InputAdornment position="end">
-                                      %
-                                    </InputAdornment>
+                    <Grid container spacing={1}>
+                      <Grid item xs={12}>
+                        <Grid container spacing={1} alignItems="center">
+                          <Grid item xs={9}>
+                            <FormControl fullWidth variant="outlined">
+                              <Select
+                                multiple
+                                displayEmpty
+                                value={selectedAccounts}
+                                onChange={onHandleAccountSelect}
+                                renderValue={(selected: any) => {
+                                  if (selected.length === 0) {
+                                    return <em>Nostro accounts</em>;
                                   }
-                                  value={orgDetail.commissionOrganization}
-                                  onChange={onHandleOrganizationCommission}
+
+                                  return selected.join(", ");
+                                }}
+                              >
+                                <MenuItem disabled value="">
+                                  <em>Nostro accounts</em>
+                                </MenuItem>
+                                {accounts
+                                  .filter(
+                                    // filter assigned accounts from list
+                                    (item: accountType) =>
+                                      assignedAccounts.filter(
+                                        (account: assignedAccountType) =>
+                                          account.account === item.id
+                                      ).length === 0
+                                  )
+                                  .map((item: accountType) => (
+                                    <MenuItem key={item.id} value={item.id}>
+                                      {item.name}
+                                    </MenuItem>
+                                  ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={3}>
+                            <div className={classes.progressButtonWrapper}>
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={onHandleAccountsAssign}
+                                disabled={loading}
+                                fullWidth
+                              >
+                                Assign
+                              </Button>
+                              {loading && (
+                                <CircularProgress
+                                  size={24}
+                                  className={classes.progressButton}
                                 />
-                              </Grid>
-                            </Grid>
+                              )}
+                            </div>
                           </Grid>
-                          <Grid item xs={6}>
-                            <Grid container spacing={1}>
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  style={{ fontWeight: "bold" }}
-                                >
-                                  Clear Commission rates
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <Input
-                                  endAdornment={
-                                    <InputAdornment position="end">
-                                      %
-                                    </InputAdornment>
-                                  }
-                                  value={orgDetail.commissionClearer}
-                                  onChange={onHandleClearerCommission}
-                                />
-                              </Grid>
+                        </Grid>
+                      </Grid>
+                      {assignedAccounts.map((account: assignedAccountType) => (
+                        <Grid item xs={12} key={account.account}>
+                          <Grid container spacing={1} alignItems="center">
+                            <Grid item>
+                              <IconButton
+                                color="primary"
+                                aria-label="Unassign account"
+                                component="span"
+                                className={classes.iconButton}
+                                onClick={() =>
+                                  onHandleAccountUnassign(account.account)
+                                }
+                              >
+                                <RemoveCircle />
+                              </IconButton>
                             </Grid>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Grid container spacing={1}>
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  style={{ fontWeight: "bold" }}
-                                >
-                                  Active Users
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  style={{ fontWeight: "bold" }}
-                                >
-                                  {orgDetail.userActive}
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Grid container spacing={1}>
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  style={{ fontWeight: "bold" }}
-                                >
-                                  Disabled Users
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12}>
-                                <Typography
-                                  variant="body2"
-                                  style={{ fontWeight: "bold" }}
-                                >
-                                  {orgDetail.userSuspended}
-                                </Typography>
-                              </Grid>
+                            <Grid item>
+                              <Typography variant="body2">{`Account: ${account.iban}`}</Typography>
                             </Grid>
                           </Grid>
                         </Grid>
-                      </CardContent>
-                    </Card>
+                      ))}
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="h6">Logo</Typography>
+                    <Grid container justify="center">
+                      <Grid item xs={6}>
+                        <CardMedia
+                          style={{ marginTop: 20 }}
+                          component="img"
+                          height="140"
+                          image={orgDetail.logo}
+                        />
+                        <ImageUploader
+                          withIcon={showingIcon}
+                          withLabel={showingIcon}
+                          buttonText="Choose Image"
+                          onChange={(ChangeEvent) => onDrop(ChangeEvent)}
+                          buttonStyles={{
+                            width: "100%",
+                          }}
+                          fileContainerStyle={{
+                            margin: 0,
+                            padding: 0,
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Grid container spacing={4}>
+                      <Grid item xs={12}>
+                        <Card variant="outlined">
+                          <CardContent>
+                            <Grid container spacing={4}>
+                              <Grid item xs={6}>
+                                <Grid container spacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      style={{ fontWeight: "bold" }}
+                                    >
+                                      Commission rates
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Input
+                                      endAdornment={
+                                        <InputAdornment position="end">
+                                          %
+                                        </InputAdornment>
+                                      }
+                                      value={orgDetail.commissionOrganization}
+                                      onChange={onHandleOrganizationCommission}
+                                    />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Grid container spacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      style={{ fontWeight: "bold" }}
+                                    >
+                                      Clear Commission rates
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Input
+                                      endAdornment={
+                                        <InputAdornment position="end">
+                                          %
+                                        </InputAdornment>
+                                      }
+                                      value={orgDetail.commissionClearer}
+                                      onChange={onHandleClearerCommission}
+                                    />
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Grid container spacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      style={{ fontWeight: "bold" }}
+                                    >
+                                      Active Users
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      style={{ fontWeight: "bold" }}
+                                    >
+                                      {orgDetail.userActive}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Grid container spacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      style={{ fontWeight: "bold" }}
+                                    >
+                                      Disabled Users
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      variant="body2"
+                                      style={{ fontWeight: "bold" }}
+                                    >
+                                      {orgDetail.userSuspended}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </Grid>
+                            </Grid>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </CardContent>
               <Divider />
               <CardActions>
                 <Grid container item justify="flex-end" xs={12}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={onHandleUpdate}
-                  >
-                    SAVE CHANGES
-                  </Button>
+                  <div className={classes.progressButtonWrapper}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={onHandleUpdate}
+                      disabled={loading}
+                    >
+                      SAVE CHANGES
+                    </Button>
+                    {loading && (
+                      <CircularProgress
+                        size={24}
+                        className={classes.progressButton}
+                      />
+                    )}
+                  </div>
                 </Grid>
               </CardActions>
             </Card>
@@ -407,6 +614,21 @@ const EditOrganizer = (): React.ReactElement => {
                 </Grid>
               </CardContent>
             </Card>
+            <Snackbar
+              autoHideDuration={2000}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              open={showAlert}
+              onClose={handleAlertClose}
+            >
+              <Alert
+                onClose={handleAlertClose}
+                severity={
+                  submitResponse.type === "success" ? "success" : "error"
+                }
+              >
+                {submitResponse.message}
+              </Alert>
+            </Snackbar>
           </Grid>
         </Grid>
       </Container>
