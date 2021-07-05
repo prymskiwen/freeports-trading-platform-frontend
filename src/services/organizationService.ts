@@ -115,7 +115,7 @@ const updateOrganizerManager = (
 const addOrganizer = (
   name: string,
   street: string,
-  street1: string,
+  street2: string,
   zip: string,
   city: string,
   country: string,
@@ -128,7 +128,7 @@ const addOrganizer = (
       .post(`/organization`, {
         name,
         street,
-        street1,
+        street2,
         zip,
         city,
         country,

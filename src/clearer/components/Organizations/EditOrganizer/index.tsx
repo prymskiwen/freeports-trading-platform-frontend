@@ -76,7 +76,6 @@ const EditOrganizer = (): React.ReactElement => {
   const showingIcon = false;
   const { getOrganizerdetail, getManagers, updateOrganization } =
     useOrganization();
-  const [isEditable, setIsEditable] = useState(false);
   const [orgDetail, setOrgDetail] = useState({
     id: "",
     name: "",
@@ -156,14 +155,6 @@ const EditOrganizer = (): React.ReactElement => {
     setOrgDetail(newOrgDetail);
   };
 
-  const onStartEdit = () => {
-    if (isEditable) {
-      setIsEditable(false);
-    } else {
-      setIsEditable(true);
-    }
-  };
-
   const onHandleUpdate = async () => {
     await updateOrganization(
       id,
@@ -175,7 +166,6 @@ const EditOrganizer = (): React.ReactElement => {
     )
       .then((data: any) => {
         const responseId = data.id;
-        console.log(responseId);
         history.push("/organizations");
       })
       .catch((err: any) => {
