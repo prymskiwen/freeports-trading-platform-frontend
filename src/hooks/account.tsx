@@ -1,6 +1,7 @@
 import {
   getAllAccounts,
   assignOrganizationAccount,
+  unassignOrganizationAccount,
 } from "../services/accountService";
 
 function useAccounts(): any {
@@ -10,6 +11,7 @@ function useAccounts(): any {
     });
     return accounts;
   };
+
   const assignAccount = async (
     organizerId: string,
     accountId: string
@@ -23,7 +25,18 @@ function useAccounts(): any {
       });
     return assign;
   };
-  return { allAccounts, assignAccount };
+
+  const unassignAccount = async (
+    organizerId: string,
+    accountId: string
+  ): Promise<any> => {
+    const unassign = await unassignOrganizationAccount(organizerId, accountId)
+      .then((data: any) => data)
+      .catch((err) => console.log(err));
+    return unassign;
+  };
+
+  return { allAccounts, assignAccount, unassignAccount };
 }
 
 export default useAccounts;

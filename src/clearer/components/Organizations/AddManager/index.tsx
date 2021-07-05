@@ -106,7 +106,7 @@ const AddManager = (): React.ReactElement => {
       managerAvatar
     ).then((res: any) => {
       console.log(res);
-      history.push(`/organizations/editOrganizer/${organizationId}`);
+      history.push(`/organizations/edit/${organizationId}`);
     });
   };
 
