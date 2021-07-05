@@ -10,8 +10,10 @@ export interface VaultRequestDto {
   method: Method;
   path: string;
   body?: any;
-  signature?: string;
-  headers?: any;
+  headers?: {
+    signature?: string;
+    authorization?: string;
+  };
 }
 const sendRequest = (request: VaultRequestDto): Promise<any> => {
   return new Promise((resolve, reject) => {
