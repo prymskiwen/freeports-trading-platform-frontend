@@ -37,7 +37,6 @@ const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
   { title: `Organizations`, path: `/organizations`, hasChildren: false },
   { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
-  { title: `Tracking`, path: `/tracking`, hasChildren: true },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {

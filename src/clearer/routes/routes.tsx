@@ -56,12 +56,6 @@ export default [
     ),
   },
   {
-    path: "/tracking",
-    exact: true,
-    auth: true,
-    component: lazy(() => import("../components/Tracking")),
-  },
-  {
     path: "/roles",
     exact: true,
     auth: true,
@@ -96,6 +90,12 @@ export default [
     exact: true,
     auth: true,
     component: lazy(() => import("../../components/Profile")),
+  },
+  {
+    path: "/settings",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Settings")),
   },
   /* {
     path: "/error",
