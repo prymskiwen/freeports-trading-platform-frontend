@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -7,7 +8,7 @@ import {
   AccordionSummary,
   Avatar,
   Button,
-  CardMedia,
+  CircularProgress,
   Divider,
   FormControl,
   Grid,
@@ -18,7 +19,6 @@ import {
   Typography,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ImageUploader from "react-images-upload";
 
 import { useOrganization } from "../../../../hooks";
 
@@ -61,6 +61,18 @@ const useStyle = makeStyles((theme) => ({
     left: 0,
     cursor: "pointer",
   },
+  progressButtonWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  progressButton: {
+    color: theme.palette.primary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 interface managerType {
@@ -73,14 +85,7 @@ interface managerType {
 
 const Manager = (props: any): React.ReactElement => {
   const classes = useStyle();
-  const showingIcon = false;
-  const {
-    getOrganizedManager,
-    updateOrganizationManager,
-    suspendOrganizationManager,
-    resumeOrganizationManager,
-  } = useOrganization();
-  const [organizerId, setOrganizerId] = useState();
+  const { getOrganizedManager } = useOrganization();
   const [organizerStatus, setOrganizerStatus] = useState(true);
   const [manager, setManager] = useState({
     id: "string",
@@ -89,29 +94,25 @@ const Manager = (props: any): React.ReactElement => {
     phone: "string",
     avatar: "/assets/user4.png",
   });
+  const { orgId, managerId, managerUpdating, onHandleManagerUpdate } = props;
 
   useEffect(() => {
     let mounted = false;
     const init = async () => {
-      const managerdata = await getOrganizedManager(
-        props.organizerid,
-        props.managerid
-      );
+      const managerData = await getOrganizedManager(orgId, managerId);
 
       if (!mounted) {
-        setOrganizerId(props.organizerid);
         setManager({
-          id: managerdata.id,
-          nickname: managerdata.nickname,
-          email: managerdata.email,
-          phone: managerdata.phone,
-          avatar: managerdata.avatar,
+          id: managerData.id,
+          nickname: managerData.nickname,
+          email: managerData.email,
+          phone: managerData.phone,
+          avatar: managerData.avatar,
         });
-        console.log(managerdata.suspended);
-        if (managerdata.suspended === "undefined") {
+        if (managerData.suspended === "undefined") {
           setOrganizerStatus(true);
         } else {
-          setOrganizerStatus(!managerdata.suspended);
+          setOrganizerStatus(!managerData.suspended);
         }
       }
     };
@@ -149,43 +150,12 @@ const Manager = (props: any): React.ReactElement => {
     setManager(newManager);
   };
 
-  const ondropAvatar = (avataImg: any) => {
-    const reader = new FileReader();
-    reader.onload = (event: any) => {
-      const newManager = { ...manager };
-      newManager.avatar = event.target.result;
-      setManager(newManager);
-    };
-    reader.readAsDataURL(avataImg[0]);
-  };
-
   const updateSubmit = async () => {
-    await updateOrganizationManager(
-      organizerId,
-      manager.id,
-      manager.nickname,
-      manager.email,
-      manager.phone,
-      manager.avatar
-    )
-      .then((data: any) => {
-        console.log(data);
-        alert("Saved");
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
-
-    if (organizerStatus === true) {
-      await resumeOrganizationManager(organizerId, manager.id);
-    } else {
-      await suspendOrganizationManager(organizerId, manager.id);
-    }
+    onHandleManagerUpdate(manager);
   };
 
   const onHandleStatus = async (event: React.ChangeEvent<any>) => {
     const { value } = event.target;
-    console.log(value);
     setOrganizerStatus(value);
   };
 
@@ -236,34 +206,6 @@ const Manager = (props: any): React.ReactElement => {
       <AccordionDetails>
         <Grid container spacing={1} xs={12}>
           <Grid item container justify="center" xs={12}>
-            {/* <Grid item xs={4}>
-              <CardMedia
-                style={{ marginTop: 20 }}
-                component="img"
-                height="140"
-                image={manager.avatar}
-              />
-              <ImageUploader
-                withIcon={showingIcon}
-                withLabel={showingIcon}
-                buttonText="Choose Image"
-                buttonStyles={{
-                  width: "100%",
-                  margin: 0,
-                  background: "#fff0",
-                  color: "#000",
-                }}
-                onChange={(ChangeEvent) => ondropAvatar(ChangeEvent)}
-                fileContainerStyle={{
-                  margin: 0,
-                  padding: 0,
-                  marginTop: "-25px",
-                  background: "#fff9",
-                  borderRadius: 0,
-                }}
-              />
-            </Grid>
-           */}
             <div className={classes.profileImageContainer}>
               <Avatar
                 src={manager.avatar}
@@ -332,9 +274,19 @@ const Manager = (props: any): React.ReactElement => {
       <Divider />
       <AccordionActions>
         <Grid item container xs={8} justify="flex-end">
-          <Button variant="contained" color="primary" onClick={updateSubmit}>
-            Save Changes
-          </Button>
+          <div className={classes.progressButtonWrapper}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={updateSubmit}
+              disabled={managerUpdating}
+            >
+              Save Changes
+            </Button>
+            {managerUpdating && (
+              <CircularProgress size={24} className={classes.progressButton} />
+            )}
+          </div>
         </Grid>
       </AccordionActions>
     </Accordion>

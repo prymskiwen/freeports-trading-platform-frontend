@@ -105,8 +105,14 @@ const EditOrganizer = (): React.ReactElement => {
   const classes = useStyle();
   const { allAccounts, assignAccount, unassignAccount } = useAccounts();
   const showingIcon = false;
-  const { getOrganizerdetail, getManagers, updateOrganization } =
-    useOrganization();
+  const {
+    getOrganizerdetail,
+    getManagers,
+    updateOrganization,
+    updateOrganizationManager,
+    suspendOrganizationManager,
+    resumeOrganizationManager,
+  } = useOrganization();
   const [orgDetail, setOrgDetail] = useState({
     id: "",
     name: "",
@@ -124,7 +130,10 @@ const EditOrganizer = (): React.ReactElement => {
   >([]);
   const [selectedAccounts, setSelectedAccounts] = useState([] as string[]);
   const [accounts, setAccounts] = useState([] as accountType[]);
-  const [loading, setLoading] = useState(false);
+  const [orgUpdating, setOrgUpdating] = useState(false);
+  const [assigning, setAssigning] = useState(false);
+  const [unassigning, setUnassigning] = useState(false);
+  const [managerUpdating, setManagerUpdating] = useState(false);
   const [submitResponse, setSubmitResponse] = useState({
     type: "success",
     message: "",
@@ -200,7 +209,7 @@ const EditOrganizer = (): React.ReactElement => {
   };
 
   const onHandleUpdate = async () => {
-    setLoading(true);
+    setOrgUpdating(true);
     setShowAlert(false);
     setSubmitResponse({ type: "", message: "" });
     await updateOrganization(
@@ -213,13 +222,14 @@ const EditOrganizer = (): React.ReactElement => {
     )
       .then((data: any) => {
         const responseId = data.id;
+        setOrgUpdating(false);
         setSubmitResponse({
           type: "success",
           message: "Organization has been updated successfully.",
         });
         setShowAlert(true);
         timer.current = window.setTimeout(() => {
-          setLoading(false);
+          setOrgUpdating(false);
           history.push("/organizations");
         }, 2000);
       })
@@ -242,7 +252,7 @@ const EditOrganizer = (): React.ReactElement => {
   const onHandleAccountsAssign = async () => {
     const newAccounts = [...assignedAccounts];
 
-    setLoading(true);
+    setAssigning(true);
     setShowAlert(false);
     setSubmitResponse({ type: "", message: "" });
     selectedAccounts.map(async (item) => {
@@ -260,7 +270,7 @@ const EditOrganizer = (): React.ReactElement => {
           }
         })
         .catch((err: any) => {
-          setLoading(false);
+          setAssigning(false);
           setSubmitResponse({
             type: "error",
             message: err.message,
@@ -268,7 +278,7 @@ const EditOrganizer = (): React.ReactElement => {
           setShowAlert(true);
         });
     });
-    setLoading(false);
+    setAssigning(false);
     setSubmitResponse({
       type: "success",
       message: "Accounts has been assigned successfully.",
@@ -279,12 +289,12 @@ const EditOrganizer = (): React.ReactElement => {
   };
 
   const onHandleAccountUnassign = async (accountId: string) => {
-    setLoading(true);
+    setUnassigning(true);
     setShowAlert(false);
     setSubmitResponse({ type: "", message: "" });
     await unassignAccount(id, accountId)
       .then(() => {
-        setLoading(false);
+        setUnassigning(false);
         setSubmitResponse({
           type: "success",
           message: "Account has been unassigned successfully.",
@@ -296,7 +306,7 @@ const EditOrganizer = (): React.ReactElement => {
         setAssignedAccounts(newAccounts);
       })
       .catch((err: any) => {
-        setLoading(false);
+        setUnassigning(false);
         setSubmitResponse({
           type: "error",
           message: err.message,
@@ -309,6 +319,41 @@ const EditOrganizer = (): React.ReactElement => {
 
   const handleAlertClose = () => {
     setShowAlert(false);
+  };
+
+  const onHandleManagerUpdate = async (manager: any) => {
+    setManagerUpdating(true);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
+    await updateOrganizationManager(
+      id,
+      manager.id,
+      manager.nickname,
+      manager.email,
+      manager.phone,
+      manager.avatar
+    )
+      .then(async (data: string) => {
+        if (manager.suspended === "undefined") {
+          await resumeOrganizationManager(id, manager.id);
+        } else {
+          await suspendOrganizationManager(id, manager.id);
+        }
+        setManagerUpdating(false);
+        setSubmitResponse({
+          type: "success",
+          message: "Manager has been updated successfully.",
+        });
+        setShowAlert(true);
+      })
+      .catch((err: any) => {
+        setManagerUpdating(false);
+        setSubmitResponse({
+          type: "error",
+          message: err.message,
+        });
+        setShowAlert(true);
+      });
   };
 
   return (
@@ -391,12 +436,12 @@ const EditOrganizer = (): React.ReactElement => {
                                 variant="contained"
                                 color="primary"
                                 onClick={onHandleAccountsAssign}
-                                disabled={loading}
+                                disabled={assigning}
                                 fullWidth
                               >
                                 Assign
                               </Button>
-                              {loading && (
+                              {assigning && (
                                 <CircularProgress
                                   size={24}
                                   className={classes.progressButton}
@@ -418,6 +463,7 @@ const EditOrganizer = (): React.ReactElement => {
                                 onClick={() =>
                                   onHandleAccountUnassign(account.account)
                                 }
+                                disabled={unassigning}
                               >
                                 <RemoveCircle />
                               </IconButton>
@@ -564,11 +610,11 @@ const EditOrganizer = (): React.ReactElement => {
                       variant="contained"
                       color="primary"
                       onClick={onHandleUpdate}
-                      disabled={loading}
+                      disabled={orgUpdating}
                     >
                       SAVE CHANGES
                     </Button>
-                    {loading && (
+                    {orgUpdating && (
                       <CircularProgress
                         size={24}
                         className={classes.progressButton}
@@ -607,7 +653,12 @@ const EditOrganizer = (): React.ReactElement => {
                   <List>
                     {managers.map((managerItem) => (
                       <ListItem key={managerItem.id}>
-                        <Manager organizerid={id} managerid={managerItem.id} />
+                        <Manager
+                          orgId={id}
+                          managerId={managerItem.id}
+                          onHandleManagerUpdate={onHandleManagerUpdate}
+                          managerUpdating={managerUpdating}
+                        />
                       </ListItem>
                     ))}
                   </List>
