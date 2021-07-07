@@ -17,7 +17,7 @@ const getAllAccounts = (): Promise<Account[]> => {
 const createAccount = (account: Account): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .put(`/account`, account)
+      .post(`/account`, account)
       .then((res: any) => {
         return resolve(res.data);
       })

@@ -1,4 +1,4 @@
-import { takeEvery, call, put } from "redux-saga/effects";
+import { takeEvery, takeLatest, call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import Account from "../../../../types/Account";
 
@@ -30,6 +30,6 @@ export function* addAccount({
   }
 }
 export function* accountsSaga(): Generator<any> {
-  yield takeEvery(actions.getAccounts, getAccounts);
+  yield takeLatest(actions.getAccounts, getAccounts);
   yield takeEvery(actions.addAccount, addAccount);
 }

@@ -40,6 +40,13 @@ const columns = [
     },
   },
   {
+    field: "iban",
+    title: "IBAN",
+    cellStyle: {
+      width: "15%",
+    },
+  },
+  {
     field: "balance",
     title: "Balance",
     cellStyle: {
