@@ -2,21 +2,15 @@ import React from "react";
 import {
   Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Fab,
-  Grid, IconButton,
+  Grid,
+  IconButton,
   makeStyles,
-  MenuItem,
-  TextField, Typography,
+  Typography,
 } from "@material-ui/core";
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import EditIcon from '@material-ui/icons/Edit';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import FlashOnIcon from '@material-ui/icons/FlashOn';
-import purple from "@material-ui/core/colors/purple";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
+import EditIcon from "@material-ui/icons/Edit";
+import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+import FlashOnIcon from "@material-ui/icons/FlashOn";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -25,7 +19,11 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import List from "@material-ui/core/List";
 
-import { data, pendingReconciliationsData, passedTransactionsData } from "../data";
+import {
+  data,
+  pendingReconciliationsData,
+  passedTransactionsData,
+} from "../data";
 
 const pendingReconciliationColumns = [
   {
@@ -122,7 +120,6 @@ const useStyles = makeStyles({
     marginRight: "20px",
   },
 });
-console.log(useStyles);
 
 const accounts = [
   { name: "Account name ", id: 1 },
@@ -135,7 +132,7 @@ const accounts = [
   { name: "Account name ", id: 8 },
 ];
 
-const NostroAccountDetails = (): React.ReactElement => {
+const Detail = (): React.ReactElement => {
   const classes = useStyles();
   const [declareAccountModalOpen, setDeclareAccountModalOpen] =
     React.useState(false);
@@ -152,19 +149,21 @@ const NostroAccountDetails = (): React.ReactElement => {
     <div className="main-wrapper">
       <Container maxWidth="xl">
         <Grid container spacing={3}>
-          <Grid container item justify="space-between" alignItems="center" xs={12}>
+          <Grid
+            container
+            item
+            justify="space-between"
+            alignItems="center"
+            xs={12}
+          >
             <Grid item>
               <IconButton color="inherit" aria-label="Add Role">
                 <ArrowBackIosIcon fontSize="large" color="primary" />
               </IconButton>
             </Grid>
             <Grid item>
-              <Typography variant="h5">
-                ACCOUNT NAME
-              </Typography>
-              <Typography>
-                Balance: CHF 1’458’742.45
-              </Typography>
+              <Typography variant="h5">ACCOUNT NAME</Typography>
+              <Typography>Balance: CHF 1’458’742.45</Typography>
             </Grid>
             <Grid item>
               <Typography>
@@ -181,7 +180,10 @@ const NostroAccountDetails = (): React.ReactElement => {
                 color="primary"
                 className={classes.importButton}
               >
-                <InsertDriveFileIcon fontSize="small" style={{ color: "white" }} />
+                <InsertDriveFileIcon
+                  fontSize="small"
+                  style={{ color: "white" }}
+                />
                 IMPORT OPERATIONS
               </Button>
               <Button
@@ -235,4 +237,4 @@ const NostroAccountDetails = (): React.ReactElement => {
   );
 };
 
-export default NostroAccountDetails;
+export default Detail;

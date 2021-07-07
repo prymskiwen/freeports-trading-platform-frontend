@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
   Container,
@@ -8,7 +9,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Fab,
+  Divider,
   Grid,
   makeStyles,
   MenuItem,
@@ -20,6 +21,8 @@ import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import { useAccountsSlice } from "./slice";
+import { selectAccounts } from "./slice/selectors";
 import { data } from "./data";
 
 const columns = [
@@ -31,9 +34,9 @@ const columns = [
     },
     sortable: false,
     render: (rowData: any) => {
-      const { name: names } = rowData;
+      const { id, name } = rowData;
 
-      return <Link to="/nostro-accounts/details">{names}</Link>;
+      return <Link to={`nostro-accounts/${id}`}>{name}</Link>;
     },
   },
   {
@@ -57,33 +60,42 @@ const columns = [
       width: "15%",
     },
   },
-  {
-    field: "last_update",
-    title: "Last Update",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "reconciliations",
-    title: "Reconciliations",
-    cellStyle: {
-      width: "15%",
-    },
-  },
 ];
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    tableButton: {
-      color: theme.palette.primary.main,
-      fontWeight: "bold",
-    },
+    actionButton: { marginRight: theme.spacing(2) },
   })
 );
+
+interface accountType {
+  name: string;
+  currency: string;
+  type: string;
+  balance?: number;
+  iban: string;
+  publicAddress?: string;
+  vaultWalletId?: string;
+}
+
 const NostroAccounts = (): React.ReactElement => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { actions } = useAccountsSlice();
+  const { accounts } = useSelector(selectAccounts);
   const [declareAccountModalOpen, setDeclareAccountModalOpen] =
     React.useState(false);
+  const [account, setAccount] = useState<accountType>({
+    name: "",
+    currency: "CHF",
+    type: "fiat",
+    balance: 0,
+    iban: "",
+    publicAddress: "",
+    vaultWalletId: "",
+  });
+  const fiat: Array<string> = ["CHF", "EUR", "USD"];
+  const crypto: Array<string> = ["BTC", "ETHER"];
 
   const handleDeclareAccountModalOpen = () => {
     setDeclareAccountModalOpen(true);
@@ -93,6 +105,72 @@ const NostroAccounts = (): React.ReactElement => {
     setDeclareAccountModalOpen(false);
   };
 
+  useEffect(() => {
+    dispatch(actions.getAccounts());
+  }, []);
+
+  const onHandleNameChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = event.target;
+    const newAccount = { ...account };
+
+    newAccount.name = value;
+    setAccount(newAccount);
+  };
+
+  const onHandleCurrencyChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = event.target;
+    const newAccount = { ...account };
+
+    if (fiat.includes(value)) {
+      newAccount.type = "fiat";
+      newAccount.publicAddress = "";
+    } else if (crypto.includes(value)) {
+      newAccount.type = "crypto";
+      newAccount.publicAddress = "";
+    }
+
+    newAccount.currency = value;
+    setAccount(newAccount);
+  };
+
+  const onHandleIBanChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = event.target;
+    const newAccount = { ...account };
+
+    newAccount.iban = value;
+    setAccount(newAccount);
+  };
+
+  const onHandlePublicAddressChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = event.target;
+    const newAccount = { ...account };
+
+    newAccount.publicAddress = value;
+    setAccount(newAccount);
+  };
+
+  const onHandleBalanceChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { value } = event.target;
+    const newAccount = { ...account };
+
+    newAccount.balance = parseInt(value, 10);
+    setAccount(newAccount);
+  };
+
+  const handleAccountCreate = () => {
+    dispatch(actions.addAccount(account));
+  };
+
   return (
     <div className="main-wrapper">
       <Container>
@@ -100,18 +178,13 @@ const NostroAccounts = (): React.ReactElement => {
           <Grid container item justify="flex-end" xs={12}>
             <Grid item>
               <Button
-                className={classes.tableButton}
+                variant="contained"
+                color="primary"
+                className={classes.actionButton}
                 onClick={handleDeclareAccountModalOpen}
               >
-                <Fab
-                  className="mr-10"
-                  color="primary"
-                  aria-label="Add"
-                  size="small"
-                >
-                  <AddIcon fontSize="small" />
-                </Fab>
-                Declare new External
+                <AddIcon fontSize="small" />
+                New Account
               </Button>
               <Dialog
                 open={declareAccountModalOpen}
@@ -119,60 +192,86 @@ const NostroAccounts = (): React.ReactElement => {
                 aria-labelledby="form-dialog-title"
               >
                 <DialogTitle id="form-dialog-title">
-                  Declare New account
+                  Create New account
                 </DialogTitle>
+                <Divider />
                 <DialogContent>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
                       <TextField
                         margin="dense"
-                        id="account_name"
                         label="Account name"
                         type="text"
                         variant="outlined"
+                        value={account.name}
+                        onChange={onHandleNameChange}
                         fullWidth
                       />
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
                         margin="dense"
-                        id="account_number"
-                        label="Account number"
-                        type="number"
+                        label="Currency"
                         variant="outlined"
+                        value={account.currency}
+                        onChange={onHandleCurrencyChange}
                         fullWidth
-                      />
+                        select
+                      >
+                        <MenuItem value="CHF">CHF</MenuItem>
+                        <MenuItem value="EUR">EUR</MenuItem>
+                        <MenuItem value="USD">USD</MenuItem>
+                        <MenuItem value="BTC">BTC</MenuItem>
+                        <MenuItem value="ETHER">ETHER</MenuItem>
+                      </TextField>
                     </Grid>
                   </Grid>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        id="currency"
-                        label="Currency"
-                        variant="outlined"
-                        fullWidth
-                        select
-                      >
-                        <MenuItem value="10">Ten</MenuItem>
-                        <MenuItem value="20">Twenty</MenuItem>
-                      </TextField>
+                      {fiat.includes(account.currency) && (
+                        <TextField
+                          margin="dense"
+                          label="Account number"
+                          variant="outlined"
+                          value={account.iban}
+                          onChange={onHandleIBanChange}
+                          fullWidth
+                        />
+                      )}
+                      {crypto.includes(account.currency) && (
+                        <TextField
+                          margin="dense"
+                          label="Account number"
+                          variant="outlined"
+                          value={account.publicAddress}
+                          onChange={onHandlePublicAddressChange}
+                          fullWidth
+                        />
+                      )}
                     </Grid>
                     <Grid item xs={6}>
                       <TextField
                         margin="dense"
-                        id="initial_balance"
                         label="Initial balance"
                         type="number"
                         variant="outlined"
+                        value={account.balance}
+                        onChange={onHandleBalanceChange}
                         fullWidth
                       />
                     </Grid>
                   </Grid>
                 </DialogContent>
+                <Divider />
                 <DialogActions>
                   <Button
                     onClick={handleDeclareAccountModalClose}
+                    variant="contained"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleAccountCreate}
                     variant="contained"
                     color="primary"
                   >
@@ -182,16 +281,9 @@ const NostroAccounts = (): React.ReactElement => {
               </Dialog>
             </Grid>
             <Grid item>
-              <Button className={classes.tableButton}>
-                <Fab
-                  className="mr-10"
-                  color="primary"
-                  aria-label="Add"
-                  size="small"
-                >
-                  <AddIcon fontSize="small" />
-                </Fab>
-                Create new vault
+              <Button variant="contained" color="primary">
+                <AddIcon fontSize="small" />
+                New Crypto Address
               </Button>
             </Grid>
           </Grid>
@@ -199,7 +291,7 @@ const NostroAccounts = (): React.ReactElement => {
             <Grid item xs={12}>
               <MaterialTable
                 columns={columns}
-                data={data}
+                data={accounts.map((acc: any) => ({ ...acc }))}
                 title="NOSTRO ACCOUNTS"
                 options={{
                   search: true,
