@@ -27,6 +27,19 @@ const createAccount = (account: Account): Promise<any> => {
   });
 };
 
+const deleteAccount = (accountId: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(`/account/${accountId}`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
+
 const assignOrganizationAccount = (
   organizerId: string,
   accountId: string
@@ -63,6 +76,7 @@ export {
   getAllAccounts as default,
   getAllAccounts,
   createAccount,
+  deleteAccount,
   assignOrganizationAccount,
   unassignOrganizationAccount,
 };

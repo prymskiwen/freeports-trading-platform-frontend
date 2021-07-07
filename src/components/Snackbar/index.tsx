@@ -23,7 +23,7 @@ const Snackbar = (): React.ReactElement => {
   return (
     <MUISnackbar
       autoHideDuration={2000}
-      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
       open={showSnackbar}
       onClose={() => dispatch(actions.hideSnackbar())}
     >

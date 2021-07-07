@@ -24,7 +24,7 @@ export const initialState: AccountsState = {
   accounts: [],
   selectedAccount: defaultAccount,
   loading: false,
-  creating: false,
+  deleting: false,
 };
 
 const slice = createSlice({
@@ -35,15 +35,21 @@ const slice = createSlice({
       state.loading = true;
       state.accounts = [];
     },
-    getProfileSuccess(state, action: PayloadAction<Account[]>) {
+    getAccountsSuccess(state, action: PayloadAction<Account[]>) {
       state.loading = false;
       state.accounts = action.payload;
     },
     addAccount(state, action: PayloadAction<Account>) {
-      state.creating = true;
+      state.loading = true;
     },
     addAccountSuccess(state, action: PayloadAction<string>) {
-      state.creating = false;
+      state.loading = false;
+    },
+    removeAccount(state, action: PayloadAction<string>) {
+      state.deleting = true;
+    },
+    removeAccountSuccess(state, action: PayloadAction<string>) {
+      state.deleting = false;
     },
   },
 });

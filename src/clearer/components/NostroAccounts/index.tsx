@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Form } from "react-final-form";
+import arrayMutators from "final-form-arrays";
+import { TextField, Select } from "mui-rff";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
@@ -12,66 +15,21 @@ import {
   Divider,
   Grid,
   makeStyles,
-  MenuItem,
-  TextField,
   Theme,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
+import red from "@material-ui/core/colors/red";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { useAccountsSlice } from "./slice";
 import { selectAccounts } from "./slice/selectors";
-import { data } from "./data";
-
-const columns = [
-  {
-    field: "name",
-    title: "Name",
-    cellStyle: {
-      width: "20%",
-    },
-    sortable: false,
-    render: (rowData: any) => {
-      const { id, name } = rowData;
-
-      return <Link to={`nostro-accounts/${id}`}>{name}</Link>;
-    },
-  },
-  {
-    field: "iban",
-    title: "IBAN",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "balance",
-    title: "Balance",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "type",
-    title: "Type",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "currency",
-    title: "Currency",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     actionButton: { marginRight: theme.spacing(2) },
+    redButton: { backgroundColor: red[500], color: "white" },
   })
 );
 
@@ -80,10 +38,22 @@ interface accountType {
   currency: string;
   type: string;
   balance?: number;
-  iban: string;
+  iban?: string;
   publicAddress?: string;
   vaultWalletId?: string;
 }
+
+const validate = (values: any) => {
+  const errors: Partial<accountType> = {};
+  if (!values.name) {
+    errors.name = "This Field Required";
+  }
+
+  if (!values.currency) {
+    errors.currency = "This Field Required";
+  }
+  return errors;
+};
 
 const NostroAccounts = (): React.ReactElement => {
   const classes = useStyles();
@@ -116,67 +86,90 @@ const NostroAccounts = (): React.ReactElement => {
     dispatch(actions.getAccounts());
   }, []);
 
-  const onHandleNameChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value } = event.target;
-    const newAccount = { ...account };
-
-    newAccount.name = value;
-    setAccount(newAccount);
-  };
-
-  const onHandleCurrencyChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value } = event.target;
-    const newAccount = { ...account };
-
-    if (fiat.includes(value)) {
+  const handleAccountCreate = async (values: accountType) => {
+    const newAccount = { ...values };
+    delete newAccount.vaultWalletId;
+    if (fiat.includes(newAccount.currency)) {
       newAccount.type = "fiat";
-      newAccount.publicAddress = "";
-    } else if (crypto.includes(value)) {
+      delete newAccount.publicAddress;
+    } else if (crypto.includes(newAccount.currency)) {
       newAccount.type = "crypto";
-      newAccount.publicAddress = "";
+      delete newAccount.iban;
     }
 
-    newAccount.currency = value;
-    setAccount(newAccount);
+    await dispatch(actions.addAccount(newAccount));
+    setDeclareAccountModalOpen(false);
   };
 
-  const onHandleIBanChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value } = event.target;
-    const newAccount = { ...account };
-
-    newAccount.iban = value;
-    setAccount(newAccount);
+  const handleAccountDelete = async (id: string) => {
+    dispatch(actions.removeAccount(id));
   };
 
-  const onHandlePublicAddressChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value } = event.target;
-    const newAccount = { ...account };
+  const columns = [
+    {
+      field: "name",
+      title: "Name",
+      cellStyle: {
+        width: "20%",
+      },
+      sortable: false,
+      render: (rowData: any) => {
+        const { id, name } = rowData;
 
-    newAccount.publicAddress = value;
-    setAccount(newAccount);
-  };
-
-  const onHandleBalanceChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { value } = event.target;
-    const newAccount = { ...account };
-
-    newAccount.balance = parseInt(value, 10);
-    setAccount(newAccount);
-  };
-
-  const handleAccountCreate = () => {
-    dispatch(actions.addAccount(account));
-  };
+        return <Link to={`nostro-accounts/${id}`}>{name}</Link>;
+      },
+    },
+    {
+      field: "iban",
+      title: "IBAN",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "publicAddress",
+      title: "Public Address",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "balance",
+      title: "Balance",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "type",
+      title: "Type",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "currency",
+      title: "Currency",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      title: "Action",
+      render: (rowData: any) => {
+        const { id } = rowData;
+        return (
+          <Button
+            className={classes.redButton}
+            variant="contained"
+            onClick={() => handleAccountDelete(id)}
+          >
+            Delete
+          </Button>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="main-wrapper">
@@ -198,93 +191,108 @@ const NostroAccounts = (): React.ReactElement => {
                 onClose={handleDeclareAccountModalClose}
                 aria-labelledby="form-dialog-title"
               >
-                <DialogTitle id="form-dialog-title">
-                  Create New account
-                </DialogTitle>
-                <Divider />
-                <DialogContent>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        label="Account name"
-                        type="text"
-                        variant="outlined"
-                        value={account.name}
-                        onChange={onHandleNameChange}
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        label="Currency"
-                        variant="outlined"
-                        value={account.currency}
-                        onChange={onHandleCurrencyChange}
-                        fullWidth
-                        select
-                      >
-                        <MenuItem value="CHF">CHF</MenuItem>
-                        <MenuItem value="EUR">EUR</MenuItem>
-                        <MenuItem value="USD">USD</MenuItem>
-                        <MenuItem value="BTC">BTC</MenuItem>
-                        <MenuItem value="ETHER">ETHER</MenuItem>
-                      </TextField>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      {fiat.includes(account.currency) && (
-                        <TextField
-                          margin="dense"
-                          label="Account number"
-                          variant="outlined"
-                          value={account.iban}
-                          onChange={onHandleIBanChange}
-                          fullWidth
-                        />
-                      )}
-                      {crypto.includes(account.currency) && (
-                        <TextField
-                          margin="dense"
-                          label="Account number"
-                          variant="outlined"
-                          value={account.publicAddress}
-                          onChange={onHandlePublicAddressChange}
-                          fullWidth
-                        />
-                      )}
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        label="Initial balance"
-                        type="number"
-                        variant="outlined"
-                        value={account.balance}
-                        onChange={onHandleBalanceChange}
-                        fullWidth
-                      />
-                    </Grid>
-                  </Grid>
-                </DialogContent>
-                <Divider />
-                <DialogActions>
-                  <Button
-                    onClick={handleDeclareAccountModalClose}
-                    variant="contained"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleAccountCreate}
-                    variant="contained"
-                    color="primary"
-                  >
-                    Create account
-                  </Button>
-                </DialogActions>
+                <Form
+                  onSubmit={handleAccountCreate}
+                  mutators={{
+                    ...arrayMutators,
+                  }}
+                  initialValues={account}
+                  validate={validate}
+                  render={({
+                    handleSubmit,
+                    submitting,
+                    pristine,
+                    form: {
+                      mutators: { push },
+                    },
+                    values,
+                  }) => (
+                    <form onSubmit={handleSubmit} noValidate>
+                      <DialogTitle id="form-dialog-title">
+                        Create New account
+                      </DialogTitle>
+                      <Divider />
+                      <DialogContent>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <TextField
+                              required
+                              label="Account name"
+                              type="text"
+                              name="name"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Select
+                              native
+                              name="currency"
+                              label="Currency"
+                              variant="outlined"
+                              fullWidth
+                            >
+                              <option value="CHF">CHF</option>
+                              <option value="EUR">EUR</option>
+                              <option value="USD">USD</option>
+                              <option value="BTC">BTC</option>
+                              <option value="ETHER">ETHER</option>
+                            </Select>
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            {fiat.includes(values.currency) && (
+                              <TextField
+                                label="Account number"
+                                variant="outlined"
+                                name="iban"
+                                fullWidth
+                              />
+                            )}
+                            {crypto.includes(values.currency) && (
+                              <TextField
+                                label="Account number"
+                                variant="outlined"
+                                name="publicAddress"
+                                fullWidth
+                              />
+                            )}
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField
+                              label="Initial balance"
+                              type="number"
+                              variant="outlined"
+                              name="balance"
+                              fieldProps={{
+                                parse: (value) => parseInt(value, 10),
+                              }}
+                              fullWidth
+                            />
+                          </Grid>
+                        </Grid>
+                      </DialogContent>
+                      <Divider />
+                      <DialogActions>
+                        <Button
+                          onClick={handleDeclareAccountModalClose}
+                          variant="contained"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                          disabled={submitting || pristine}
+                        >
+                          Create account
+                        </Button>
+                      </DialogActions>
+                    </form>
+                  )}
+                />
               </Dialog>
             </Grid>
             <Grid item>
