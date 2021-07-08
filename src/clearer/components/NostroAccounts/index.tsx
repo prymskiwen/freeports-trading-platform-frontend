@@ -1,5 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Form } from "react-final-form";
+import arrayMutators from "final-form-arrays";
+import { TextField, Select } from "mui-rff";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
   Container,
@@ -8,82 +12,67 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Fab,
+  Divider,
   Grid,
   makeStyles,
-  MenuItem,
-  TextField,
   Theme,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
+import red from "@material-ui/core/colors/red";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { data } from "./data";
+import { useAccountsSlice } from "./slice";
+import { selectAccounts } from "./slice/selectors";
 
-const columns = [
-  {
-    field: "name",
-    title: "Name",
-    cellStyle: {
-      width: "20%",
-    },
-    sortable: false,
-    render: (rowData: any) => {
-      const { name: names } = rowData;
-
-      return <Link to="/nostro-accounts/details">{names}</Link>;
-    },
-  },
-  {
-    field: "balance",
-    title: "Balance",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "type",
-    title: "Type",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "currency",
-    title: "Currency",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "last_update",
-    title: "Last Update",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "reconciliations",
-    title: "Reconciliations",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-];
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    tableButton: {
-      color: theme.palette.primary.main,
-      fontWeight: "bold",
-    },
+    actionButton: { marginRight: theme.spacing(2) },
+    redButton: { backgroundColor: red[500], color: "white" },
   })
 );
+
+interface accountType {
+  name: string;
+  currency: string;
+  type: string;
+  balance?: number;
+  iban?: string;
+  publicAddress?: string;
+  vaultWalletId?: string;
+}
+
+const validate = (values: any) => {
+  const errors: Partial<accountType> = {};
+  if (!values.name) {
+    errors.name = "This Field Required";
+  }
+
+  if (!values.currency) {
+    errors.currency = "This Field Required";
+  }
+  return errors;
+};
+
 const NostroAccounts = (): React.ReactElement => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { actions } = useAccountsSlice();
+  const { accounts } = useSelector(selectAccounts);
   const [declareAccountModalOpen, setDeclareAccountModalOpen] =
     React.useState(false);
+  const [account, setAccount] = useState<accountType>({
+    name: "",
+    currency: "CHF",
+    type: "fiat",
+    balance: 0,
+    iban: "",
+    publicAddress: "",
+    vaultWalletId: "",
+  });
+  const fiat: Array<string> = ["CHF", "EUR", "USD"];
+  const crypto: Array<string> = ["BTC", "ETHER"];
 
   const handleDeclareAccountModalOpen = () => {
     setDeclareAccountModalOpen(true);
@@ -93,6 +82,95 @@ const NostroAccounts = (): React.ReactElement => {
     setDeclareAccountModalOpen(false);
   };
 
+  useEffect(() => {
+    dispatch(actions.getAccounts());
+  }, []);
+
+  const handleAccountCreate = async (values: accountType) => {
+    const newAccount = { ...values };
+    delete newAccount.vaultWalletId;
+    if (fiat.includes(newAccount.currency)) {
+      newAccount.type = "fiat";
+      delete newAccount.publicAddress;
+    } else if (crypto.includes(newAccount.currency)) {
+      newAccount.type = "crypto";
+      delete newAccount.iban;
+    }
+
+    await dispatch(actions.addAccount(newAccount));
+    setDeclareAccountModalOpen(false);
+  };
+
+  const handleAccountDelete = async (id: string) => {
+    dispatch(actions.removeAccount(id));
+  };
+
+  const columns = [
+    {
+      field: "name",
+      title: "Name",
+      cellStyle: {
+        width: "20%",
+      },
+      sortable: false,
+      render: (rowData: any) => {
+        const { id, name } = rowData;
+
+        return <Link to={`nostro-accounts/${id}`}>{name}</Link>;
+      },
+    },
+    {
+      field: "iban",
+      title: "IBAN",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "publicAddress",
+      title: "Public Address",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "balance",
+      title: "Balance",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "type",
+      title: "Type",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      field: "currency",
+      title: "Currency",
+      cellStyle: {
+        width: "15%",
+      },
+    },
+    {
+      title: "Action",
+      render: (rowData: any) => {
+        const { id } = rowData;
+        return (
+          <Button
+            className={classes.redButton}
+            variant="contained"
+            onClick={() => handleAccountDelete(id)}
+          >
+            Delete
+          </Button>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="main-wrapper">
       <Container>
@@ -100,98 +178,127 @@ const NostroAccounts = (): React.ReactElement => {
           <Grid container item justify="flex-end" xs={12}>
             <Grid item>
               <Button
-                className={classes.tableButton}
+                variant="contained"
+                color="primary"
+                className={classes.actionButton}
                 onClick={handleDeclareAccountModalOpen}
               >
-                <Fab
-                  className="mr-10"
-                  color="primary"
-                  aria-label="Add"
-                  size="small"
-                >
-                  <AddIcon fontSize="small" />
-                </Fab>
-                Declare new External
+                <AddIcon fontSize="small" />
+                New Account
               </Button>
               <Dialog
                 open={declareAccountModalOpen}
                 onClose={handleDeclareAccountModalClose}
                 aria-labelledby="form-dialog-title"
               >
-                <DialogTitle id="form-dialog-title">
-                  Declare New account
-                </DialogTitle>
-                <DialogContent>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        id="account_name"
-                        label="Account name"
-                        type="text"
-                        variant="outlined"
-                        fullWidth
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        id="account_number"
-                        label="Account number"
-                        type="number"
-                        variant="outlined"
-                        fullWidth
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        id="currency"
-                        label="Currency"
-                        variant="outlined"
-                        fullWidth
-                        select
-                      >
-                        <MenuItem value="10">Ten</MenuItem>
-                        <MenuItem value="20">Twenty</MenuItem>
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        margin="dense"
-                        id="initial_balance"
-                        label="Initial balance"
-                        type="number"
-                        variant="outlined"
-                        fullWidth
-                      />
-                    </Grid>
-                  </Grid>
-                </DialogContent>
-                <DialogActions>
-                  <Button
-                    onClick={handleDeclareAccountModalClose}
-                    variant="contained"
-                    color="primary"
-                  >
-                    Create account
-                  </Button>
-                </DialogActions>
+                <Form
+                  onSubmit={handleAccountCreate}
+                  mutators={{
+                    ...arrayMutators,
+                  }}
+                  initialValues={account}
+                  validate={validate}
+                  render={({
+                    handleSubmit,
+                    submitting,
+                    pristine,
+                    form: {
+                      mutators: { push },
+                    },
+                    values,
+                  }) => (
+                    <form onSubmit={handleSubmit} noValidate>
+                      <DialogTitle id="form-dialog-title">
+                        Create New account
+                      </DialogTitle>
+                      <Divider />
+                      <DialogContent>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <TextField
+                              required
+                              label="Account name"
+                              type="text"
+                              name="name"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Select
+                              native
+                              name="currency"
+                              label="Currency"
+                              variant="outlined"
+                              fullWidth
+                            >
+                              <option value="CHF">CHF</option>
+                              <option value="EUR">EUR</option>
+                              <option value="USD">USD</option>
+                              <option value="BTC">BTC</option>
+                              <option value="ETHER">ETHER</option>
+                            </Select>
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            {fiat.includes(values.currency) && (
+                              <TextField
+                                label="Account number"
+                                variant="outlined"
+                                name="iban"
+                                fullWidth
+                              />
+                            )}
+                            {crypto.includes(values.currency) && (
+                              <TextField
+                                label="Account number"
+                                variant="outlined"
+                                name="publicAddress"
+                                fullWidth
+                              />
+                            )}
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField
+                              label="Initial balance"
+                              type="number"
+                              variant="outlined"
+                              name="balance"
+                              fieldProps={{
+                                parse: (value) => parseInt(value, 10),
+                              }}
+                              fullWidth
+                            />
+                          </Grid>
+                        </Grid>
+                      </DialogContent>
+                      <Divider />
+                      <DialogActions>
+                        <Button
+                          onClick={handleDeclareAccountModalClose}
+                          variant="contained"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                          disabled={submitting || pristine}
+                        >
+                          Create account
+                        </Button>
+                      </DialogActions>
+                    </form>
+                  )}
+                />
               </Dialog>
             </Grid>
             <Grid item>
-              <Button className={classes.tableButton}>
-                <Fab
-                  className="mr-10"
-                  color="primary"
-                  aria-label="Add"
-                  size="small"
-                >
-                  <AddIcon fontSize="small" />
-                </Fab>
-                Create new vault
+              <Button variant="contained" color="primary">
+                <AddIcon fontSize="small" />
+                New Crypto Address
               </Button>
             </Grid>
           </Grid>
@@ -199,7 +306,7 @@ const NostroAccounts = (): React.ReactElement => {
             <Grid item xs={12}>
               <MaterialTable
                 columns={columns}
-                data={data}
+                data={accounts.map((acc: any) => ({ ...acc }))}
                 title="NOSTRO ACCOUNTS"
                 options={{
                   search: true,

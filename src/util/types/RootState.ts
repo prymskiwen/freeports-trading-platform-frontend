@@ -1,5 +1,6 @@
 // [IMPORT NEW CONTAINERSTATE ABOVE] < Needed for generating containers seamlessly
 
+import { AccountsState } from "../../clearer/components/NostroAccounts/slice/types";
 import { CoWorkersState } from "../../clearer/components/CoWorker/slice/types";
 import { CoWorkerFormState } from "../../clearer/components/CoWorkerForm/slice/types";
 import { SnackbarState } from "../../components/Snackbar/slice/types";
@@ -14,6 +15,7 @@ import { ProfileState } from "../../components/Profile/slice/types";
   So, not available always
 */
 export interface RootState {
+  accounts?: AccountsState;
   coWorkers?: CoWorkersState;
   global?: any;
   auth?: any;

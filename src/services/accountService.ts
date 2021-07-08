@@ -1,6 +1,7 @@
 import axios from "../util/axios";
+import Account from "../types/Account";
 
-const getAllAccounts = (): Promise<any> => {
+const getAllAccounts = (): Promise<Account[]> => {
   return new Promise((resolve, reject) => {
     axios
       .get(`/account`)
@@ -9,6 +10,32 @@ const getAllAccounts = (): Promise<any> => {
       })
       .catch((err) => {
         return reject(err.response.data);
+      });
+  });
+};
+
+const createAccount = (account: Account): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/account`, account)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
+
+const deleteAccount = (accountId: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(`/account/${accountId}`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response);
       });
   });
 };
@@ -48,6 +75,8 @@ const unassignOrganizationAccount = (
 export {
   getAllAccounts as default,
   getAllAccounts,
+  createAccount,
+  deleteAccount,
   assignOrganizationAccount,
   unassignOrganizationAccount,
 };
