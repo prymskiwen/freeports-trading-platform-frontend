@@ -14,6 +14,19 @@ const getAllAccounts = (): Promise<Account[]> => {
   });
 };
 
+const getAccount = (accountId: string): Promise<Account> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/account/${accountId}`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 const createAccount = (account: Account): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
@@ -75,6 +88,7 @@ const unassignOrganizationAccount = (
 export {
   getAllAccounts as default,
   getAllAccounts,
+  getAccount,
   createAccount,
   deleteAccount,
   assignOrganizationAccount,
