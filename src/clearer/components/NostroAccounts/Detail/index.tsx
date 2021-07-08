@@ -134,6 +134,7 @@ const useStyles = makeStyles({
 
 const Detail = (): React.ReactElement => {
   const { id: accountId } = useParams<{ id: string }>();
+  console.log("account id ", accountId);
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -154,7 +155,7 @@ const Detail = (): React.ReactElement => {
     return () => {
       mounted = true;
     };
-  }, []);
+  }, [accountId]);
 
   const handleBackClick = () => {
     history.push("/nostro-accounts");
