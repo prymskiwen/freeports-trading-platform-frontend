@@ -112,20 +112,15 @@ export class Vault {
   public async grantAllPermissions(
     ownerType: PermissionOwnerType,
     ownerId: string
-  ): Promise<any> {
+  ): Promise<VaultRequestDto[]> {
     return Promise.all(
-      Object.keys(VaultPermissions)
-        .filter(
-          (key) =>
-            !Number.isNaN(Number(VaultPermissions[key as VaultPermissions]))
-        )
-        .map((permission) => {
-          return this.grantPermission(
-            permission as VaultPermissions,
-            ownerType,
-            ownerId
-          );
-        })
+      Object.keys(VaultPermissions).map((permission) => {
+        return this.grantPermission(
+          permission as VaultPermissions,
+          ownerType,
+          ownerId
+        );
+      })
     );
   }
 
@@ -156,6 +151,16 @@ export class Vault {
     return request;
   }
 
+  public async getPermissionsByOwner(
+    ownerId: string
+  ): Promise<VaultRequestDto> {
+    const request = await this.createRequest(
+      Method.GET,
+      `/vault/owner/${ownerId}/user/permission`
+    );
+    return request;
+  }
+
   public async createAccount(type: VaultAccountType): Promise<VaultRequestDto> {
     const request = await this.createRequest(
       Method.POST,
@@ -166,12 +171,20 @@ export class Vault {
     return request;
   }
 
-  public async authenticate() {
-    const {
-      data: { tokenString },
-    } = await this.createToken("0");
+  public async authenticate(): Promise<string> {
+    const { tokenString } = await this.createToken("0");
     this.accessToken = tokenString;
     this.tokenObtainedAt = Date.now();
+
+    // const reqs = await this.grantAllPermissions(PermissionOwnerType.user, "1");
+
+    // const result = await Promise.all(reqs.map((r) => this.sendRequest(r)));
+
+    // const request = await this.createOrganization();
+
+    // const result = await this.sendRequest(request);
+    console.log("Organization created ", result);
+
     return tokenString;
   }
 
@@ -182,8 +195,9 @@ export class Vault {
     headers: any = {}
   ): Promise<VaultRequestDto> {
     if (
-      !this.accessToken ||
-      Date.now() - this.tokenObtainedAt > 14 * 60 * 60 * 1000
+      (!this.accessToken ||
+        Date.now() - this.tokenObtainedAt > 14 * 60 * 60 * 1000) &&
+      path !== "/token"
     ) {
       await this.authenticate();
     }
@@ -193,6 +207,7 @@ export class Vault {
       path,
       body,
       headers: {
+        "signature-type": "raw",
         ...headers,
         authorization: this.accessToken,
         signature,
@@ -268,7 +283,7 @@ export class Vault {
     return signature;
   }
 
-  private createToken(organizationId: string) {
+  private async createToken(organizationId: string) {
     // const publicKeyDER = this.publicKey.export({ type: "spki", format: "der" });
 
     const reqBody = {
@@ -276,11 +291,11 @@ export class Vault {
       organizationId,
     };
 
-    return this.sendRequest<AuthenticateResponse>({
-      method: Method.POST,
-      path: "/token",
-      body: reqBody,
-    });
+    const request = await this.createRequest(Method.POST, "/token", reqBody);
+
+    const response = await sendRequest(request);
+
+    return response;
   }
 
   private async grantPermission(

@@ -13,6 +13,7 @@ export interface VaultRequestDto {
   headers?: {
     signature?: string;
     authorization?: string;
+    "signature-type"?: string;
   };
 }
 const sendRequest = (request: VaultRequestDto): Promise<any> => {

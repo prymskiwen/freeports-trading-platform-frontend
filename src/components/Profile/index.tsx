@@ -122,6 +122,8 @@ const Profile = (): React.ReactElement => {
 
       const getToken = async () => {
         const results = await vault.authenticate();
+        const organizations = await vault.getAllOrganizations();
+        console.log("organizations ", results);
       };
 
       getToken();
