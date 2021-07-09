@@ -115,6 +115,7 @@ const Profile = (): React.ReactElement => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
+<<<<<<< HEAD
   // useEffect(() => {
   //   console.log("key list effect");
   //   if (keyList[0] && keyList[0].privateKey) {
@@ -128,6 +129,21 @@ const Profile = (): React.ReactElement => {
   //     getToken();
   //   }
   // }, [keyList]);
+=======
+  useEffect(() => {
+    if (keyList[0] && keyList[0].privateKey) {
+      const vault = new Vault(keyList[0].privateKey, keyList[0].spki);
+
+      const getToken = async () => {
+        const results = await vault.authenticate();
+        const organizations = await vault.getAllOrganizations();
+        console.log("organizations ", results);
+      };
+
+      getToken();
+    }
+  }, [keyList]);
+>>>>>>>  vault authenticate
   useEffect(() => {
     dispatch(actions.getProfile());
 
