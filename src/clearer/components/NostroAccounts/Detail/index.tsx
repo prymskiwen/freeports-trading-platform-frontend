@@ -56,7 +56,7 @@ interface operationType {
   type: string;
 }
 
-const pendingReconciliationColumns = [
+const pendingReconciliationColumns = (currency: string) => [
   {
     field: "date",
     title: "Date",
@@ -79,7 +79,7 @@ const pendingReconciliationColumns = [
     render: (rowData: any) => {
       const { type, amount } = rowData;
 
-      return type === "credit" ? amount : "";
+      return type === "credit" ? `${currency} ${amount}` : "";
     },
   },
   {
@@ -90,7 +90,7 @@ const pendingReconciliationColumns = [
     render: (rowData: any) => {
       const { type, amount } = rowData;
 
-      return type === "debit" ? amount : "";
+      return type === "debit" ? `${currency} ${amount}` : "";
     },
   },
   {
@@ -389,7 +389,9 @@ const Detail = (): React.ReactElement => {
                   <Grid container spacing={4}>
                     <Grid item xs={12}>
                       <MaterialTable
-                        columns={pendingReconciliationColumns}
+                        columns={pendingReconciliationColumns(
+                          selectedAccount.currency
+                        )}
                         data={operations.map((opt: any) => ({
                           ...opt,
                           date: convertDateToDMY(opt.date),
@@ -445,7 +447,7 @@ const Detail = (): React.ReactElement => {
                 <Divider />
                 <DialogContent>
                   <Grid container spacing={2}>
-                    <Grid item xs={5}>
+                    <Grid item xs={4}>
                       <MuiTextField
                         required
                         type="date"
@@ -454,7 +456,7 @@ const Detail = (): React.ReactElement => {
                         fullWidth
                       />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
                       <MuiTextField
                         required
                         label="Amount"
@@ -463,6 +465,15 @@ const Detail = (): React.ReactElement => {
                         variant="outlined"
                         fieldProps={{
                           parse: (value) => parseInt(value, 10),
+                        }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Typography variant="body1">
+                                {selectedAccount.currency}
+                              </Typography>
+                            </InputAdornment>
+                          ),
                         }}
                         fullWidth
                       />
