@@ -23,6 +23,7 @@ import {
   Home,
   Notifications,
   Person,
+  Settings,
 } from "@material-ui/icons";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
@@ -192,6 +193,12 @@ const Header = ({
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText primary="Desks" />
+                  </MenuItem>
+                  <MenuItem onClick={() => redirect("/settings")}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" />
                   </MenuItem>
                   <Divider />
                   <MenuItem onClick={signOut}>

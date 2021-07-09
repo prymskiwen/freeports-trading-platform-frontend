@@ -24,19 +24,19 @@ export default [
     component: lazy(() => import("../components/Organizations")),
   },
   {
-    path: "/organizations/addOrganization",
+    path: "/organizations/add",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Organizations/AddOrganizer")),
   },
   {
-    path: "/organizations/editOrganizer/:id",
+    path: "/organizations/edit/:id",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Organizations/EditOrganizer")),
   },
   {
-    path: "/organizations/:organizationId/addmanager",
+    path: "/organizations/:organizationId/managers/add",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Organizations/AddManager")),
@@ -48,18 +48,10 @@ export default [
     component: lazy(() => import("../components/NostroAccounts")),
   },
   {
-    path: "/nostro-accounts/details",
+    path: "/nostro-accounts/:id",
     exact: true,
     auth: true,
-    component: lazy(
-      () => import("../components/NostroAccounts/NostroAccountDetails")
-    ),
-  },
-  {
-    path: "/tracking",
-    exact: true,
-    auth: true,
-    component: lazy(() => import("../components/Tracking")),
+    component: lazy(() => import("../components/NostroAccounts/Detail")),
   },
   {
     path: "/roles",
@@ -96,6 +88,12 @@ export default [
     exact: true,
     auth: true,
     component: lazy(() => import("../../components/Profile")),
+  },
+  {
+    path: "/settings",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Settings")),
   },
   /* {
     path: "/error",

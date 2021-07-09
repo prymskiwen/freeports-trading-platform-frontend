@@ -23,6 +23,7 @@ import {
   Home,
   Notifications,
   Person,
+  Settings,
 } from "@material-ui/icons";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
@@ -36,7 +37,6 @@ const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
   { title: `Organizations`, path: `/organizations`, hasChildren: false },
   { title: `Nostro Accounts`, path: `/nostro-accounts`, hasChildren: false },
-  { title: `Tracking`, path: `/tracking`, hasChildren: true },
 ];
 const useStyles = makeStyles({
   navDisplayFlex: {
@@ -185,8 +185,13 @@ const Header = ({
                     <ListItemIcon>
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
-
                     <ListItemText primary="Co-workers" />
+                  </MenuItem>
+                  <MenuItem onClick={() => redirect("/settings")}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" />
                   </MenuItem>
                   <Divider />
                   <MenuItem onClick={signOut}>

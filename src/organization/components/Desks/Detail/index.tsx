@@ -33,9 +33,6 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(2),
       marginLeft: theme.spacing(2),
     },
-    deskContentWrapper: {
-      padding: theme.spacing(8),
-    },
     textLink: {
       color: red[500],
       cursor: "pointer",
@@ -82,6 +79,7 @@ const Detail = (): React.ReactElement => {
               <Grid>
                 <TextField
                   className="w-100"
+                  placeholder="Search..."
                   value={searchText}
                   onChange={onSearchTextChange}
                   InputProps={{

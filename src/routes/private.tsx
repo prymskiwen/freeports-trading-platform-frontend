@@ -28,7 +28,6 @@ const PrivateRoute: React.FC<RouteCompProps> = ({
   const { isAuthenticated } = useAuth();
   const classes = useStyles();
   const certified = rest as any;
-  console.log("");
   return (
     <Route
       {...rest}

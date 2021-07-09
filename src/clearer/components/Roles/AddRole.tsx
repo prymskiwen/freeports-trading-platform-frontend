@@ -161,8 +161,8 @@ const AddRole = (): React.ReactElement => {
             message: "New role has been created successfully.",
           });
           setShowAlert(true);
-          setLoading(false);
           timer.current = window.setTimeout(() => {
+            setLoading(false);
             history.push("/roles");
           }, 2000);
         }

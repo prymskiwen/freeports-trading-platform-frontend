@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
 import {
+  Avatar,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
   Container,
+  Divider,
   Grid,
   FormControl,
-  Select,
-  MenuItem,
-  Button,
   makeStyles,
+  MenuItem,
+  Select,
 } from "@material-ui/core";
-import ImageUploader from "react-images-upload";
 import { Form } from "react-final-form";
 import { TextField } from "mui-rff";
 import { useHistory } from "react-router";
+
 import { useOrganization, useAccounts } from "../../../../hooks";
 
 const useStyles = makeStyles((theme) => ({
@@ -20,6 +26,31 @@ const useStyles = makeStyles((theme) => ({
   },
   marginL10: {
     marginLeft: 10,
+  },
+  profileImageContainer: {
+    position: "relative",
+    width: 150,
+    height: 150,
+    margin: 20,
+    "&:hover, &:focus": {
+      "& $profileImage": {
+        opacity: 0.5,
+      },
+    },
+  },
+  profileImage: {
+    width: "100%",
+    height: "100%",
+    opacity: 1,
+  },
+  profileFileInput: {
+    opacity: 0,
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    cursor: "pointer",
   },
 }));
 
@@ -68,9 +99,7 @@ interface accountType {
 const AddOrganizer = (): React.ReactElement => {
   const history = useHistory();
   const classes = useStyles();
-  const showingIcon = false;
-  const showingLogo = true;
-  const [logoImage, setLogoImage] = useState();
+  const [avatar, setAvatar] = useState();
 
   const [accounts, setAccounts] = useState([] as accountType[]);
   const [selectedAccounts, setSelectedAccounts] = useState([] as string[]);
@@ -81,9 +110,9 @@ const AddOrganizer = (): React.ReactElement => {
   useEffect(() => {
     let mounted = false;
     const init = async () => {
-      const getaccounts = await allAccounts();
+      const accountList = await allAccounts();
       if (!mounted) {
-        setAccounts(getaccounts);
+        setAccounts(accountList);
       }
     };
 
@@ -93,15 +122,20 @@ const AddOrganizer = (): React.ReactElement => {
     };
   }, []);
 
-  const onPicker = (pic: any) => {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      setLogoImage(e.target.result);
-    };
-    reader.readAsDataURL(pic[0]);
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.currentTarget;
+    if (files && files.length) {
+      const reader = new FileReader();
+      reader.onload = (event: any) => {
+        setAvatar(event.target.result);
+      };
+      reader.readAsDataURL(files[0]);
+    }
   };
 
-  const onHanelsetAccount = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const onHandleAccountSelect = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
     const { value } = event.target;
     setSelectedAccounts(value as string[]);
   };
@@ -114,17 +148,15 @@ const AddOrganizer = (): React.ReactElement => {
       values.zip,
       values.city,
       values.country,
-      logoImage,
+      avatar,
       values.commissionOrganization,
       values.commissionClearer
     )
       .then((data: any) => {
         const responseId = data.id;
-        console.log(responseId);
         if (selectedAccounts.length > 0) {
           selectedAccounts.map(async (accountItem, key) => {
             await assignAccount(responseId, accountItem).then((res: any) => {
-              console.log(res);
               if (key === selectedAccounts.length - 1) {
                 history.push("/organizations");
               }
@@ -157,188 +189,156 @@ const AddOrganizer = (): React.ReactElement => {
           validate={onValidate}
           render={({ handleSubmit, values }) => (
             <form onSubmit={handleSubmit} noValidate>
-              <Grid container item spacing={1} xs={6}>
-                <Grid item xs={12}>
-                  <h2>CREATE NEW ORGANIZATION</h2>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      required
-                      id="outlined-adornment-amount"
-                      label="Organization name"
-                      name="name"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      id="outlined-adornment-amount"
-                      label="Street 1"
-                      name="street1"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      id="outlined-adornment-amount"
-                      label="Street 2"
-                      name="street2"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={6}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      id="outlined-adornment-amount"
-                      label="zip"
-                      name="zip"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={6}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      id="outlined-adornment-amount"
-                      label="City"
-                      name="city"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <TextField
-                      id="outlined-adornment-amount"
-                      label="Country"
-                      name="country"
-                      variant="outlined"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <span style={{ fontWeight: "bold" }}>Nostro Accounts</span>
+              <Card>
+                <CardHeader title="Create new organization" />
+                <Divider />
+                <CardContent>
+                  <Grid container spacing={4}>
+                    <Grid item xs={6}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth variant="outlined">
+                            <TextField
+                              required
+                              label="Organization name"
+                              name="name"
+                              variant="outlined"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth variant="outlined">
+                            <TextField
+                              label="Street 1"
+                              name="street1"
+                              variant="outlined"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth variant="outlined">
+                            <TextField
+                              label="Street 2"
+                              name="street2"
+                              variant="outlined"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth variant="outlined">
+                                <TextField
+                                  label="zip"
+                                  name="zip"
+                                  variant="outlined"
+                                />
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth variant="outlined">
+                                <TextField
+                                  label="City"
+                                  name="city"
+                                  variant="outlined"
+                                />
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl fullWidth variant="outlined">
+                            <TextField
+                              label="Country"
+                              name="country"
+                              variant="outlined"
+                            />
+                          </FormControl>
+                        </Grid>
+                        {accounts.length > 0 ? (
+                          <Grid item xs={12}>
+                            <FormControl fullWidth variant="outlined">
+                              <Select
+                                multiple
+                                displayEmpty
+                                value={selectedAccounts}
+                                onChange={onHandleAccountSelect}
+                                renderValue={(selected: any) => {
+                                  if (selected.length === 0) {
+                                    return <em>Nostro accounts</em>;
+                                  }
 
-                  <FormControl fullWidth>
-                    <Select
-                      multiple
-                      value={selectedAccounts}
-                      onChange={onHanelsetAccount}
-                    >
-                      {accounts.map((item) => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} style={{ padding: 10 }}>
-                  <span style={{ fontWeight: "bold" }}>
-                    Add Organization logo
-                  </span>
-                  <FormControl fullWidth style={{ marginTop: 5 }}>
-                    <ImageUploader
-                      withIcon={showingIcon}
-                      withLabel={showingIcon}
-                      buttonText="Choose Image"
-                      onChange={(ChangeEvent) => onPicker(ChangeEvent)}
-                      buttonStyles={{
-                        width: "100%",
-                        padding: 10,
-                        fontSize: 20,
-                      }}
-                      fileContainerStyle={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      withPreview={showingLogo}
-                      singleImage={showingLogo}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid
-                  item
-                  container
-                  direction="row"
-                  justify="flex-start"
-                  spacing={3}
-                  xs={12}
-                  style={{ padding: 10 }}
-                >
-                  <Grid item xs={6}>
-                    <FormControl
-                      fullWidth
-                      className={classes.margin}
-                      variant="outlined"
-                    >
-                      <TextField
-                        required
-                        id="outlined-adornment-amount"
-                        label="Set organization commission rate"
-                        name="commissionOrganization"
-                        variant="outlined"
-                      />
-                    </FormControl>
+                                  return selected.join(", ");
+                                }}
+                              >
+                                <MenuItem disabled value="">
+                                  <em>Nostro accounts</em>
+                                </MenuItem>
+                                {accounts.map((item) => (
+                                  <MenuItem key={item.id} value={item.id}>
+                                    {item.name}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                        ) : (
+                          <></>
+                        )}
+                        <Grid item xs={12}>
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth variant="outlined">
+                                <TextField
+                                  aria-required
+                                  label="Organization commission rate"
+                                  name="commissionOrganization"
+                                  variant="outlined"
+                                />
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth variant="outlined">
+                                <TextField
+                                  required
+                                  label="Clearer commission rate"
+                                  name="commissionClearer"
+                                  variant="outlined"
+                                />
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Grid container justify="center" alignItems="center">
+                        <div className={classes.profileImageContainer}>
+                          <Avatar
+                            src={avatar}
+                            alt="Avatar"
+                            className={classes.profileImage}
+                          />
+                          <input
+                            type="file"
+                            name="avatar"
+                            className={classes.profileFileInput}
+                            onChange={onAvatarChange}
+                          />
+                        </div>
+                      </Grid>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <FormControl
-                      fullWidth
-                      className={classes.margin}
-                      variant="outlined"
-                    >
-                      <TextField
-                        required
-                        id="outlined-adornment-amount"
-                        label="Set clearer commission rate"
-                        name="commissionClearer"
-                        variant="outlined"
-                      />
-                    </FormControl>
+                </CardContent>
+                <Divider />
+                <CardActions>
+                  <Grid container justify="flex-end">
+                    <Button variant="contained" color="primary" type="submit">
+                      Submit
+                    </Button>
                   </Grid>
-                </Grid>
-                <Grid
-                  item
-                  container
-                  justify="flex-end"
-                  xs={12}
-                  style={{ padding: 10 }}
-                >
-                  <Button variant="contained" color="secondary" type="submit">
-                    SAVE NEW ORGANIZATION
-                  </Button>
-                </Grid>
-              </Grid>
+                </CardActions>
+              </Card>
             </form>
           )}
         />
