@@ -1,10 +1,12 @@
+/* eslint-disable no-return-assign */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Form } from "react-final-form";
 import arrayMutators from "final-form-arrays";
+import Papa from "papaparse";
 import { Radios, TextField as MuiTextField } from "mui-rff";
 import {
   Button,
@@ -36,11 +38,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import List from "@material-ui/core/List";
 
-import {
-  data,
-  pendingReconciliationsData,
-  passedTransactionsData,
-} from "../data";
+import { passedTransactionsData } from "../data";
 
 import { useAccountsSlice } from "../slice";
 import { useAccountDetailSlice } from "./slice";
@@ -111,6 +109,9 @@ const useStyles = makeStyles({
   deleteButton: {
     color: red[500],
   },
+  fileInput: {
+    display: "none",
+  },
 });
 
 const validate = (values: any) => {
@@ -167,6 +168,8 @@ const Detail = (): React.ReactElement => {
   const accountDetailLoading = useSelector(selectIsDetailLoading);
   const [searchText, setSearchText] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [importedFile, setImportedFile] = useState(null);
 
   const pendingReconciliationColumns = [
     {
@@ -278,6 +281,42 @@ const Detail = (): React.ReactElement => {
     );
   };
 
+  const handleImportClick = () => {
+    if (fileRef.current !== null) fileRef.current.click();
+  };
+
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.currentTarget;
+    if (files && files.length) {
+      Papa.parse(files[0], {
+        skipEmptyLines: true,
+        complete: (results: any) => {
+          const { data } = results;
+          const keys = data[0];
+          const values = data.slice(1);
+          const objects = values.map((array: Array<any>) => {
+            const object: any = {
+              label: "",
+              date: "",
+              type: "credit",
+              amount: 0,
+            };
+            keys.forEach((key: string, i: number) => (object[key] = array[i]));
+            return object;
+          });
+          objects.map(async (object: operationType) => {
+            await dispatch(
+              accountDetailActions.addOperation({
+                accountId,
+                operation: object,
+              })
+            );
+          });
+        },
+      });
+    }
+  };
+
   return (
     <div className="main-wrapper">
       <Container>
@@ -348,6 +387,7 @@ const Detail = (): React.ReactElement => {
                       variant="contained"
                       color="primary"
                       className={classes.importButton}
+                      onClick={handleImportClick}
                     >
                       <InsertDriveFileIcon
                         fontSize="small"
@@ -355,6 +395,13 @@ const Detail = (): React.ReactElement => {
                       />
                       IMPORT OPERATIONS
                     </Button>
+                    <input
+                      type="file"
+                      ref={fileRef}
+                      accept=".csv, .xlsx, .xls"
+                      className={classes.fileInput}
+                      onChange={handleFileImport}
+                    />
                     <Button
                       variant="contained"
                       color="primary"
