@@ -10,6 +10,7 @@ import {
   getAccount,
   createOperation,
   getAllOperations,
+  deleteOperation,
 } from "../../../../../services/accountService";
 import { snackbarActions } from "../../../../../components/Snackbar/slice";
 
@@ -86,8 +87,46 @@ export function* addOperation({
     );
   }
 }
+
+export function* removeOperation({
+  payload,
+}: PayloadAction<{ accountId: string; operationId: string }>): Generator<any> {
+  try {
+    const response = yield call(
+      deleteOperation,
+      payload.accountId,
+      payload.operationId
+    );
+    if (response) {
+      yield put(actions.removeOperationSuccess(response as string));
+      yield put(
+        snackbarActions.showSnackbar({
+          message: "Account operation has been deleted successfully",
+          type: "success",
+        })
+      );
+      const operationsResponse = yield call(
+        getAllOperations,
+        payload.accountId
+      );
+      yield put(
+        actions.getOperationsSuccess(
+          (operationsResponse as PaginatedResponse<Operation>).content
+        )
+      );
+    }
+  } catch (error) {
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
+  }
+}
 export function* accountDetailSaga(): Generator<any> {
   yield takeEvery(actions.getAccount, retrieveAccount);
   yield takeEvery(actions.getOperations, getOperations);
   yield takeEvery(actions.addOperation, addOperation);
+  yield takeEvery(actions.removeOperation, removeOperation);
 }

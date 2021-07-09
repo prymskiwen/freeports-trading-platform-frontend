@@ -14,10 +14,12 @@ import {
   DialogTitle,
   Divider,
   Grid,
+  IconButton,
   makeStyles,
   Theme,
 } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
 import red from "@material-ui/core/colors/red";
 import MaterialTable from "material-table";
 
@@ -29,7 +31,7 @@ import { selectAccounts } from "./slice/selectors";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     actionButton: { marginRight: theme.spacing(2) },
-    redButton: { backgroundColor: red[500], color: "white" },
+    deleteButton: { color: red[500] },
   })
 );
 
@@ -159,13 +161,12 @@ const NostroAccounts = (): React.ReactElement => {
       render: (rowData: any) => {
         const { id } = rowData;
         return (
-          <Button
-            className={classes.redButton}
-            variant="contained"
+          <IconButton
+            className={classes.deleteButton}
             onClick={() => handleAccountDelete(id)}
           >
-            Delete
-          </Button>
+            <DeleteIcon />
+          </IconButton>
         );
       },
     },

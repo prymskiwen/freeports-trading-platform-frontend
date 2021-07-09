@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
@@ -22,9 +23,11 @@ import {
 } from "@material-ui/core";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
 import FlashOnIcon from "@material-ui/icons/FlashOn";
 import SearchIcon from "@material-ui/icons/Search";
+import red from "@material-ui/core/colors/red";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -55,58 +58,6 @@ interface operationType {
   label?: string;
   type: string;
 }
-
-const pendingReconciliationColumns = (currency: string) => [
-  {
-    field: "date",
-    title: "Date",
-    cellStyle: {
-      width: "15%",
-    },
-  },
-  {
-    field: "label",
-    title: "Purpose of the transfer",
-    cellStyle: {
-      width: "35%",
-    },
-  },
-  {
-    title: "Credit",
-    cellStyle: {
-      width: "15%",
-    },
-    render: (rowData: any) => {
-      const { type, amount } = rowData;
-
-      return type === "credit" ? `${currency} ${amount}` : "";
-    },
-  },
-  {
-    title: "Debit",
-    cellStyle: {
-      width: "30%",
-    },
-    render: (rowData: any) => {
-      const { type, amount } = rowData;
-
-      return type === "debit" ? `${currency} ${amount}` : "";
-    },
-  },
-  {
-    title: "Action",
-    cellStyle: {
-      width: "5%",
-    },
-    render: (rowData: any) => {
-      return (
-        <IconButton color="inherit" aria-label="Add Role">
-          <FlashOnIcon fontSize="small" color="primary" />
-        </IconButton>
-      );
-    },
-  },
-];
 
 const passedTransactionsColumns = [
   {
@@ -156,6 +107,9 @@ const passedTransactionsColumns = [
 const useStyles = makeStyles({
   importButton: {
     marginRight: "20px",
+  },
+  deleteButton: {
+    color: red[500],
   },
 });
 
@@ -214,6 +168,72 @@ const Detail = (): React.ReactElement => {
   const [searchText, setSearchText] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
+  const pendingReconciliationColumns = [
+    {
+      field: "date",
+      title: "Date",
+      cellStyle: {
+        width: "20%",
+      },
+    },
+    {
+      field: "label",
+      title: "Purpose of the transfer",
+      cellStyle: {
+        width: "30%",
+      },
+    },
+    {
+      title: "Credit",
+      cellStyle: {
+        width: "15%",
+      },
+      render: (rowData: any) => {
+        const { type, amount } = rowData;
+
+        return type === "credit" ? `${selectedAccount.currency} ${amount}` : "";
+      },
+    },
+    {
+      title: "Debit",
+      cellStyle: {
+        width: "15%",
+      },
+      render: (rowData: any) => {
+        const { type, amount } = rowData;
+
+        return type === "debit" ? `${selectedAccount.currency} ${amount}` : "";
+      },
+    },
+    {
+      cellStyle: {
+        width: "10%",
+      },
+      sorting: false,
+      render: (rowData: any) => {
+        const { id } = rowData;
+
+        return (
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <IconButton color="inherit">
+                <FlashOnIcon fontSize="small" color="primary" />
+              </IconButton>
+            </Grid>
+            <Grid item xs={6}>
+              <IconButton
+                color="inherit"
+                onClick={() => handleOperationDelete(id)}
+              >
+                <DeleteIcon fontSize="small" color="error" />
+              </IconButton>
+            </Grid>
+          </Grid>
+        );
+      },
+    },
+  ];
+
   useEffect(() => {
     let mounted = false;
     const init = async () => {
@@ -250,6 +270,12 @@ const Detail = (): React.ReactElement => {
       accountDetailActions.addOperation({ accountId, operation: values })
     );
     setCreateModalOpen(false);
+  };
+
+  const handleOperationDelete = async (operationId: string) => {
+    await dispatch(
+      accountDetailActions.removeOperation({ accountId, operationId })
+    );
   };
 
   return (
@@ -389,9 +415,7 @@ const Detail = (): React.ReactElement => {
                   <Grid container spacing={4}>
                     <Grid item xs={12}>
                       <MaterialTable
-                        columns={pendingReconciliationColumns(
-                          selectedAccount.currency
-                        )}
+                        columns={pendingReconciliationColumns}
                         data={operations.map((opt: any) => ({
                           ...opt,
                           date: convertDateToDMY(opt.date),

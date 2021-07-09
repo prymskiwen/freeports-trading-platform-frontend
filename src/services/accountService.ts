@@ -102,10 +102,26 @@ const getAllOperations = (accountId: string): Promise<Operation[]> => {
 const createOperation = (
   accountId: string,
   operation: Operation
-): Promise<any> => {
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
       .post(`/account/${accountId}/operation`, operation)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
+
+const deleteOperation = (
+  accountId: string,
+  operationId: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(`/account/${accountId}/operation/${operationId}`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -125,4 +141,5 @@ export {
   unassignOrganizationAccount,
   createOperation,
   getAllOperations,
+  deleteOperation,
 };

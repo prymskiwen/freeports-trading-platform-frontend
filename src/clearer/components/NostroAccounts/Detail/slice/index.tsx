@@ -28,6 +28,7 @@ export const initialState: AccountDetailState = {
   loading: false,
   creatingOperation: false,
   gettingOperations: false,
+  deletingOperation: false,
 };
 
 const slice = createSlice({
@@ -58,6 +59,15 @@ const slice = createSlice({
     },
     addOperationSuccess(state, action: PayloadAction<string>) {
       state.creatingOperation = false;
+    },
+    removeOperation(
+      state,
+      action: PayloadAction<{ accountId: string; operationId: string }>
+    ) {
+      state.deletingOperation = true;
+    },
+    removeOperationSuccess(state, action: PayloadAction<string>) {
+      state.deletingOperation = false;
     },
   },
 });

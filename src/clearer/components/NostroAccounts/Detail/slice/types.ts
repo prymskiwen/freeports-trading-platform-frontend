@@ -7,4 +7,5 @@ export interface AccountDetailState {
   loading: boolean;
   creatingOperation: boolean;
   gettingOperations: boolean;
+  deletingOperation: boolean;
 }
