@@ -59,7 +59,7 @@ const NostroAccounts = (): React.ReactElement => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { actions } = useAccountsSlice();
-  const { accounts } = useSelector(selectAccounts);
+  const accounts = useSelector(selectAccounts);
   const [declareAccountModalOpen, setDeclareAccountModalOpen] =
     React.useState(false);
   const [account, setAccount] = useState<accountType>({
@@ -209,7 +209,7 @@ const NostroAccounts = (): React.ReactElement => {
                   }) => (
                     <form onSubmit={handleSubmit} noValidate>
                       <DialogTitle id="form-dialog-title">
-                        Create New account
+                        Create New Account
                       </DialogTitle>
                       <Divider />
                       <DialogContent>

@@ -7,6 +7,7 @@ import {
   useInjectSaga,
 } from "../../../../../util/redux-injectors";
 import Account from "../../../../../types/Account";
+import Operation from "../../../../../types/Operation";
 import { accountDetailSaga } from "./saga";
 import { AccountDetailState } from "./types";
 
@@ -23,7 +24,10 @@ const defaultAccount = {
 
 export const initialState: AccountDetailState = {
   selectedAccount: defaultAccount,
+  operations: [],
   loading: false,
+  creatingOperation: false,
+  gettingOperations: false,
 };
 
 const slice = createSlice({
@@ -37,6 +41,23 @@ const slice = createSlice({
     getAccountSuccess(state, action: PayloadAction<Account>) {
       state.loading = false;
       state.selectedAccount = action.payload;
+    },
+    getOperations(state, action: PayloadAction<string>) {
+      state.gettingOperations = true;
+      state.operations = [];
+    },
+    getOperationsSuccess(state, action: PayloadAction<Operation[]>) {
+      state.gettingOperations = false;
+      state.operations = action.payload;
+    },
+    addOperation(
+      state,
+      action: PayloadAction<{ accountId: string; operation: Operation }>
+    ) {
+      state.creatingOperation = true;
+    },
+    addOperationSuccess(state, action: PayloadAction<string>) {
+      state.creatingOperation = false;
     },
   },
 });

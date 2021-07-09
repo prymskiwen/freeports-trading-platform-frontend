@@ -1,10 +1,16 @@
-import { takeEvery, call, put } from "redux-saga/effects";
+import { takeEvery, call, put, take } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import Account from "../../../../../types/Account";
+import Operation from "../../../../../types/Operation";
+import PaginatedResponse from "../../../../../types/PaginatedResponse";
 
 import { accountDetailActions as actions } from ".";
 
-import { getAccount } from "../../../../../services/accountService";
+import {
+  getAccount,
+  createOperation,
+  getAllOperations,
+} from "../../../../../services/accountService";
 import { snackbarActions } from "../../../../../components/Snackbar/slice";
 
 export function* retrieveAccount({
@@ -14,13 +20,74 @@ export function* retrieveAccount({
     const response = yield call(getAccount, payload);
     if (response) yield put(actions.getAccountSuccess(response as Account));
   } catch (error) {
-    snackbarActions.showSnackbar({
-      message: error.message,
-      type: "error",
-    });
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
   }
 }
 
+export function* getOperations({
+  payload,
+}: PayloadAction<string>): Generator<any> {
+  try {
+    const response = yield call(getAllOperations, payload);
+    if (response)
+      yield put(
+        actions.getOperationsSuccess(
+          (response as PaginatedResponse<Operation>).content
+        )
+      );
+  } catch (error) {
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
+  }
+}
+
+export function* addOperation({
+  payload,
+}: PayloadAction<{ accountId: string; operation: Operation }>): Generator<any> {
+  try {
+    const response = yield call(
+      createOperation,
+      payload.accountId,
+      payload.operation
+    );
+    if (response) {
+      yield put(actions.addOperationSuccess(response as string));
+      yield put(
+        snackbarActions.showSnackbar({
+          message: "Account operation has been created successfully",
+          type: "success",
+        })
+      );
+      const operationsResponse = yield call(
+        getAllOperations,
+        payload.accountId
+      );
+      yield put(
+        actions.getOperationsSuccess(
+          (operationsResponse as PaginatedResponse<Operation>).content
+        )
+      );
+    }
+  } catch (error) {
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
+  }
+}
 export function* accountDetailSaga(): Generator<any> {
   yield takeEvery(actions.getAccount, retrieveAccount);
+  yield takeEvery(actions.getOperations, getOperations);
+  yield takeEvery(actions.addOperation, addOperation);
 }

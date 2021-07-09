@@ -16,10 +16,12 @@ export function* getAccounts(): Generator<any> {
     const response = yield call(getAllAccounts);
     if (response) yield put(actions.getAccountsSuccess(response as Account[]));
   } catch (error) {
-    snackbarActions.showSnackbar({
-      message: error.message,
-      type: "error",
-    });
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
   }
 }
 
@@ -40,10 +42,12 @@ export function* addAccount({
       yield take(actions.getAccountsSuccess);
     }
   } catch (error) {
-    snackbarActions.showSnackbar({
-      message: error.message,
-      type: "error",
-    });
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
   }
 }
 
@@ -64,10 +68,12 @@ export function* removeAccount({
       yield take(actions.getAccountsSuccess);
     }
   } catch (error) {
-    snackbarActions.showSnackbar({
-      message: error.message,
-      type: "error",
-    });
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.message,
+        type: "error",
+      })
+    );
   }
 }
 

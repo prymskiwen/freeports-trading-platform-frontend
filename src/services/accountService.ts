@@ -1,5 +1,6 @@
 import axios from "../util/axios";
 import Account from "../types/Account";
+import Operation from "../types/Operation";
 
 const getAllAccounts = (): Promise<Account[]> => {
   return new Promise((resolve, reject) => {
@@ -85,6 +86,35 @@ const unassignOrganizationAccount = (
   });
 };
 
+const getAllOperations = (accountId: string): Promise<Operation[]> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/account/${accountId}/operation`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const createOperation = (
+  accountId: string,
+  operation: Operation
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/account/${accountId}/operation`, operation)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response);
+      });
+  });
+};
+
 export {
   getAllAccounts as default,
   getAllAccounts,
@@ -93,4 +123,6 @@ export {
   deleteAccount,
   assignOrganizationAccount,
   unassignOrganizationAccount,
+  createOperation,
+  getAllOperations,
 };

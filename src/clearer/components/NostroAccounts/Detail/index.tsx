@@ -2,9 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { Form } from "react-final-form";
+import arrayMutators from "final-form-arrays";
+import { Radios, TextField as MuiTextField } from "mui-rff";
 import {
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   Grid,
   IconButton,
   InputAdornment,
@@ -33,8 +41,20 @@ import {
 
 import { useAccountsSlice } from "../slice";
 import { useAccountDetailSlice } from "./slice";
-import { selectAccounts } from "../slice/selectors";
-import { selectAccountDetail } from "./slice/selectors";
+import { selectAccounts, selectIsAccountsLoading } from "../slice/selectors";
+import {
+  selectAccountDetail,
+  selectIsDetailLoading,
+  selectOperations,
+} from "./slice/selectors";
+import Loader from "../../../../components/Loader";
+
+interface operationType {
+  amount: number;
+  date: string;
+  label?: string;
+  type: string;
+}
 
 const pendingReconciliationColumns = [
   {
@@ -45,29 +65,36 @@ const pendingReconciliationColumns = [
     },
   },
   {
-    field: "purpose_of_the_transfer",
+    field: "label",
     title: "Purpose of the transfer",
     cellStyle: {
       width: "35%",
     },
   },
   {
-    field: "credit",
     title: "Credit",
     cellStyle: {
       width: "15%",
     },
+    render: (rowData: any) => {
+      const { type, amount } = rowData;
+
+      return type === "credit" ? amount : "";
+    },
   },
   {
-    field: "debit",
     title: "Debit",
     cellStyle: {
       width: "30%",
     },
+    render: (rowData: any) => {
+      const { type, amount } = rowData;
+
+      return type === "debit" ? amount : "";
+    },
   },
   {
-    field: "flash",
-    title: "",
+    title: "Action",
     cellStyle: {
       width: "5%",
     },
@@ -132,23 +159,67 @@ const useStyles = makeStyles({
   },
 });
 
+const validate = (values: any) => {
+  const errors: Partial<any> = {};
+
+  if (!values.date) {
+    errors.date = "This Field Required";
+  }
+
+  if (!values.type) {
+    errors.type = "This Field Required";
+  }
+
+  if (!values.amount) {
+    errors.amount = "This Field Required";
+  }
+
+  if (!values.date) {
+    errors.date = "This Field Required";
+  }
+
+  return errors;
+};
+
+const convertDateToDMY = (date: string) => {
+  const d = new Date(date);
+  let month = `${d.getMonth() + 1}`;
+  let day = `${d.getDate()}`;
+  const year = `${d.getFullYear()}`;
+
+  if (month.length < 2) month = `0${month}`;
+  if (day.length < 2) day = `0${day}`;
+
+  return [day, month, year].join(".");
+};
+
 const Detail = (): React.ReactElement => {
   const { id: accountId } = useParams<{ id: string }>();
-  console.log("account id ", accountId);
   const classes = useStyles();
   const dispatch = useDispatch();
   const history = useHistory();
   const { actions: accountsActions } = useAccountsSlice();
   const { actions: accountDetailActions } = useAccountDetailSlice();
-  const { accounts } = useSelector(selectAccounts);
-  const { selectedAccount } = useSelector(selectAccountDetail);
+  const accounts = useSelector(selectAccounts);
+  const operations = useSelector(selectOperations);
+  const [operation, setOperation] = useState<operationType>({
+    amount: 0,
+    date: "",
+    label: "",
+    type: "credit",
+  });
+  const selectedAccount = useSelector(selectAccountDetail);
+  const accountsLoading = useSelector(selectIsAccountsLoading);
+  const accountDetailLoading = useSelector(selectIsDetailLoading);
   const [searchText, setSearchText] = useState("");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   useEffect(() => {
     let mounted = false;
     const init = async () => {
       await dispatch(accountsActions.getAccounts());
       await dispatch(accountDetailActions.getAccount(accountId));
+      await dispatch(accountDetailActions.getOperations(accountId));
     };
     init();
 
@@ -164,6 +235,21 @@ const Detail = (): React.ReactElement => {
   const onSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setSearchText(value);
+  };
+
+  const handleCreateModalOpen = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleCreateModalClose = () => {
+    setCreateModalOpen(false);
+  };
+
+  const handleOperationCreate = async (values: operationType) => {
+    await dispatch(
+      accountDetailActions.addOperation({ accountId, operation: values })
+    );
+    setCreateModalOpen(false);
   };
 
   return (
@@ -243,7 +329,11 @@ const Detail = (): React.ReactElement => {
                       />
                       IMPORT OPERATIONS
                     </Button>
-                    <Button variant="contained" color="primary">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleCreateModalOpen}
+                    >
                       <EditIcon fontSize="small" style={{ color: "white" }} />
                       CREATE OPERATIONS
                     </Button>
@@ -270,54 +360,163 @@ const Detail = (): React.ReactElement => {
                     }}
                   />
                 </Grid>
-                <List component="nav" aria-label="accounts">
-                  {accounts
-                    .filter((accItem) =>
-                      accItem.name
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase())
-                    )
-                    .map((account) => (
-                      <ListItem
-                        component={Link}
-                        button
-                        key={account.id}
-                        selected={account.id === selectedAccount.id}
-                        to={`/nostro-accounts/${account.id}`}
-                      >
-                        <ListItemText primary={`${account.name}`} />
-                      </ListItem>
-                    ))}
-                </List>
+                {accountsLoading && <Loader />}
+                {!accountsLoading && (
+                  <List component="nav" aria-label="accounts">
+                    {accounts
+                      .filter((accItem) =>
+                        accItem.name
+                          .toLowerCase()
+                          .includes(searchText.toLowerCase())
+                      )
+                      .map((account) => (
+                        <ListItem
+                          component={Link}
+                          button
+                          key={account.id}
+                          selected={account.id === selectedAccount.id}
+                          to={`/nostro-accounts/${account.id}`}
+                        >
+                          <ListItemText primary={`${account.name}`} />
+                        </ListItem>
+                      ))}
+                  </List>
+                )}
               </Grid>
               <Grid item xs={10}>
-                <Grid container spacing={4}>
-                  <Grid item xs={12}>
-                    <MaterialTable
-                      columns={pendingReconciliationColumns}
-                      data={pendingReconciliationsData}
-                      title="Pending reconciliations"
-                      options={{
-                        search: true,
-                      }}
-                    />
+                {accountDetailLoading && <Loader />}
+                {!accountDetailLoading && (
+                  <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                      <MaterialTable
+                        columns={pendingReconciliationColumns}
+                        data={operations.map((opt: any) => ({
+                          ...opt,
+                          date: convertDateToDMY(opt.date),
+                        }))}
+                        title="Pending reconciliations"
+                        options={{
+                          search: true,
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <MaterialTable
+                        columns={passedTransactionsColumns}
+                        data={passedTransactionsData}
+                        title="Passed transactions"
+                        options={{
+                          search: true,
+                          pageSize: 10,
+                        }}
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <MaterialTable
-                      columns={passedTransactionsColumns}
-                      data={passedTransactionsData}
-                      title="Passed transactions"
-                      options={{
-                        search: true,
-                        pageSize: 10,
-                      }}
-                    />
-                  </Grid>
-                </Grid>
+                )}
               </Grid>
             </Grid>
           </Grid>
         </Grid>
+        <Dialog
+          open={createModalOpen}
+          onClose={handleCreateModalClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <Form
+            onSubmit={handleOperationCreate}
+            mutators={{
+              ...arrayMutators,
+            }}
+            initialValues={operation}
+            validate={validate}
+            render={({
+              handleSubmit,
+              submitting,
+              pristine,
+              form: {
+                mutators: { push },
+              },
+              values,
+            }) => (
+              <form onSubmit={handleSubmit} noValidate>
+                <DialogTitle id="form-dialog-title">
+                  Create Bank Account Operation
+                </DialogTitle>
+                <Divider />
+                <DialogContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={5}>
+                      <MuiTextField
+                        required
+                        type="date"
+                        name="date"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <MuiTextField
+                        required
+                        label="Amount"
+                        type="number"
+                        name="amount"
+                        variant="outlined"
+                        fieldProps={{
+                          parse: (value) => parseInt(value, 10),
+                        }}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Radios
+                        name="type"
+                        formControlProps={{ margin: "none" }}
+                        radioGroupProps={{ row: true }}
+                        data={[
+                          {
+                            label: (
+                              <Typography variant="body2">Credit</Typography>
+                            ),
+                            value: "credit",
+                          },
+                          {
+                            label: (
+                              <Typography variant="body2">Debit</Typography>
+                            ),
+                            value: "debit",
+                          },
+                        ]}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <MuiTextField
+                        label="Purpose of the transfer"
+                        type="text"
+                        name="label"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </Grid>
+                  </Grid>
+                </DialogContent>
+                <Divider />
+                <DialogActions>
+                  <Button onClick={handleCreateModalClose} variant="contained">
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={submitting || pristine}
+                  >
+                    Create
+                  </Button>
+                </DialogActions>
+              </form>
+            )}
+          />
+        </Dialog>
       </Container>
     </div>
   );

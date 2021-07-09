@@ -9,12 +9,10 @@ const selectDomain = (state: RootState) => state.accounts || initialState;
 // eslint-disable-next-line import/prefer-default-export
 export const selectAccounts = createSelector(
   [selectDomain],
-  (accountsState) => ({
-    accounts: accountsState.accounts,
-  })
+  (accountsState) => accountsState.accounts
 );
 
-export const selectIsLoading = createSelector(
+export const selectIsAccountsLoading = createSelector(
   [selectDomain],
   (accountsState) => accountsState.loading
 );
