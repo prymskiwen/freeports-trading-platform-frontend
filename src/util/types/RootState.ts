@@ -4,6 +4,8 @@ import { AccountsState } from "../../clearer/components/NostroAccounts/slice/typ
 import { AccountDetailState } from "../../clearer/components/NostroAccounts/Detail/slice/types";
 import { CoWorkersState } from "../../clearer/components/CoWorker/slice/types";
 import { CoWorkerFormState } from "../../clearer/components/CoWorkerForm/slice/types";
+import { DesksState } from "../../organization/components/Desks/slice/types";
+import { DeskDetailState } from "../../organization/components/Desks/Detail/slice/types";
 import { SnackbarState } from "../../components/Snackbar/slice/types";
 import { ProfileState } from "../../components/Profile/slice/types";
 
@@ -19,6 +21,8 @@ export interface RootState {
   accounts?: AccountsState;
   accountDetail?: AccountDetailState;
   coWorkers?: CoWorkersState;
+  desks?: DesksState;
+  deskDetail?: DeskDetailState;
   global?: any;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
