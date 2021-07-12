@@ -1,7 +1,6 @@
 import { takeEvery, call, put, take } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import Desk from "../../../../../types/Desk";
-import PaginatedResponse from "../../../../../types/PaginatedResponse";
 
 import { deskDetailActions as actions } from ".";
 
