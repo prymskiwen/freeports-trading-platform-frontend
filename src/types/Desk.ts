@@ -3,5 +3,11 @@ export default interface Desk {
 
   name: string;
 
+  investors?: number;
+
+  coworkers?: number;
+
+  value?: number;
+
   createdAt?: string;
 }

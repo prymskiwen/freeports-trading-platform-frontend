@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
 import Lockr from "lockr";
@@ -25,6 +26,7 @@ import {
   Theme,
   Typography,
 } from "@material-ui/core";
+import DeleteIcon from "@material-ui/icons/Delete";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -49,46 +51,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const columns = [
-  {
-    field: "name",
-    title: "Desks",
-    cellStyle: {
-      width: "25%",
-    },
-    render: (rowData: any) => {
-      const { id, name } = rowData;
-
-      return <Link to={`/desks/${id}`}>{name}</Link>;
-    },
-  },
-  {
-    field: "investors",
-    title: "Investors",
-    cellStyle: {
-      width: "25%",
-    },
-  },
-  {
-    field: "coWorkers",
-    title: "Co-workers",
-    cellStyle: {
-      width: "25%",
-    },
-  },
-  {
-    field: "deskValue",
-    title: "Desk Value",
-    cellStyle: {
-      width: "25%",
-    },
-  },
-];
-
 const currencyOptions = [{ name: "U$", value: "usd" }];
 interface deskType {
   name: string;
-  createdAt: string;
+  investors?: number;
+  coworkers?: number;
+  value?: number;
+  createdAt?: string;
 }
 
 const validate = (values: any) => {
@@ -106,10 +75,64 @@ const Desks = (): React.ReactElement => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [desk, setDesk] = useState<deskType>({
     name: "",
-    createdAt: "",
   });
   const { actions } = useDesksSlice();
   const desks = useSelector(selectDesks);
+
+  const columns = [
+    {
+      field: "name",
+      title: "Desks",
+      cellStyle: {
+        width: "30%",
+      },
+      render: (rowData: any) => {
+        const { id, name } = rowData;
+
+        return <Link to={`/desks/${id}`}>{name}</Link>;
+      },
+    },
+    {
+      field: "investors",
+      title: "Investors",
+      cellStyle: {
+        width: "20%",
+      },
+    },
+    {
+      field: "coworkers",
+      title: "Co-workers",
+      cellStyle: {
+        width: "20%",
+      },
+    },
+    {
+      field: "value",
+      title: "Desk Value",
+      cellStyle: {
+        width: "20%",
+      },
+    },
+    {
+      title: "Action",
+      cellStyle: {
+        width: "10%",
+      },
+      render: (rowData: any) => {
+        const { id } = rowData;
+
+        return (
+          <Grid container spacing={2}>
+            <Grid item>
+              <IconButton color="inherit" onClick={() => handleDeskDelete(id)}>
+                <DeleteIcon fontSize="small" color="error" />
+              </IconButton>
+            </Grid>
+          </Grid>
+        );
+      },
+    },
+  ];
 
   useEffect(() => {
     dispatch(actions.getDesks(organizationId));
@@ -126,6 +149,10 @@ const Desks = (): React.ReactElement => {
   const handleDeskCreate = async (values: deskType) => {
     await dispatch(actions.addDesk({ organizationId, desk: values }));
     setDialogOpen(false);
+  };
+
+  const handleDeskDelete = (id: string) => {
+    dispatch(actions.removeDesk({ organizationId, deskId: id }));
   };
 
   return (

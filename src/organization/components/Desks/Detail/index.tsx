@@ -196,11 +196,13 @@ const Detail = (): React.ReactElement => {
                 {deskDetailLoading && <Loader />}
                 {!deskDetailLoading && (
                   <Container>
-                    <Grid container alignItems="center" justify="space-between">
-                      <div>
+                    <Grid container>
+                      <Grid item xs={12}>
                         <Typography variant="h5">
                           {selectedDesk.name}
                         </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
                         {selectedDesk.createdAt && (
                           <Typography variant="body2" color="textSecondary">
                             {`Creation date: ${convertDateToDMY(
@@ -208,8 +210,7 @@ const Detail = (): React.ReactElement => {
                             )}`}
                           </Typography>
                         )}
-                      </div>
-                      <Button className={classes.deleteButton}>Delete</Button>
+                      </Grid>
                     </Grid>
                     <Divider />
                   </Container>
