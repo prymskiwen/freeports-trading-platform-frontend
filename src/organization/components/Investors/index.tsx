@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
-  Button,
   Container,
   createStyles,
-  Fab,
   FormControl,
   Grid,
+  Icon,
+  IconButton,
   makeStyles,
   MenuItem,
   Select,
@@ -14,8 +14,7 @@ import {
   Typography,
   Chip,
 } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import MaterialTable, { MTableHeader, MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -26,8 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
     addButton: {
       // color: theme.palette.primary.main,
       fontWeight: "bold",
-      marginRight: theme.spacing(2),
-      marginLeft: theme.spacing(2),
+      padding: 0,
     },
     currencyDropdown: {
       margin: theme.spacing(1),
@@ -77,17 +75,6 @@ const Investors = (): React.ReactElement => {
     <div className="main-wrapper">
       <Container>
         <Grid container spacing={2}>
-          <Grid container item alignItems="center" xs={12}>
-            <Typography variant="h4">Investors</Typography>
-            <Fab
-              className={`${classes.addButton} mr-10`}
-              color="primary"
-              aria-label="Add"
-              size="small"
-            >
-              <AddIcon fontSize="small" />
-            </Fab>
-          </Grid>
           <Grid container item alignItems="center" justify="flex-end" xs={12}>
             <Typography variant="subtitle1">
               Preferred currency display:{" "}
@@ -109,15 +96,20 @@ const Investors = (): React.ReactElement => {
           <Grid container>
             <Grid item xs={12}>
               <MaterialTable
-                title=""
+                title={
+                  <Grid container alignItems="center" spacing={2}>
+                    <Grid item>
+                      <Typography variant="h5">Investors</Typography>
+                    </Grid>
+                    <Grid item>
+                      <IconButton className={classes.addButton} color="primary">
+                        <Icon fontSize="large">add_circle</Icon>
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                }
                 columns={columns}
                 data={data}
-                options={{
-                  search: true,
-                  pageSize: 10,
-                  filtering: false,
-                  searchFieldAlignment: "left",
-                }}
               />
             </Grid>
           </Grid>

@@ -30,7 +30,7 @@ export default [
     component: lazy(() => import("../components/Desks")),
   },
   {
-    path: "/desks/detail",
+    path: "/desks/:deskId",
     exact: true,
     auth: true,
     component: lazy(() => import("../components/Desks/Detail")),
