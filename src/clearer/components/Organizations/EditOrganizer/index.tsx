@@ -251,10 +251,14 @@ const EditOrganizer = (): React.ReactElement => {
     let valid = true;
     list.forEach((item1: string) => {
       const selectedObject = getAccount(item1);
-      const invalidCount = list.filter(
+      let invalidCount = list.filter(
         (item2: string) =>
           item1 !== item2 &&
           selectedObject.currency === getAccount(item2).currency
+      ).length;
+      if (invalidCount) valid = false;
+      invalidCount = assignedAccounts.filter(
+        (acc: assignedAccountType) => selectedObject.currency === acc.currency
       ).length;
       if (invalidCount) valid = false;
     });
@@ -496,7 +500,9 @@ const EditOrganizer = (): React.ReactElement => {
                               </IconButton>
                             </Grid>
                             <Grid item>
-                              <Typography variant="body2">{`Account: ${account.iban}`}</Typography>
+                              <Typography variant="body2">
+                                {`Account (${account.currency}): ${account.iban}`}
+                              </Typography>
                             </Grid>
                           </Grid>
                         </Grid>

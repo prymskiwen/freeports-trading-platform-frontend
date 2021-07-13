@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
 import {
   Avatar,
@@ -13,12 +14,22 @@ import {
   makeStyles,
   MenuItem,
   Select,
+  Snackbar,
 } from "@material-ui/core";
 import { Form } from "react-final-form";
 import { TextField } from "mui-rff";
 import { useHistory } from "react-router";
+import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
 import { useOrganization, useAccounts } from "../../../../hooks";
+
+interface accountType {
+  id: string;
+  name: string;
+  currency: string;
+  type: string;
+  iban: string;
+}
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -64,21 +75,6 @@ const onValidate = (values: any) => {
   if (!values.name) {
     errors.name = "This Field Required";
   }
-  // if(!values.street1){
-  //   errors.street1 = "This Field Required";
-  // }
-  // if(!values.street2){
-  //   errors.street2 = "This Field Required";
-  // }
-  // if(!values.zip){
-  //   errors.zip = "This Field Required";
-  // }
-  // if(!values.city){
-  //   errors.city = "This Field Required";
-  // }
-  // if(!values.country){
-  //   errors.country = "This Field Required";
-  // }
   if (!values.commissionOrganization) {
     errors.commissionOrganization = "This Field Required";
   }
@@ -88,24 +84,24 @@ const onValidate = (values: any) => {
   return errors;
 };
 
-interface accountType {
-  id: string;
-  name: string;
-  currency: string;
-  type: string;
-  iban: string;
-}
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+};
 
 const AddOrganizer = (): React.ReactElement => {
   const history = useHistory();
   const classes = useStyles();
   const [avatar, setAvatar] = useState();
-
   const [accounts, setAccounts] = useState([] as accountType[]);
   const [selectedAccounts, setSelectedAccounts] = useState([] as string[]);
-
   const { addOrganization } = useOrganization();
   const { allAccounts, assignAccount } = useAccounts();
+  const [submitResponse, setSubmitResponse] = useState({
+    type: "success",
+    message: "",
+  });
+  const [showAlert, setShowAlert] = useState(false);
+  const timer = React.useRef<number>();
 
   useEffect(() => {
     let mounted = false;
@@ -122,6 +118,10 @@ const AddOrganizer = (): React.ReactElement => {
     };
   }, []);
 
+  const handleAlertClose = () => {
+    setShowAlert(false);
+  };
+
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.currentTarget;
     if (files && files.length) {
@@ -133,11 +133,38 @@ const AddOrganizer = (): React.ReactElement => {
     }
   };
 
+  const getAccount = (accId: string): accountType => {
+    const obj = accounts.filter((item: accountType) => item.id === accId);
+    return obj[0];
+  };
+
+  const handleAssignCheck = (list: Array<string>): boolean => {
+    let valid = true;
+    list.forEach((item1: string) => {
+      const selectedObject = getAccount(item1);
+      const invalidCount = list.filter(
+        (item2: string) =>
+          item1 !== item2 &&
+          selectedObject.currency === getAccount(item2).currency
+      ).length;
+      if (invalidCount) valid = false;
+    });
+    return valid;
+  };
+
   const onHandleAccountSelect = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     const { value } = event.target;
-    setSelectedAccounts(value as string[]);
+    if (handleAssignCheck(value as string[]))
+      setSelectedAccounts(value as string[]);
+    else {
+      setSubmitResponse({
+        type: "error",
+        message: "You can't select the accounts with the same currency",
+      });
+      setShowAlert(true);
+    }
   };
 
   const onsubmit = async (values: any) => {
@@ -276,7 +303,7 @@ const AddOrganizer = (): React.ReactElement => {
                                 </MenuItem>
                                 {accounts.map((item) => (
                                   <MenuItem key={item.id} value={item.id}>
-                                    {item.name}
+                                    {`${item.name} (${item.currency})`}
                                   </MenuItem>
                                 ))}
                               </Select>
@@ -343,6 +370,20 @@ const AddOrganizer = (): React.ReactElement => {
           )}
         />
       </Container>
+
+      <Snackbar
+        autoHideDuration={2000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={showAlert}
+        onClose={handleAlertClose}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={submitResponse.type === "success" ? "success" : "error"}
+        >
+          {submitResponse.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
