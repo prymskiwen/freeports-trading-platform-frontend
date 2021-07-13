@@ -242,11 +242,38 @@ const EditOrganizer = (): React.ReactElement => {
     history.push(`/organizations/${id}/managers/add`);
   };
 
+  const getAccount = (accId: string): accountType => {
+    const obj = accounts.filter((item: accountType) => item.id === accId);
+    return obj[0];
+  };
+
+  const handleAssignCheck = (list: Array<string>): boolean => {
+    let valid = true;
+    list.forEach((item1: string) => {
+      const selectedObject = getAccount(item1);
+      const invalidCount = list.filter(
+        (item2: string) =>
+          item1 !== item2 &&
+          selectedObject.currency === getAccount(item2).currency
+      ).length;
+      if (invalidCount) valid = false;
+    });
+    return valid;
+  };
+
   const onHandleAccountSelect = (
     event: React.ChangeEvent<{ value: unknown }>
   ) => {
     const { value } = event.target;
-    setSelectedAccounts(value as string[]);
+    if (handleAssignCheck(value as string[]))
+      setSelectedAccounts(value as string[]);
+    else {
+      setSubmitResponse({
+        type: "error",
+        message: "You can't select the accounts with the same currency",
+      });
+      setShowAlert(true);
+    }
   };
 
   const onHandleAccountsAssign = async () => {
@@ -424,7 +451,7 @@ const EditOrganizer = (): React.ReactElement => {
                                   )
                                   .map((item: accountType) => (
                                     <MenuItem key={item.id} value={item.id}>
-                                      {item.name}
+                                      {`${item.name} (${item.currency})`}
                                     </MenuItem>
                                   ))}
                               </Select>
