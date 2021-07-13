@@ -183,7 +183,7 @@ export class Vault {
     // const request = await this.createOrganization();
 
     // const result = await this.sendRequest(request);
-    console.log("Organization created ", result);
+    // console.log("Organization created ", result);
 
     return tokenString;
   }
