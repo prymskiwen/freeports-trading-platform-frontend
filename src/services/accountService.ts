@@ -14,6 +14,7 @@ const getAllAccounts = (): Promise<Account[]> => {
       });
   });
 };
+<<<<<<< HEAD
 
 const getAccount = (accountId: string): Promise<Account> => {
   return new Promise((resolve, reject) => {
@@ -53,6 +54,8 @@ const deleteAccount = (accountId: string): Promise<any> => {
       });
   });
 };
+=======
+>>>>>>> VAULT INCOMPLETE
 
 const assignOrganizationAccount = (
   organizerId: string,
@@ -63,6 +66,7 @@ const assignOrganizationAccount = (
       .put(`/account/${accountId}/${organizerId}`)
       .then((res: any) => {
         return resolve(res.data);
+<<<<<<< HEAD
       })
       .catch((err) => {
         return reject(err.response);
@@ -124,6 +128,8 @@ const deleteOperation = (
       .delete(`/account/${accountId}/operation/${operationId}`)
       .then((res: any) => {
         return resolve(res.data);
+=======
+>>>>>>> VAULT INCOMPLETE
       })
       .catch((err) => {
         return reject(err.response);
@@ -131,6 +137,7 @@ const deleteOperation = (
   });
 };
 
+<<<<<<< HEAD
 export {
   getAllAccounts as default,
   getAllAccounts,
@@ -143,3 +150,6 @@ export {
   getAllOperations,
   deleteOperation,
 };
+=======
+export { getAllAccounts as default, getAllAccounts, assignOrganizationAccount };
+>>>>>>> VAULT INCOMPLETE
