@@ -7,6 +7,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CircularProgress,
   Container,
   Divider,
   Grid,
@@ -22,6 +23,7 @@ import { useHistory } from "react-router";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 
 import { useOrganization, useAccounts } from "../../../../hooks";
+import { selectIsLoading } from "../../CoWorker/slice/selectors";
 
 interface accountType {
   id: string;
@@ -63,6 +65,18 @@ const useStyles = makeStyles((theme) => ({
     left: 0,
     cursor: "pointer",
   },
+  progressButtonWrapper: {
+    margin: theme.spacing(1),
+    position: "relative",
+  },
+  progressButton: {
+    color: theme.palette.primary.main,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
 }));
 
 const onValidate = (values: any) => {
@@ -101,6 +115,7 @@ const AddOrganizer = (): React.ReactElement => {
     message: "",
   });
   const [showAlert, setShowAlert] = useState(false);
+  const [loading, setLoading] = useState(false);
   const timer = React.useRef<number>();
 
   useEffect(() => {
@@ -168,6 +183,9 @@ const AddOrganizer = (): React.ReactElement => {
   };
 
   const onsubmit = async (values: any) => {
+    setLoading(true);
+    setShowAlert(false);
+    setSubmitResponse({ type: "", message: "" });
     await addOrganization(
       values.name,
       values.street1,
@@ -189,12 +207,24 @@ const AddOrganizer = (): React.ReactElement => {
               }
             });
           });
-        } else {
-          history.push("/organizations");
         }
+        setSubmitResponse({
+          type: "success",
+          message: "Organization has been created successfully.",
+        });
+        setShowAlert(true);
+        timer.current = window.setTimeout(() => {
+          setLoading(false);
+          history.push("/organizations");
+        }, 2000);
       })
       .catch((err: any) => {
-        console.log(err);
+        setLoading(false);
+        setSubmitResponse({
+          type: "error",
+          message: err.message,
+        });
+        setShowAlert(true);
       });
   };
 
@@ -360,9 +390,22 @@ const AddOrganizer = (): React.ReactElement => {
                 <Divider />
                 <CardActions>
                   <Grid container justify="flex-end">
-                    <Button variant="contained" color="primary" type="submit">
-                      Submit
-                    </Button>
+                    <div className={classes.progressButtonWrapper}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={loading}
+                      >
+                        Submit
+                      </Button>
+                      {loading && (
+                        <CircularProgress
+                          size={24}
+                          className={classes.progressButton}
+                        />
+                      )}
+                    </div>
                   </Grid>
                 </CardActions>
               </Card>
