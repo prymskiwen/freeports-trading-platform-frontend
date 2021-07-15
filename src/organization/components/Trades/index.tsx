@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
 import { Link } from "react-router-dom";
-import { Container, Grid } from "@material-ui/core";
+import { Button, Container, Grid } from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -123,14 +124,18 @@ const Trades = (): React.ReactElement => {
       <Container>
         <Grid container spacing={4}>
           <Grid item xs={12}>
+            <Grid container justify="flex-end">
+              <Button color="primary" variant="contained">
+                <AddIcon fontSize="small" />
+                New Trade
+              </Button>
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
             <MaterialTable
-              title="MANUAL TRADES"
+              title="ORDER REQUESTS"
               columns={tradeColumns}
               data={manualTrades}
-              options={{
-                search: true,
-                pageSize: 5,
-              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -138,10 +143,6 @@ const Trades = (): React.ReactElement => {
               title="TRADE HISTORY"
               columns={historyColumns}
               data={tradeHistory}
-              options={{
-                search: true,
-                pageSize: 5,
-              }}
             />
           </Grid>
         </Grid>
