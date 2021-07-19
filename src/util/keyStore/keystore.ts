@@ -19,6 +19,7 @@
 // The key storage database name is hard coded as KeyStore. It
 // uses one object store, called keys.
 //
+import vault from "../../vault";
 
 let db: any = null;
 const dbName = "KeyStore";
@@ -102,6 +103,7 @@ const saveKey = (
 
           const objectStore = transaction.objectStore(objectStoreName);
           const request = objectStore.add(savedObject);
+          vault.init().then().catch(console.error);
         })
         .catch((err) => {
           reject(err);
@@ -126,6 +128,7 @@ const saveKey = (
 
       const objectStore = transaction.objectStore(objectStoreName);
       const request = objectStore.add(savedObject);
+      vault.init().then().catch(console.error);
     }
   });
 };

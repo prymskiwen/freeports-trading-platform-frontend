@@ -5,55 +5,53 @@ import {
   getOrganizationManagers,
   getOrganizerManager,
   addOrganizationManager,
-  addOrganizer,
+  createOrganization,
   addAccount,
   updateOrganizer,
   updateOrganizerManager,
   suspendManager,
   resumeManager,
 } from "../services/organizationService";
-import reduxActions from "../store/actions";
-
-const { clearError, setError } = reduxActions;
+import { useGlobalSlice } from "../slice";
 
 function useOrganization(): any {
   const dispatch = useDispatch();
-
+  const { actions } = useGlobalSlice();
   const organizers = async (
     pageNum: number,
     pagelimit: number,
     searchVal: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const organizations = await getOrganizations(pageNum, pagelimit, searchVal)
       .then((data: any) => {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return organizations;
   };
   const getOrganizerdetail = async (id: string) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const organizationDetail = await getOrganizationDetail(id)
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return organizationDetail;
   };
 
   const getManagers = async (id: string) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const managers = await getOrganizationManagers(id)
       .then((data) => {
         return data.content;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return managers;
   };
@@ -66,7 +64,7 @@ function useOrganization(): any {
     phone: string,
     avatar: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const manager = await addOrganizationManager(
       organizerId,
       nickname,
@@ -79,7 +77,7 @@ function useOrganization(): any {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return manager;
   };
@@ -88,13 +86,13 @@ function useOrganization(): any {
     organizedId: string,
     managerId: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const manager = await getOrganizerManager(organizedId, managerId)
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return manager;
   };
@@ -110,8 +108,8 @@ function useOrganization(): any {
     commissionOrganization: string,
     commissionClearer: string
   ) => {
-    dispatch(clearError());
-    const newOrganization = await addOrganizer(
+    dispatch(actions.clearError());
+    const newOrganization = await createOrganization(
       name,
       street,
       street2,
@@ -126,7 +124,7 @@ function useOrganization(): any {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return newOrganization;
   };
@@ -140,7 +138,7 @@ function useOrganization(): any {
     publicAddress: string,
     vaultWalletId: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const newAddAccount = await addAccount(
       organizerId,
       name,
@@ -154,7 +152,7 @@ function useOrganization(): any {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return newAddAccount;
   };
@@ -167,7 +165,7 @@ function useOrganization(): any {
     commissionOrganization: string,
     commissionClearer: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const updatedOrganization = await updateOrganizer(
       organizerId,
       createdAt,
@@ -180,7 +178,7 @@ function useOrganization(): any {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return updatedOrganization;
   };
@@ -193,7 +191,7 @@ function useOrganization(): any {
     phone: string,
     avatar: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const updatedOrganizationManager = await updateOrganizerManager(
       organizerId,
       managerId,
@@ -206,7 +204,7 @@ function useOrganization(): any {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return updatedOrganizationManager;
   };
@@ -215,13 +213,13 @@ function useOrganization(): any {
     organizerId: string,
     managerId: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const suspend = await suspendManager(organizerId, managerId)
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return suspend;
   };
@@ -230,13 +228,13 @@ function useOrganization(): any {
     organizerId: string,
     managerId: string
   ) => {
-    dispatch(clearError());
+    dispatch(actions.clearError());
     const resume = await resumeManager(organizerId, managerId)
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        dispatch(setError(err));
+        dispatch(actions.setError(err));
       });
     return resume;
   };

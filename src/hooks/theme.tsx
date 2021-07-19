@@ -1,12 +1,10 @@
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-
-import reduxActions from "../store/actions";
-
-const { setTheme } = reduxActions;
+import { useGlobalSlice } from "../slice";
 
 function useTheme(): any {
   const dispatch = useDispatch();
 
+  const { actions } = useGlobalSlice();
   const { theme } = useSelector(
     (state: any) => ({
       theme: state.global.theme,
@@ -17,7 +15,7 @@ function useTheme(): any {
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
 
-    dispatch(setTheme(newTheme));
+    dispatch(actions.setTheme(newTheme));
   };
 
   return {

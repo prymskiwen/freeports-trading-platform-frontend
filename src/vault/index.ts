@@ -1,9 +1,12 @@
+/* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from "axios";
 
 import { VaultAccountType } from "./enum/vault-account-type";
 import { PermissionOwnerType } from "./enum/permission-owner-type";
 import sendRequest, { Method, VaultRequestDto } from "../services/vaultService";
 import arrayBufferToBase64 from "../util/keyStore/functions";
+import { open, listKeys, close } from "../util/keyStore/keystore";
+import { keyPairType } from "../components/Profile/slice/types";
 
 // eslint-disable-next-line no-shadow
 export enum VaultPermissions {
@@ -55,7 +58,9 @@ interface RequestBody {
 export class Vault {
   private API_PREFIX = "/api/v1";
 
-  publicKey: string;
+  publicKey!: string;
+
+  privateKey!: CryptoKey;
 
   accessToken: string | undefined;
 
@@ -63,10 +68,18 @@ export class Vault {
 
   private hashingAlgorithm = "SHA-256";
 
-  // eslint-disable-next-line no-useless-constructor
-  constructor(private privateKey: CryptoKey, private spki: ArrayBuffer) {
-    this.publicKey = this.spki2String(new Uint8Array(spki));
-    (window as any).privateKey = privateKey;
+  public async init(): Promise<any> {
+    const keys = await this.getKeyList();
+    if (!keys[0]) {
+      console.warn("User has no keys");
+      return;
+    }
+    this.publicKey = this.spki2String(new Uint8Array(keys[0].spki));
+    if (keys[0].privateKey) {
+      this.privateKey = keys[0].privateKey;
+    } else {
+      throw new Error("Stored keys have no privateKey");
+    }
   }
 
   public async createOrganization(): Promise<VaultRequestDto> {
@@ -362,4 +375,25 @@ export class Vault {
       f.readAsArrayBuffer(bb);
     });
   }
+
+  async getKeyList(): Promise<
+    Array<{
+      publicKey: CryptoKey | null;
+      privateKey: CryptoKey | null;
+      name: string;
+      spki: ArrayBuffer;
+    }>
+  > {
+    await open();
+    const keysList = await listKeys();
+
+    await close();
+    return keysList.map((key: { id: number; value: keyPairType }) => key.value);
+  }
 }
+
+const vault = new Vault();
+vault.init().then();
+(window as any).vault = vault;
+
+export default vault;
