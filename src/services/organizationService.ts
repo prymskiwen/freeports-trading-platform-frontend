@@ -1,4 +1,5 @@
 import axios from "../util/axios";
+import vault from "../vault";
 
 const getOrganizations = (
   pageNum: number,
@@ -112,7 +113,7 @@ const updateOrganizerManager = (
   });
 };
 
-const addOrganizer = (
+const createOrganization = async (
   name: string,
   street: string,
   street2: string,
@@ -123,6 +124,7 @@ const addOrganizer = (
   commissionOrganization: string,
   commissionClearer: string
 ): Promise<any> => {
+  const vaultRequest = await vault.createOrganization();
   return new Promise((resolve, reject) => {
     axios
       .post(`/organization`, {
@@ -135,6 +137,7 @@ const addOrganizer = (
         logo,
         commissionOrganization,
         commissionClearer,
+        vaultRequest,
       })
       .then((res: any) => {
         return resolve(res.data);
@@ -238,7 +241,7 @@ export {
   getOrganizationManagers,
   getOrganizerManager,
   addOrganizationManager,
-  addOrganizer,
+  createOrganization,
   addAccount,
   updateOrganizer,
   updateOrganizerManager,

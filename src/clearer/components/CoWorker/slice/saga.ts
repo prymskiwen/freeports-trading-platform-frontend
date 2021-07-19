@@ -131,10 +131,12 @@ export function* updateCoWorker({
 export function* getCoWorker({ payload }: PayloadAction<User>): Generator<any> {
   try {
     if (payload.id) {
-      const response = yield call(getClearerUser, payload.id);
+      const response: any = yield call(getClearerUser, payload.id);
 
       if (!(response as User).roles || !(response as User).roles?.length) {
         (response as User).roles = [""];
+      } else {
+        response.roles = response.roles?.map((r: any) => r.id);
       }
       yield put(actions.selectCoWorkerSuccess(response as User));
     } else {
