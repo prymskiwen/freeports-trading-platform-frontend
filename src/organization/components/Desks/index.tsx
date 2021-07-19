@@ -174,7 +174,9 @@ const Desks = (): React.ReactElement => {
                 >
                   <Select value="usd">
                     {currencyOptions.map((opt) => (
-                      <MenuItem value={opt.value}>{opt.name}</MenuItem>
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
