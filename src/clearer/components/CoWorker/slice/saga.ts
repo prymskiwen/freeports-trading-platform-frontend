@@ -37,7 +37,12 @@ export function* getCoWorkers({
       actions.getCoWorkersSuccess((response as PaginatedResponse<User>).content)
     );
   } catch (error) {
-    console.log("error", error);
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
   }
 }
 
@@ -76,7 +81,12 @@ export function* createCoWorker({
       yield put(actions.selectCoWorker(selectedCoWorker));
     }
   } catch (error) {
-    console.log("error", error);
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
   }
 }
 export function* updateCoWorker({
@@ -109,7 +119,12 @@ export function* updateCoWorker({
       yield put(actions.selectCoWorker(selectedCoWorker));
     }
   } catch (error) {
-    console.log("error", error);
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
   }
 }
 
@@ -126,7 +141,12 @@ export function* getCoWorker({ payload }: PayloadAction<User>): Generator<any> {
       yield put(actions.selectCoWorkerSuccess(payload));
     }
   } catch (error) {
-    console.log("error", error);
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
   }
 }
 export function* suspendCoWorker({
@@ -146,7 +166,12 @@ export function* suspendCoWorker({
       );
     }
   } catch (error) {
-    console.log("error", error);
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
   }
 }
 export function* resumeCoWorker({
@@ -166,7 +191,12 @@ export function* resumeCoWorker({
       );
     }
   } catch (error) {
-    console.log("error", error);
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
   }
 }
 
