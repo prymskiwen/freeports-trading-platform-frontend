@@ -6,6 +6,8 @@ import { CoWorkersState } from "../../clearer/components/CoWorker/slice/types";
 import { CoWorkerFormState } from "../../clearer/components/CoWorkerForm/slice/types";
 import { DesksState } from "../../organization/components/Desks/slice/types";
 import { DeskDetailState } from "../../organization/components/Desks/Detail/slice/types";
+import { InvestorsState } from "../../organization/components/Investors/slice/types";
+import { InvestorDetailState } from "../../organization/components/Investors/Detail/slice/types";
 import { SnackbarState } from "../../components/Snackbar/slice/types";
 import { ProfileState } from "../../components/Profile/slice/types";
 import { GlobalState } from "../../slice/types";
@@ -25,6 +27,8 @@ export interface RootState {
   desks?: DesksState;
   deskDetail?: DeskDetailState;
   global?: GlobalState;
+  investors?: InvestorsState;
+  investorDetail?: InvestorDetailState;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
   profileForm?: ProfileState;

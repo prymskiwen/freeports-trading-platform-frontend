@@ -23,7 +23,7 @@ export function* retrieveAccount({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -44,7 +44,7 @@ export function* getOperations({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -81,7 +81,7 @@ export function* addOperation({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -118,7 +118,7 @@ export function* removeOperation({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );

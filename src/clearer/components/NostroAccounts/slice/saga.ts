@@ -18,7 +18,7 @@ export function* getAccounts(): Generator<any> {
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -44,7 +44,7 @@ export function* addAccount({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -70,7 +70,7 @@ export function* removeAccount({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
