@@ -105,7 +105,7 @@ const OTPSignIn = (): React.ReactElement => {
   }, [isOTPDefined]);
 
   useEffect(() => {
-    if (error.errorType !== "") {
+    if (error && error.errorType !== "") {
       setErrorMessage(error.message);
     }
   }, [error]);
