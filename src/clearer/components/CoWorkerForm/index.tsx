@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validate = (values: any) => {
-  const errors: Partial<User> = {};
+  const errors: { [key: string]: string } = {};
   if (!values.nickname) {
     errors.nickname = "This Field Required";
   }

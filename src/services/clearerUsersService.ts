@@ -36,9 +36,6 @@ const getClearerUser = (id: string): Promise<User> => {
     axios
       .get(`/user/${id}`)
       .then((res: any) => {
-        console.log("map user ", res.data);
-        res.data.roles = res.data.roles?.map((r: any) => r.id);
-
         return resolve(res.data);
       })
       .catch((err) => {

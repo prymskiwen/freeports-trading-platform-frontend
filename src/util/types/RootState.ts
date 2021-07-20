@@ -10,6 +10,7 @@ import { InvestorsState } from "../../organization/components/Investors/slice/ty
 import { InvestorDetailState } from "../../organization/components/Investors/Detail/slice/types";
 import { SnackbarState } from "../../components/Snackbar/slice/types";
 import { ProfileState } from "../../components/Profile/slice/types";
+import { GlobalState } from "../../slice/types";
 
 /* 
   Because the redux-injectors injects your
@@ -27,7 +28,7 @@ export interface RootState {
   deskDetail?: DeskDetailState;
   investors?: InvestorsState;
   investorDetail?: InvestorDetailState;
-  global?: any;
+  global?: GlobalState;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
   profileForm?: ProfileState;

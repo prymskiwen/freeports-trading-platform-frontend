@@ -2,4 +2,5 @@
 
 interface Window {
   store: Store;
+  vault: Vault;
 }
