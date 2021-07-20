@@ -2,20 +2,19 @@ import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 import reduxActions from "../store/actions";
 import { login, qrCodeGen, otpCheck, publicKey } from "../services/authService";
+import { globalActions as actions } from "../slice";
 
 const {
   authLogin,
   authLoginSuccess,
   authLoginFailed,
   authLogout,
-  clearError,
-  setError,
   authOTPCheck,
   authOTPCheckSuccess,
   authOTPCheckFailed,
 } = reduxActions;
-
 function useAuth(): any {
+  const { clearError, setError } = actions;
   const dispatch = useDispatch();
 
   const { authStep, isAuthenticated, isOTPDefined, loading, error } =
