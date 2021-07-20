@@ -26,9 +26,9 @@ export interface RootState {
   coWorkers?: CoWorkersState;
   desks?: DesksState;
   deskDetail?: DeskDetailState;
+  global?: GlobalState;
   investors?: InvestorsState;
   investorDetail?: InvestorDetailState;
-  global?: GlobalState;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
   profileForm?: ProfileState;
