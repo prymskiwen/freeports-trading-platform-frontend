@@ -43,10 +43,10 @@ export default [
     component: lazy(() => import("../components/Investors")),
   },
   {
-    path: "/investors/:investorId",
+    path: "/desks/:deskId/investors/:investorId",
     exact: true,
     auth: true,
-    component: lazy(() => import("../components/Investors/InvestorDetail")),
+    component: lazy(() => import("../components/Investors/Detail")),
   },
   {
     path: "/trades",

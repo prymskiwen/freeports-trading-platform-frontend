@@ -28,11 +28,11 @@ import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import data from "./data";
 import { useInvestorsSlice } from "./slice";
-import { selectInvestors } from "./slice/selectors";
+import { selectInvestors, selectIsInvestorsLoading } from "./slice/selectors";
 import { useDesksSlice } from "../Desks/slice";
 import { selectDesks } from "../Desks/slice/selectors";
+import Loader from "../../../components/Loader";
 
 interface investorType {
   deskId: string;
@@ -57,37 +57,13 @@ const useStyles = makeStyles((theme: Theme) =>
     errorMessage: {
       marginTop: theme.spacing(8),
     },
+    noDecoration: {
+      "&:hover": {
+        textDecoration: "none",
+      },
+    },
   })
 );
-
-const columns = [
-  {
-    field: "id",
-    title: "Investor ID",
-    cellStyle: {
-      width: "30%",
-    },
-    render: (rowData: any) => {
-      const { id } = rowData;
-
-      return <Link to={`/investors/${id}`}>{id}</Link>;
-    },
-  },
-  {
-    field: "accountSummary",
-    title: "Account summary",
-    cellStyle: {
-      width: "30%",
-    },
-  },
-  {
-    field: "tradingAccountSummary",
-    title: "Trading account summary",
-    cellStyle: {
-      width: "40%",
-    },
-  },
-];
 
 const currencyOptions = [{ name: "U$", value: "usd" }];
 
@@ -107,6 +83,7 @@ const Investors = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { actions: investorActions } = useInvestorsSlice();
   const investors = useSelector(selectInvestors);
+  const investorsLoading = useSelector(selectIsInvestorsLoading);
   const { actions: deskActions } = useDesksSlice();
   const desks = useSelector(selectDesks);
   const { organizationId } = Lockr.get("USER_DATA");
@@ -115,10 +92,60 @@ const Investors = (): React.ReactElement => {
     name: "",
   });
   const [dialogOpen, setDialogOpen] = useState(false);
+  const columns = [
+    {
+      field: "id",
+      title: "Investor ID",
+      cellStyle: {
+        width: "20%",
+      },
+      render: (rowData: any) => {
+        const { id, desk } = rowData;
+
+        return <Link to={`/desks/${desk}/investors/${id}`}>{id}</Link>;
+      },
+    },
+    {
+      field: "accountSummary",
+      title: "Account summary",
+      cellStyle: {
+        width: "30%",
+      },
+    },
+    {
+      field: "tradingAccountSummary",
+      title: "Trading account summary",
+      cellStyle: {
+        width: "30%",
+      },
+    },
+    {
+      cellStyle: {
+        width: "20%",
+      },
+      render: (rowData: any) => {
+        const { id } = rowData;
+
+        return (
+          <Link to={`/investors/${id}`} className={classes.noDecoration}>
+            INITIATE NEW TRADE
+          </Link>
+        );
+      },
+    },
+  ];
 
   useEffect(() => {
-    dispatch(investorActions.getInvestors());
-    dispatch(deskActions.getDesks(organizationId));
+    let mounted = false;
+    const init = async () => {
+      dispatch(investorActions.getInvestors());
+      dispatch(deskActions.getDesks(organizationId));
+    };
+    init();
+
+    return () => {
+      mounted = true;
+    };
   }, []);
 
   const handleDialogOpen = () => {
@@ -169,28 +196,31 @@ const Investors = (): React.ReactElement => {
           </Grid>
           <Grid container>
             <Grid item xs={12}>
-              <MaterialTable
-                title={
-                  <Grid container alignItems="center" spacing={2}>
-                    <Grid item>
-                      <Typography variant="h5">Investors</Typography>
+              {investorsLoading && <Loader />}
+              {!investorsLoading && (
+                <MaterialTable
+                  title={
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid item>
+                        <Typography variant="h5">Investors</Typography>
+                      </Grid>
+                      <Grid item>
+                        <IconButton
+                          className={classes.addButton}
+                          color="primary"
+                          onClick={handleDialogOpen}
+                        >
+                          <Icon fontSize="large">add_circle</Icon>
+                        </IconButton>
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <IconButton
-                        className={classes.addButton}
-                        color="primary"
-                        onClick={handleDialogOpen}
-                      >
-                        <Icon fontSize="large">add_circle</Icon>
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                }
-                columns={columns}
-                data={investors.map((investorItem: any) => ({
-                  ...investorItem,
-                }))}
-              />
+                  }
+                  columns={columns}
+                  data={investors.map((investorItem: any) => ({
+                    ...investorItem,
+                  }))}
+                />
+              )}
             </Grid>
           </Grid>
         </Grid>
