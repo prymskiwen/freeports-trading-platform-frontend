@@ -77,7 +77,7 @@ const SignIn = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    if (error.errorType !== "") {
+    if (error && error.errorType !== "") {
       setErrorMessage(error.message);
     }
   }, [error]);
