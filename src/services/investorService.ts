@@ -89,6 +89,28 @@ const getTradeRequests = (
   });
 };
 
+const createTradeRequest = (
+  organizationId: string,
+  deskId: string,
+  investorId: string,
+  trade: TradeRequest
+): Promise<TradeRequest[]> => {
+  return new Promise((resolve, reject) => {
+    console.log(trade);
+    axios
+      .post(
+        `/organization/${organizationId}/desk/${deskId}/investor/${investorId}/trade`,
+        trade
+      )
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 export {
   getAllInvestors as default,
   getAllInvestors,
@@ -96,4 +118,5 @@ export {
   createInvestor,
   deleteInvestor,
   getTradeRequests,
+  createTradeRequest,
 };

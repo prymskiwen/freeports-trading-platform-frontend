@@ -1,12 +1,20 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useState } from "react";
 import Lockr from "lockr";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { Form } from "react-final-form";
+import arrayMutators from "final-form-arrays";
+import { TextField as MuiTextField, Select as MuiSelect } from "mui-rff";
 import {
   Button,
   Container,
   createStyles,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
   IconButton,
@@ -41,6 +49,25 @@ import {
 import Loader from "../../../../components/Loader";
 import { useOrganization } from "../../../../hooks";
 import TradeRequest from "../../../../types/TradeRequest";
+
+interface tradeType {
+  accountFrom: string;
+  accountTo: string;
+  type: string;
+  status?: string;
+  quantity: string;
+  limitPrice: string;
+  limitTime: string;
+  currencyFrom?: string;
+  currencyTo?: string;
+}
+
+interface accountType {
+  currency: string;
+  iban: string;
+  account: string;
+  balance?: number;
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -78,10 +105,15 @@ const tradesColumns = [
     },
   },
   {
-    field: "date",
+    field: "createdAt",
     title: "Date",
     cellStyle: {
       width: "12%",
+    },
+    render: (rowData: any) => {
+      const { createdAt } = rowData;
+
+      return convertDateToDMY(createdAt);
     },
   },
   {
@@ -89,6 +121,14 @@ const tradesColumns = [
     title: "Order",
     cellStyle: {
       width: "12%",
+    },
+    render: (rowData: any) => {
+      const { type } = rowData;
+
+      if (type === "limit") return "Limits";
+      if (type === "market") return "At market";
+      if (type === "manual") return "Manual";
+      return "";
     },
   },
   {
@@ -212,8 +252,31 @@ const convertDateToDMY = (date: string) => {
   return [day, month, year].join(".");
 };
 
+const validate = (values: any) => {
+  const errors: Partial<any> = {};
+
+  if (!values.accountFrom) {
+    errors.accountFrom = "This Field Required";
+  }
+
+  if (!values.accountTo) {
+    errors.accountTo = "This Field Required";
+  }
+
+  if (!values.type) {
+    errors.type = "This Field Required";
+  }
+
+  if (!values.quantity) {
+    errors.quantity = "This Field Required";
+  }
+
+  return errors;
+};
+
 const InvestorDetail = (): React.ReactElement => {
   const classes = useStyles();
+  const history = useHistory();
   const dispatch = useDispatch();
   const { organizationId } = Lockr.get("USER_DATA");
   const { deskId } = useParams<{ deskId: string }>();
@@ -231,6 +294,15 @@ const InvestorDetail = (): React.ReactElement => {
   const [tradingAccounts, setTradingAccounts] = useState<
     Array<{ currency: string; iban: string; account: string; balance?: number }>
   >([]);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [tradeRequest, setTradeRequest] = useState<tradeType>({
+    accountFrom: "",
+    accountTo: "",
+    type: "",
+    quantity: "",
+    limitPrice: "",
+    limitTime: "",
+  });
 
   useEffect(() => {
     let mounted = false;
@@ -244,7 +316,7 @@ const InvestorDetail = (): React.ReactElement => {
         })
       );
       const { clearing } = await getOrganizerdetail(organizationId);
-      if (!mounted) {
+      if (!mounted && clearing) {
         setTradingAccounts(clearing);
       }
     };
@@ -260,12 +332,41 @@ const InvestorDetail = (): React.ReactElement => {
     setSearchText(value);
   };
 
+  const handleCreateModalOpen = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleCreateModalClose = () => {
+    setCreateModalOpen(false);
+  };
+
+  const handleTradeCreate = async (values: tradeType) => {
+    console.log(values);
+    await dispatch(
+      investorDetailActions.addTradeRequest({
+        organizationId,
+        deskId,
+        investorId,
+        trade: values,
+      })
+    );
+    setCreateModalOpen(false);
+  };
+
+  const handleBackClick = () => {
+    history.push("/investors");
+  };
+
   return (
     <div className="main-wrapper">
       <Container>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <IconButton color="inherit" aria-label="Add Role">
+            <IconButton
+              color="inherit"
+              aria-label="Back"
+              onClick={handleBackClick}
+            >
               <ArrowBackIosIcon fontSize="large" color="primary" />
             </IconButton>
           </Grid>
@@ -363,7 +464,11 @@ const InvestorDetail = (): React.ReactElement => {
                                   <Typography variant="h5">TRADES</Typography>
                                 </Grid>
                                 <Grid item>
-                                  <Button variant="contained" color="primary">
+                                  <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleCreateModalOpen}
+                                  >
                                     <Grid
                                       container
                                       alignItems="center"
@@ -465,6 +570,146 @@ const InvestorDetail = (): React.ReactElement => {
             )}
           </Grid>
         </Grid>
+        <Dialog
+          open={createModalOpen}
+          onClose={handleCreateModalClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <Form
+            onSubmit={handleTradeCreate}
+            mutators={{
+              ...arrayMutators,
+            }}
+            initialValues={tradeRequest}
+            validate={validate}
+            render={({
+              handleSubmit,
+              submitting,
+              pristine,
+              form: {
+                mutators: { push },
+              },
+              values,
+            }) => (
+              <form onSubmit={handleSubmit} noValidate>
+                <DialogTitle id="form-dialog-title">Create Trade</DialogTitle>
+                <Divider />
+                <DialogContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <MuiSelect
+                        native
+                        name="accountFrom"
+                        label="Account From"
+                        variant="outlined"
+                        fullWidth
+                      >
+                        <option value="0">Select...</option>
+                        {tradingAccounts
+                          .filter(
+                            (accItem: accountType) =>
+                              accItem.account !== values.accountTo
+                          )
+                          .map((accItem: accountType) => (
+                            <option
+                              key={accItem.account}
+                              value={accItem.account}
+                            >
+                              {accItem.currency}
+                            </option>
+                          ))}
+                      </MuiSelect>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <MuiSelect
+                        native
+                        name="accountTo"
+                        label="Account To"
+                        variant="outlined"
+                        fullWidth
+                      >
+                        <option value="0">Select...</option>
+                        {tradingAccounts
+                          .filter(
+                            (accItem: accountType) =>
+                              accItem.account !== values.accountFrom
+                          )
+                          .map((accItem: accountType) => (
+                            <option
+                              key={accItem.account}
+                              value={accItem.account}
+                            >
+                              {accItem.currency}
+                            </option>
+                          ))}
+                      </MuiSelect>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <MuiSelect
+                        native
+                        name="type"
+                        label="Type"
+                        variant="outlined"
+                        fullWidth
+                      >
+                        <option value="0">Select...</option>
+                        <option value="limit">Limit</option>
+                        <option value="market">Market</option>
+                        <option value="manual">Manual</option>
+                      </MuiSelect>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <MuiTextField
+                        required
+                        label="Quantity"
+                        type="text"
+                        name="quantity"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    </Grid>
+                    {values.type === "limit" && (
+                      <>
+                        <Grid item xs={6}>
+                          <MuiTextField
+                            label="Limit Price"
+                            type="text"
+                            name="limitPrice"
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <MuiTextField
+                            label="Limit Time"
+                            type="datetime-local"
+                            name="limitTime"
+                            variant="outlined"
+                            fullWidth
+                          />
+                        </Grid>
+                      </>
+                    )}
+                  </Grid>
+                </DialogContent>
+                <Divider />
+                <DialogActions>
+                  <Button onClick={handleCreateModalClose} variant="contained">
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={submitting || pristine}
+                  >
+                    Create
+                  </Button>
+                </DialogActions>
+              </form>
+            )}
+          />
+        </Dialog>
       </Container>
     </div>
   );

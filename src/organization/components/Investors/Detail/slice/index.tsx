@@ -23,6 +23,7 @@ export const initialState: InvestorDetailState = {
   tradeRequests: [],
   loadingDetail: false,
   loadingTradeRequests: false,
+  creatingTradeRequest: false,
 };
 
 const slice = createSlice({
@@ -58,6 +59,20 @@ const slice = createSlice({
     getTradeRequestsSuccess(state, action: PayloadAction<Array<TradeRequest>>) {
       state.loadingTradeRequests = false;
       state.tradeRequests = action.payload;
+    },
+    addTradeRequest(
+      state,
+      action: PayloadAction<{
+        organizationId: string;
+        deskId: string;
+        investorId: string;
+        trade: TradeRequest;
+      }>
+    ) {
+      state.creatingTradeRequest = true;
+    },
+    addTradeRequestSuccess(state, action: PayloadAction<string>) {
+      state.creatingTradeRequest = false;
     },
   },
 });

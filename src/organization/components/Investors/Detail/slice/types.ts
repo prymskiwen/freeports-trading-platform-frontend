@@ -6,4 +6,5 @@ export interface InvestorDetailState {
   tradeRequests: Array<TradeRequest>;
   loadingDetail: boolean;
   loadingTradeRequests: boolean;
+  creatingTradeRequest: boolean;
 }

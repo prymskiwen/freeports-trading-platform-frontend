@@ -5,19 +5,19 @@ export default interface TradeRequest {
 
   accountTo: string;
 
-  status: string;
+  status?: string;
 
-  currencyFrom: string;
+  currencyFrom?: string;
 
-  currencyTo: string;
+  currencyTo?: string;
 
   type: string;
 
   quantity: string;
 
-  limitPrice?: string;
+  limitPrice: string;
 
-  limitTime?: string;
+  limitTime: string;
 
   createdAt?: string;
 }
