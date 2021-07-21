@@ -243,11 +243,9 @@ const InvestorDetail = (): React.ReactElement => {
           investorId,
         })
       );
-      const { clearing: orgAccounts } = await getOrganizerdetail(
-        organizationId
-      );
+      const { clearing } = await getOrganizerdetail(organizationId);
       if (!mounted) {
-        setTradingAccounts(orgAccounts);
+        setTradingAccounts(clearing);
       }
     };
     init();
