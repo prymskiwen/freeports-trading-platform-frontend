@@ -1,6 +1,5 @@
 import axios from "../util/axios";
 import Investor from "../types/Investor";
-import TradeRequest from "../types/TradeRequest";
 
 const getAllInvestors = (): Promise<Investor[]> => {
   return new Promise((resolve, reject) => {
@@ -70,53 +69,10 @@ const deleteInvestor = (
   });
 };
 
-const getTradeRequests = (
-  organizationId: string,
-  deskId: string,
-  investorId: string
-): Promise<TradeRequest[]> => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(
-        `/organization/${organizationId}/desk/${deskId}/investor/${investorId}/trade`
-      )
-      .then((res: any) => {
-        return resolve(res.data);
-      })
-      .catch((err) => {
-        return reject(err.response.data);
-      });
-  });
-};
-
-const createTradeRequest = (
-  organizationId: string,
-  deskId: string,
-  investorId: string,
-  trade: TradeRequest
-): Promise<TradeRequest[]> => {
-  return new Promise((resolve, reject) => {
-    console.log(trade);
-    axios
-      .post(
-        `/organization/${organizationId}/desk/${deskId}/investor/${investorId}/trade`,
-        trade
-      )
-      .then((res: any) => {
-        return resolve(res.data);
-      })
-      .catch((err) => {
-        return reject(err.response.data);
-      });
-  });
-};
-
 export {
   getAllInvestors as default,
   getAllInvestors,
   getInvestor,
   createInvestor,
   deleteInvestor,
-  getTradeRequests,
-  createTradeRequest,
 };

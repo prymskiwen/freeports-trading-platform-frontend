@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useState } from "react";
 import Lockr from "lockr";
 import { Link } from "react-router-dom";
 import { Form } from "react-final-form";
 import arrayMutators from "final-form-arrays";
-import { TextField, Select as MuiSelect } from "mui-rff";
+import { TextField as MuiTextField, Select as MuiSelect } from "mui-rff";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
@@ -29,10 +30,12 @@ import MaterialTable from "material-table";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { useInvestorsSlice } from "./slice";
-import { selectInvestors, selectIsInvestorsLoading } from "./slice/selectors";
+import { useInvestorDetailSlice } from "./Detail/slice";
 import { useDesksSlice } from "../Desks/slice";
+import { selectInvestors, selectIsInvestorsLoading } from "./slice/selectors";
 import { selectDesks } from "../Desks/slice/selectors";
 import Loader from "../../../components/Loader";
+import { useOrganization } from "../../../hooks";
 
 interface investorType {
   deskId: string;
@@ -41,6 +44,23 @@ interface investorType {
 interface deskType {
   id?: string;
   name: string;
+}
+interface tradeType {
+  accountFrom: string;
+  accountTo: string;
+  type: string;
+  status?: string;
+  quantity: string;
+  limitPrice: string;
+  limitTime: string;
+  currencyFrom?: string;
+  currencyTo?: string;
+}
+interface accountType {
+  currency: string;
+  iban: string;
+  account: string;
+  balance?: number;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -67,7 +87,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const currencyOptions = [{ name: "U$", value: "usd" }];
 
-const validate = (values: any) => {
+const validateInvestor = (values: any) => {
   const errors: Partial<investorType> = {};
   if (!values.deskId) {
     errors.deskId = "This Field Required";
@@ -78,12 +98,36 @@ const validate = (values: any) => {
   return errors;
 };
 
+const validateTrade = (values: any) => {
+  const errors: Partial<any> = {};
+
+  if (!values.accountFrom) {
+    errors.accountFrom = "This Field Required";
+  }
+
+  if (!values.accountTo) {
+    errors.accountTo = "This Field Required";
+  }
+
+  if (!values.type) {
+    errors.type = "This Field Required";
+  }
+
+  if (!values.quantity) {
+    errors.quantity = "This Field Required";
+  }
+
+  return errors;
+};
+
 const Investors = (): React.ReactElement => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { actions: investorActions } = useInvestorsSlice();
+  const { getOrganizerdetail } = useOrganization();
   const investors = useSelector(selectInvestors);
   const investorsLoading = useSelector(selectIsInvestorsLoading);
+  const { actions: investorsActions } = useInvestorsSlice();
+  const { actions: investorDetailActions } = useInvestorDetailSlice();
   const { actions: deskActions } = useDesksSlice();
   const desks = useSelector(selectDesks);
   const { organizationId } = Lockr.get("USER_DATA");
@@ -91,7 +135,21 @@ const Investors = (): React.ReactElement => {
     deskId: "",
     name: "",
   });
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [tradeRequest, setTradeRequest] = useState<tradeType>({
+    accountFrom: "",
+    accountTo: "",
+    type: "",
+    quantity: "",
+    limitPrice: "",
+    limitTime: "",
+  });
+  const [selectedInvestorId, setSelectedInvestorId] = useState("");
+  const [selectedDeskId, setSelectedDeskId] = useState("");
+  const [tradingAccounts, setTradingAccounts] = useState<
+    Array<{ currency: string; iban: string; account: string; balance?: number }>
+  >([]);
+  const [createInvestorModalOpen, setCreateInvestorModalOpen] = useState(false);
+  const [createTradeModalOpen, setCreateTradeModalOpen] = useState(false);
   const columns = [
     {
       field: "id",
@@ -124,12 +182,12 @@ const Investors = (): React.ReactElement => {
         width: "20%",
       },
       render: (rowData: any) => {
-        const { id } = rowData;
+        const { id, desk } = rowData;
 
         return (
-          <Link to={`/investors/${id}`} className={classes.noDecoration}>
+          <Button color="primary" onClick={() => handleNewTradeClick(desk, id)}>
             INITIATE NEW TRADE
-          </Link>
+          </Button>
         );
       },
     },
@@ -138,8 +196,12 @@ const Investors = (): React.ReactElement => {
   useEffect(() => {
     let mounted = false;
     const init = async () => {
-      dispatch(investorActions.getInvestors());
-      dispatch(deskActions.getDesks(organizationId));
+      const orgDetail = await getOrganizerdetail(organizationId);
+      if (!mounted && orgDetail.clearing) {
+        setTradingAccounts(orgDetail.clearing);
+      }
+      await dispatch(investorsActions.getInvestors());
+      await dispatch(deskActions.getDesks(organizationId));
     };
     init();
 
@@ -148,28 +210,45 @@ const Investors = (): React.ReactElement => {
     };
   }, []);
 
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
+  const handleCreateInvestorDialogOpen = () => {
+    setCreateInvestorModalOpen(true);
   };
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
+  const handleCreateInvestorDialogClose = () => {
+    setCreateInvestorModalOpen(false);
   };
 
-  const handleDeskCreate = async (values: investorType) => {
-    console.log(values);
+  const handleInvestorCreate = async (values: investorType) => {
     await dispatch(
-      investorActions.addInvestor({
+      investorsActions.addInvestor({
         organizationId,
         deskId: values.deskId,
         investor: values,
       })
     );
-    setDialogOpen(false);
+    setCreateInvestorModalOpen(false);
   };
 
-  const handleDeskDelete = (id: string) => {
-    // dispatch(actions.removeDesk({ organizationId, deskId: id }));
+  const handleCreateTradeDialogClose = () => {
+    setCreateTradeModalOpen(false);
+  };
+
+  const handleNewTradeClick = (deskId: string, investorId: string) => {
+    setCreateTradeModalOpen(true);
+    setSelectedDeskId(deskId);
+    setSelectedInvestorId(investorId);
+  };
+
+  const handleTradeCreate = async (values: tradeType) => {
+    await dispatch(
+      investorDetailActions.addTradeRequest({
+        organizationId,
+        deskId: selectedDeskId,
+        investorId: selectedInvestorId,
+        trade: values,
+      })
+    );
+    setCreateTradeModalOpen(false);
   };
 
   return (
@@ -208,7 +287,7 @@ const Investors = (): React.ReactElement => {
                         <IconButton
                           className={classes.addButton}
                           color="primary"
-                          onClick={handleDialogOpen}
+                          onClick={handleCreateInvestorDialogOpen}
                         >
                           <Icon fontSize="large">add_circle</Icon>
                         </IconButton>
@@ -226,17 +305,17 @@ const Investors = (): React.ReactElement => {
         </Grid>
       </Container>
       <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
+        open={createInvestorModalOpen}
+        onClose={handleCreateInvestorDialogClose}
         aria-labelledby="form-dialog-title"
       >
         <Form
-          onSubmit={handleDeskCreate}
+          onSubmit={handleInvestorCreate}
           mutators={{
             ...arrayMutators,
           }}
           initialValues={investor}
-          validate={validate}
+          validate={validateInvestor}
           render={({
             handleSubmit,
             submitting,
@@ -244,7 +323,7 @@ const Investors = (): React.ReactElement => {
             form: {
               mutators: { push },
             },
-            values,
+            values: investorValues,
           }) => (
             <form onSubmit={handleSubmit} noValidate>
               <DialogTitle id="form-dialog-title">
@@ -270,7 +349,7 @@ const Investors = (): React.ReactElement => {
                     </MuiSelect>
                   </Grid>
                   <Grid item xs={6}>
-                    <TextField
+                    <MuiTextField
                       required
                       label="Investor name"
                       type="text"
@@ -283,7 +362,147 @@ const Investors = (): React.ReactElement => {
               </DialogContent>
               <Divider />
               <DialogActions>
-                <Button onClick={handleDialogClose} variant="contained">
+                <Button
+                  onClick={handleCreateInvestorDialogClose}
+                  variant="contained"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={submitting || pristine}
+                >
+                  Create
+                </Button>
+              </DialogActions>
+            </form>
+          )}
+        />
+      </Dialog>
+      <Dialog
+        open={createTradeModalOpen}
+        onClose={handleCreateTradeDialogClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <Form
+          onSubmit={handleTradeCreate}
+          mutators={{
+            ...arrayMutators,
+          }}
+          initialValues={tradeRequest}
+          validate={validateTrade}
+          render={({
+            handleSubmit,
+            submitting,
+            pristine,
+            form: {
+              mutators: { push },
+            },
+            values: tradeValues,
+          }) => (
+            <form onSubmit={handleSubmit} noValidate>
+              <DialogTitle id="form-dialog-title">Create Trade</DialogTitle>
+              <Divider />
+              <DialogContent>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <MuiSelect
+                      native
+                      name="accountFrom"
+                      label="Account From"
+                      variant="outlined"
+                      fullWidth
+                    >
+                      <option value="0">Select...</option>
+                      {tradingAccounts
+                        .filter(
+                          (accItem: accountType) =>
+                            accItem.account !== tradeValues.accountTo
+                        )
+                        .map((accItem: accountType) => (
+                          <option key={accItem.account} value={accItem.account}>
+                            {accItem.currency}
+                          </option>
+                        ))}
+                    </MuiSelect>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <MuiSelect
+                      native
+                      name="accountTo"
+                      label="Account To"
+                      variant="outlined"
+                      fullWidth
+                    >
+                      <option value="0">Select...</option>
+                      {tradingAccounts
+                        .filter(
+                          (accItem: accountType) =>
+                            accItem.account !== tradeValues.accountFrom
+                        )
+                        .map((accItem: accountType) => (
+                          <option key={accItem.account} value={accItem.account}>
+                            {accItem.currency}
+                          </option>
+                        ))}
+                    </MuiSelect>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <MuiSelect
+                      native
+                      name="type"
+                      label="Type"
+                      variant="outlined"
+                      fullWidth
+                    >
+                      <option value="0">Select...</option>
+                      <option value="limit">Limit</option>
+                      <option value="market">Market</option>
+                      <option value="manual">Manual</option>
+                    </MuiSelect>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <MuiTextField
+                      required
+                      label="Quantity"
+                      type="text"
+                      name="quantity"
+                      variant="outlined"
+                      fullWidth
+                    />
+                  </Grid>
+                  {tradeValues.type === "limit" && (
+                    <>
+                      <Grid item xs={6}>
+                        <MuiTextField
+                          label="Limit Price"
+                          type="text"
+                          name="limitPrice"
+                          variant="outlined"
+                          fullWidth
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <MuiTextField
+                          label="Limit Time"
+                          type="datetime-local"
+                          name="limitTime"
+                          variant="outlined"
+                          fullWidth
+                        />
+                      </Grid>
+                    </>
+                  )}
+                </Grid>
+              </DialogContent>
+              <Divider />
+              <DialogActions>
+                <Button
+                  onClick={handleCreateTradeDialogClose}
+                  variant="contained"
+                >
                   Cancel
                 </Button>
                 <Button

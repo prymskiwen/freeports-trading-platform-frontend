@@ -5,11 +5,11 @@ import TradeRequest from "../../../../../types/TradeRequest";
 
 import { investorDetailActions as actions } from ".";
 
+import { getInvestor } from "../../../../../services/investorService";
 import {
-  getInvestor,
   getTradeRequests,
   createTradeRequest,
-} from "../../../../../services/investorService";
+} from "../../../../../services/tradeService";
 import { snackbarActions } from "../../../../../components/Snackbar/slice";
 
 export function* retrieveInvestor({

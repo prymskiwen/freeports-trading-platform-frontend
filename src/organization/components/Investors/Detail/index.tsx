@@ -93,23 +93,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const tradesColumns = [
   {
-    field: "id",
     title: "ID",
-    cellStyle: {
-      width: "12%",
-    },
     render: (rowData: any) => {
-      const { id } = rowData;
+      const { friendlyId } = rowData;
 
-      return <Link to="/">{id}</Link>;
+      return <Link to="/">{friendlyId}</Link>;
     },
   },
   {
     field: "createdAt",
     title: "Date",
-    cellStyle: {
-      width: "12%",
-    },
     render: (rowData: any) => {
       const { createdAt } = rowData;
 
@@ -119,9 +112,6 @@ const tradesColumns = [
   {
     field: "order",
     title: "Order",
-    cellStyle: {
-      width: "12%",
-    },
     render: (rowData: any) => {
       const { type } = rowData;
 
@@ -134,37 +124,22 @@ const tradesColumns = [
   {
     field: "status",
     title: "Status",
-    cellStyle: {
-      width: "12%",
-    },
   },
   {
     field: "send",
     title: "Send",
-    cellStyle: {
-      width: "12%",
-    },
   },
   {
     field: "receive",
     title: "Receive",
-    cellStyle: {
-      width: "12%",
-    },
   },
   {
     field: "broker",
     title: "Broker",
-    cellStyle: {
-      width: "16%",
-    },
   },
   {
     field: "commission",
     title: "Commission",
-    cellStyle: {
-      width: "12%",
-    },
   },
 ];
 
@@ -307,17 +282,9 @@ const InvestorDetail = (): React.ReactElement => {
   useEffect(() => {
     let mounted = false;
     const init = async () => {
-      await dispatch(investorsActions.getInvestors());
-      await dispatch(
-        investorDetailActions.getInvestor({
-          organizationId,
-          deskId,
-          investorId,
-        })
-      );
-      const { clearing } = await getOrganizerdetail(organizationId);
-      if (!mounted && clearing) {
-        setTradingAccounts(clearing);
+      const orgDetail = await getOrganizerdetail(organizationId);
+      if (!mounted && orgDetail.clearing) {
+        setTradingAccounts(orgDetail.clearing);
       }
     };
     init();
@@ -325,6 +292,24 @@ const InvestorDetail = (): React.ReactElement => {
     return () => {
       mounted = true;
     };
+  }, []);
+
+  useEffect(() => {
+    dispatch(investorsActions.getInvestors());
+    dispatch(
+      investorDetailActions.getInvestor({
+        organizationId,
+        deskId,
+        investorId,
+      })
+    );
+    dispatch(
+      investorDetailActions.getTradeRequests({
+        organizationId,
+        deskId,
+        investorId,
+      })
+    );
   }, [investorId]);
 
   const onSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -341,7 +326,6 @@ const InvestorDetail = (): React.ReactElement => {
   };
 
   const handleTradeCreate = async (values: tradeType) => {
-    console.log(values);
     await dispatch(
       investorDetailActions.addTradeRequest({
         organizationId,
@@ -526,7 +510,6 @@ const InvestorDetail = (): React.ReactElement => {
                             options={{
                               search: false,
                               sorting: false,
-                              pageSize: 2,
                             }}
                           />
                         </Grid>
@@ -540,7 +523,6 @@ const InvestorDetail = (): React.ReactElement => {
                             options={{
                               search: false,
                               sorting: false,
-                              pageSize: 2,
                             }}
                             components={{
                               Toolbar: (props) => (
