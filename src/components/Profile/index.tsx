@@ -33,6 +33,7 @@ import {
   importPrivateKeyFromFile,
 } from "../../util/keyStore/functions";
 import defaultAvatar from "../../assets/images/profile.jpg";
+import { Vault } from "../../vault";
 
 const useStyles = makeStyles((theme) => ({
   saveBtn: {
