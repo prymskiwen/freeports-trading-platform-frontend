@@ -240,6 +240,7 @@ const Investors = (): React.ReactElement => {
   };
 
   const handleTradeCreate = async (values: tradeType) => {
+    console.log(values);
     await dispatch(
       investorDetailActions.addTradeRequest({
         organizationId,
