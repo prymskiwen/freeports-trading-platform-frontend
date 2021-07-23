@@ -91,130 +91,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const tradesColumns = [
-  {
-    title: "ID",
-    render: (rowData: any) => {
-      const { friendlyId } = rowData;
-
-      return <Link to="/">{friendlyId}</Link>;
-    },
-  },
-  {
-    field: "createdAt",
-    title: "Date",
-    render: (rowData: any) => {
-      const { createdAt } = rowData;
-
-      return convertDateToDMY(createdAt);
-    },
-  },
-  {
-    field: "order",
-    title: "Order",
-    render: (rowData: any) => {
-      const { type } = rowData;
-
-      if (type === "limit") return "Limits";
-      if (type === "market") return "At market";
-      if (type === "manual") return "Manual";
-      return "";
-    },
-  },
-  {
-    field: "status",
-    title: "Status",
-  },
-  {
-    field: "send",
-    title: "Send",
-  },
-  {
-    field: "receive",
-    title: "Receive",
-  },
-  {
-    field: "broker",
-    title: "Broker",
-  },
-  {
-    field: "commission",
-    title: "Commission",
-  },
-];
-
-const currentAccountsColumns = [
-  {
-    field: "accountId",
-    title: "Account ID",
-    cellStyle: {
-      width: "25%",
-    },
-  },
-  {
-    field: "cryptocurrency",
-    title: "Cryptocurrency",
-    cellStyle: {
-      width: "25%",
-    },
-  },
-  {
-    field: "balance",
-    title: "Balance",
-    cellStyle: {
-      width: "25%",
-    },
-  },
-  {
-    field: "rules",
-    title: "Rules",
-    cellStyle: {
-      width: "25%",
-    },
-    render: (rowData: any) => {
-      const { id } = rowData;
-
-      return (
-        <div>
-          <IconButton color="inherit" aria-label="Add Role">
-            <VisibilityIcon fontSize="small" color="primary" />
-          </IconButton>
-          <Button color="primary">Transfer!</Button>
-        </div>
-      );
-    },
-  },
-];
-
-const tradingAccountColumns = [
-  {
-    field: "account",
-    title: "Account ID",
-    cellStyle: {
-      width: "30%",
-    },
-    render: (rowData: any) => {
-      const { account } = rowData;
-
-      return <Link to="/">{account}</Link>;
-    },
-  },
-  {
-    field: "currency",
-    title: "Currency",
-    cellStyle: {
-      width: "35%",
-    },
-  },
-  {
-    field: "balance",
-    title: "Balance",
-    cellStyle: {
-      width: "35%",
-    },
-  },
-];
-
 const convertDateToDMY = (date: string) => {
   const d = new Date(date);
   let month = `${d.getMonth() + 1}`;
@@ -428,7 +304,57 @@ const InvestorDetail = (): React.ReactElement => {
                       {!tradeRequestsLoading && (
                         <MaterialTable
                           title="TRADES"
-                          columns={tradesColumns}
+                          columns={[
+                            {
+                              title: "ID",
+                              render: (rowData: any) => {
+                                const { friendlyId } = rowData;
+
+                                return <Link to="/">{friendlyId}</Link>;
+                              },
+                            },
+                            {
+                              field: "createdAt",
+                              title: "Date",
+                              render: (rowData: any) => {
+                                const { createdAt } = rowData;
+
+                                return convertDateToDMY(createdAt);
+                              },
+                            },
+                            {
+                              field: "order",
+                              title: "Order",
+                              render: (rowData: any) => {
+                                const { type } = rowData;
+
+                                if (type === "limit") return "Limits";
+                                if (type === "market") return "At market";
+                                if (type === "manual") return "Manual";
+                                return "";
+                              },
+                            },
+                            {
+                              field: "status",
+                              title: "Status",
+                            },
+                            {
+                              field: "send",
+                              title: "Send",
+                            },
+                            {
+                              field: "receive",
+                              title: "Receive",
+                            },
+                            {
+                              field: "broker",
+                              title: "Broker",
+                            },
+                            {
+                              field: "commission",
+                              title: "Commission",
+                            },
+                          ]}
                           data={tradeRequests.map((trade: TradeRequest) => ({
                             ...trade,
                           }))}
@@ -497,7 +423,54 @@ const InvestorDetail = (): React.ReactElement => {
                                 </Grid>
                               </Grid>
                             }
-                            columns={currentAccountsColumns}
+                            columns={[
+                              {
+                                field: "accountId",
+                                title: "Account ID",
+                                cellStyle: {
+                                  width: "25%",
+                                },
+                              },
+                              {
+                                field: "cryptocurrency",
+                                title: "Cryptocurrency",
+                                cellStyle: {
+                                  width: "25%",
+                                },
+                              },
+                              {
+                                field: "balance",
+                                title: "Balance",
+                                cellStyle: {
+                                  width: "25%",
+                                },
+                              },
+                              {
+                                field: "rules",
+                                title: "Rules",
+                                cellStyle: {
+                                  width: "25%",
+                                },
+                                render: (rowData: any) => {
+                                  const { id } = rowData;
+
+                                  return (
+                                    <div>
+                                      <IconButton
+                                        color="inherit"
+                                        aria-label="Add Role"
+                                      >
+                                        <VisibilityIcon
+                                          fontSize="small"
+                                          color="primary"
+                                        />
+                                      </IconButton>
+                                      <Button color="primary">Transfer!</Button>
+                                    </div>
+                                  );
+                                },
+                              },
+                            ]}
                             data={
                               selectedInvestor.accounts
                                 ? selectedInvestor.accounts.map(
@@ -516,7 +489,34 @@ const InvestorDetail = (): React.ReactElement => {
                         <Grid item xs={12}>
                           <MaterialTable
                             title="TRADING ACCOUNTS"
-                            columns={tradingAccountColumns}
+                            columns={[
+                              {
+                                field: "account",
+                                title: "Account ID",
+                                cellStyle: {
+                                  width: "30%",
+                                },
+                                render: (rowData: any) => {
+                                  const { account } = rowData;
+
+                                  return <Link to="/">{account}</Link>;
+                                },
+                              },
+                              {
+                                field: "currency",
+                                title: "Currency",
+                                cellStyle: {
+                                  width: "35%",
+                                },
+                              },
+                              {
+                                field: "balance",
+                                title: "Balance",
+                                cellStyle: {
+                                  width: "35%",
+                                },
+                              },
+                            ]}
                             data={tradingAccounts.map((accItem: any) => ({
                               ...accItem,
                             }))}
