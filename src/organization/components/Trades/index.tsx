@@ -147,7 +147,9 @@ const Trades = (): React.ReactElement => {
                       const { investor } = rowData;
 
                       return (
-                        <Link to={`/investors/${investor.id}`}>
+                        <Link
+                          to={`/desks/${investor.desk}/investors/${investor.id}`}
+                        >
                           {investor.id}
                         </Link>
                       );
