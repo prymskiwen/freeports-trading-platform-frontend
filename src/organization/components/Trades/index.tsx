@@ -1,59 +1,36 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { Button, Container, Grid } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
+import SyncAltIcon from "@material-ui/icons/SyncAlt";
 import MaterialTable from "material-table";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import data from "./data";
 
+import { useTradesSlice } from "./slice";
+import {
+  selectTradeRequests,
+  selectIsTradeRequestsLoading,
+} from "./slice/selectors";
+import Loader from "../../../components/Loader";
+
 const { manualTrades, tradeHistory } = data;
 
-const tradeColumns = [
-  {
-    field: "date",
-    title: "Date",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "investors",
-    title: "Investors",
-    cellStyle: {
-      width: "20%",
-    },
-    render: (rowData: any) => {
-      const { investorId } = rowData;
+const convertDateToDMY = (date: string) => {
+  const d = new Date(date);
+  let month = `${d.getMonth() + 1}`;
+  let day = `${d.getDate()}`;
+  const year = `${d.getFullYear()}`;
 
-      return <Link to={`/trades/${investorId}`}>{investorId}</Link>;
-    },
-  },
-  {
-    field: "status",
-    title: "Status",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "send",
-    title: "Send",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-  {
-    field: "claimedValue",
-    title: "Claimed Value",
-    cellStyle: {
-      width: "20%",
-    },
-  },
-];
+  if (month.length < 2) month = `0${month}`;
+  if (day.length < 2) day = `0${day}`;
 
+  return [day, month, year].join(".");
+};
 const historyColumns = [
   {
     field: "date",
@@ -119,6 +96,23 @@ const historyColumns = [
 ];
 
 const Trades = (): React.ReactElement => {
+  const dispatch = useDispatch();
+  const tradeRequests = useSelector(selectTradeRequests);
+  const tradeRequestsLoading = useSelector(selectIsTradeRequestsLoading);
+  const { actions: tradesActions } = useTradesSlice();
+
+  useEffect(() => {
+    let mounted = false;
+    const init = async () => {
+      await dispatch(tradesActions.getTradeRequests());
+    };
+    init();
+
+    return () => {
+      mounted = true;
+    };
+  }, []);
+
   return (
     <div className="main-wrapper">
       <Container>
@@ -132,11 +126,71 @@ const Trades = (): React.ReactElement => {
             </Grid>
           </Grid>
           <Grid item xs={12}>
-            <MaterialTable
-              title="ORDER REQUESTS"
-              columns={tradeColumns}
-              data={manualTrades}
-            />
+            {tradeRequestsLoading && <Loader />}
+            {!tradeRequestsLoading && (
+              <MaterialTable
+                title="ORDER REQUESTS"
+                columns={[
+                  {
+                    field: "createdAt",
+                    title: "Date",
+                    render: (rowData: any) => {
+                      const { createdAt } = rowData;
+
+                      return convertDateToDMY(createdAt);
+                    },
+                  },
+                  {
+                    field: "investor",
+                    title: "Investors",
+                    render: (rowData: any) => {
+                      const { investor } = rowData;
+
+                      return (
+                        <Link to={`/investors/${investor.id}`}>
+                          {investor.id}
+                        </Link>
+                      );
+                    },
+                  },
+                  {
+                    field: "type",
+                    title: "Order",
+                  },
+                  {
+                    field: "status",
+                    title: "Status",
+                  },
+                  {
+                    title: "Send",
+                  },
+                  {
+                    title: "Receive",
+                  },
+                  {
+                    title: "Broker",
+                  },
+                  {
+                    title: "Commission",
+                  },
+                  {
+                    title: "Actions",
+                    render: (rowData: any) => {
+                      const { id } = rowData;
+
+                      return (
+                        <Link to={`/trades/${id}`}>
+                          <SyncAltIcon />
+                        </Link>
+                      );
+                    },
+                  },
+                ]}
+                data={tradeRequests.map((investorItem: any) => ({
+                  ...investorItem,
+                }))}
+              />
+            )}
           </Grid>
           <Grid item xs={12}>
             <MaterialTable

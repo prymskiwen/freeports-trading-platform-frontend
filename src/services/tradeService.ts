@@ -1,7 +1,20 @@
 import axios from "../util/axios";
 import TradeRequest from "../types/TradeRequest";
 
-const getTradeRequests = (
+const getAllTradeRequests = (): Promise<TradeRequest[]> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/my/request/trade`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getInvestorTradeRequests = (
   organizationId: string,
   deskId: string,
   investorId: string
@@ -41,4 +54,9 @@ const createTradeRequest = (
   });
 };
 
-export { getTradeRequests as default, getTradeRequests, createTradeRequest };
+export {
+  getAllTradeRequests as default,
+  getAllTradeRequests,
+  getInvestorTradeRequests,
+  createTradeRequest,
+};
