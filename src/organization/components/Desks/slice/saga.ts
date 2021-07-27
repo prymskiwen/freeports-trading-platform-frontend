@@ -22,7 +22,7 @@ export function* getDesks({ payload }: PayloadAction<string>): Generator<any> {
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -52,7 +52,7 @@ export function* addDesk({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -82,7 +82,7 @@ export function* removeDesk({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );

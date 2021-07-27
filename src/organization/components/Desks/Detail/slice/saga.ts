@@ -20,7 +20,7 @@ export function* retrieveDesk({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
