@@ -9,6 +9,7 @@ import { DeskDetailState } from "../../organization/components/Desks/Detail/slic
 import { InvestorsState } from "../../organization/components/Investors/slice/types";
 import { InvestorDetailState } from "../../organization/components/Investors/Detail/slice/types";
 import { TradesState } from "../../organization/components/Trades/slice/types";
+import { TradeDetailState } from "../../organization/components/Trades/Detail/slice/types";
 import { SnackbarState } from "../../components/Snackbar/slice/types";
 import { ProfileState } from "../../components/Profile/slice/types";
 import { GlobalState } from "../../slice/types";
@@ -31,6 +32,7 @@ export interface RootState {
   investors?: InvestorsState;
   investorDetail?: InvestorDetailState;
   trades?: TradesState;
+  tradeDetail?: TradeDetailState;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
   profileForm?: ProfileState;

@@ -31,69 +31,6 @@ const convertDateToDMY = (date: string) => {
 
   return [day, month, year].join(".");
 };
-const historyColumns = [
-  {
-    field: "date",
-    title: "Date",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-  {
-    field: "investors",
-    title: "Investors",
-    cellStyle: {
-      width: "12%",
-    },
-    render: (rowData: any) => {
-      const { investorId } = rowData;
-
-      return <Link to={`/trades/${investorId}`}>{investorId}</Link>;
-    },
-  },
-  {
-    field: "order",
-    title: "Order",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-  {
-    field: "status",
-    title: "Status",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-  {
-    field: "send",
-    title: "Send",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-  {
-    field: "receive",
-    title: "Receive",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-  {
-    field: "broker",
-    title: "Broker",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-  {
-    field: "commission",
-    title: "Commission",
-    cellStyle: {
-      width: "12%",
-    },
-  },
-];
 
 const Trades = (): React.ReactElement => {
   const dispatch = useDispatch();
@@ -147,7 +84,9 @@ const Trades = (): React.ReactElement => {
                       const { investor } = rowData;
 
                       return (
-                        <Link to={`/investors/${investor.id}`}>
+                        <Link
+                          to={`/desks/${investor.desk}/investors/${investor.id}`}
+                        >
                           {investor.id}
                         </Link>
                       );
@@ -176,10 +115,12 @@ const Trades = (): React.ReactElement => {
                   {
                     title: "Actions",
                     render: (rowData: any) => {
-                      const { id } = rowData;
+                      const { id, investor } = rowData;
 
                       return (
-                        <Link to={`/trades/${id}`}>
+                        <Link
+                          to={`/desks/${investor.desk}/investors/${investor.id}/trades/${id}`}
+                        >
                           <SyncAltIcon />
                         </Link>
                       );
@@ -195,7 +136,71 @@ const Trades = (): React.ReactElement => {
           <Grid item xs={12}>
             <MaterialTable
               title="TRADE HISTORY"
-              columns={historyColumns}
+              columns={[
+                {
+                  field: "date",
+                  title: "Date",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+                {
+                  field: "investors",
+                  title: "Investors",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                  render: (rowData: any) => {
+                    const { investorId } = rowData;
+
+                    return (
+                      <Link to={`/trades/${investorId}`}>{investorId}</Link>
+                    );
+                  },
+                },
+                {
+                  field: "order",
+                  title: "Order",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+                {
+                  field: "status",
+                  title: "Status",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+                {
+                  field: "send",
+                  title: "Send",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+                {
+                  field: "receive",
+                  title: "Receive",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+                {
+                  field: "broker",
+                  title: "Broker",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+                {
+                  field: "commission",
+                  title: "Commission",
+                  cellStyle: {
+                    width: "12%",
+                  },
+                },
+              ]}
               data={tradeHistory}
             />
           </Grid>
