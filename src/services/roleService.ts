@@ -10,6 +10,19 @@ interface PermissionType {
   permissions: Array<{ code: string; name: string }>;
 }
 
+const getClearerRoles = (): Promise<Array<RoleType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/role`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 const addNewRole = (
   name: string,
   permissions: Array<string>
@@ -28,6 +41,7 @@ const addNewRole = (
       });
   });
 };
+
 const modifyRole = (
   id: string,
   name: string,
@@ -47,6 +61,7 @@ const modifyRole = (
       });
   });
 };
+
 const deleteRole = (id: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
@@ -59,18 +74,7 @@ const deleteRole = (id: string): Promise<string> => {
       });
   });
 };
-const getClearerRoles = (): Promise<Array<RoleType>> => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`/role`)
-      .then((res: any) => {
-        return resolve(res.data);
-      })
-      .catch((err) => {
-        return reject(err.response.data);
-      });
-  });
-};
+
 const getClearerPermissions = (): Promise<Array<PermissionType>> => {
   return new Promise((resolve, reject) => {
     axios
@@ -84,7 +88,10 @@ const getClearerPermissions = (): Promise<Array<PermissionType>> => {
   });
 };
 
-const assignClearerRolesToUser = (userId: string, roles: string[]) => {
+const assignClearerRolesToUser = (
+  userId: string,
+  roles: string[]
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
       .post(`/user/${userId}/role/assign`, { roles })
@@ -97,10 +104,57 @@ const assignClearerRolesToUser = (userId: string, roles: string[]) => {
   });
 };
 
-const updateClearerRolesToUser = (userId: string, roles: string[]) => {
+const updateClearerRolesToUser = (
+  userId: string,
+  roles: string[]
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     axios
       .patch(`/user/${userId}/role`, { roles })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getOrgRoles = (organizationId: string): Promise<Array<RoleType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/role`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const deleteOrgRole = (
+  organizationId: string,
+  roleId: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(`/organization/${organizationId}/role/${roleId}`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getOrgPermissions = (
+  organizationId: string
+): Promise<Array<PermissionType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/permission`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -119,4 +173,7 @@ export {
   getClearerPermissions,
   assignClearerRolesToUser,
   updateClearerRolesToUser,
+  getOrgRoles,
+  deleteOrgRole,
+  getOrgPermissions,
 };
