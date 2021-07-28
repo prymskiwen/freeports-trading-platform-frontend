@@ -7,14 +7,34 @@ import { RootState } from "../../../../util/types/RootState";
 const selectDomain = (state: RootState) => state.orgRoles || initialState;
 
 // eslint-disable-next-line import/prefer-default-export
-export const selectRoles = createSelector(
+export const selectOrgRoles = createSelector(
   [selectDomain],
-  (rolesState) => rolesState.roles
+  (rolesState) => rolesState.orgRoles
 );
 
-export const selectIsRolesLoading = createSelector(
+export const selectIsOrgRolesLoading = createSelector(
   [selectDomain],
-  (rolesState) => rolesState.rolesLoading
+  (rolesState) => rolesState.orgRolesLoading
+);
+
+export const selectMultiDeskRoles = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.multiDeskRoles
+);
+
+export const selectIsMultiDeskRolesLoading = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.multiDeskRolesLoading
+);
+
+export const selectDeskRoles = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.deskRoles
+);
+
+export const selectIsDeskRolesLoading = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.deskRolesLoading
 );
 
 export const selectIsRoleUpdating = createSelector(
@@ -27,12 +47,32 @@ export const selectIsRoleRemoving = createSelector(
   (rolesState) => rolesState.deleting
 );
 
-export const selectPermissions = createSelector(
+export const selectOrgPermissions = createSelector(
   [selectDomain],
-  (rolesState) => rolesState.permissions
+  (rolesState) => rolesState.orgPermissions
 );
 
-export const selectIsPermissionsLoading = createSelector(
+export const selectIsOrgPermissionsLoading = createSelector(
   [selectDomain],
-  (rolesState) => rolesState.permissionsLoading
+  (rolesState) => rolesState.orgPermissionsLoading
+);
+
+export const selectMultiDeskPermissions = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.multiDeskPermissions
+);
+
+export const selectIsMultiDeskPermissionsLoading = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.multiDeskPermissionsLoading
+);
+
+export const selectDeskPermissions = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.deskPermissions
+);
+
+export const selectIsDeskPermissionsLoading = createSelector(
+  [selectDomain],
+  (rolesState) => rolesState.deskPermissionsLoading
 );
