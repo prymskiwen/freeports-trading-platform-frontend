@@ -13,10 +13,3 @@ export interface ProfileState {
   profile: OrganizationProfileType;
   loading: boolean;
 }
-
-export interface keyPairType {
-  publicKey: CryptoKey | null;
-  privateKey: CryptoKey;
-  name: string;
-  spki: ArrayBuffer;
-}

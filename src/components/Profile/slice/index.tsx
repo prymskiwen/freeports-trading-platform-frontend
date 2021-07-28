@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-param-reassign */
 import { PayloadAction } from "@reduxjs/toolkit";
 
 import { createSlice } from "../../../util/@reduxjs/toolkit";
+import { SavedKeyObject } from "../../../util/keyStore/keystore";
 import { useInjectReducer, useInjectSaga } from "../../../util/redux-injectors";
 import { profileSaga } from "./saga";
 import { ProfileState } from "./types";
@@ -30,6 +32,14 @@ const slice = createSlice({
       state.loading = false;
       state.profile = action.payload;
     },
+    addPublicKey(state, action: PayloadAction<SavedKeyObject>) {
+      state.loading = true;
+    },
+    addPublicKeySuccess(state) {
+      state.loading = false;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    addKeyToKeyStore(state, action: PayloadAction<any>) {},
   },
 });
 
