@@ -1,5 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
+import Lockr from "lockr";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import {
   Button,
