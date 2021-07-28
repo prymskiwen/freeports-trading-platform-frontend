@@ -5,12 +5,17 @@ import { tradesActions as actions } from ".";
 
 import { getAllTradeRequests } from "../../../../services/tradeService";
 import { snackbarActions } from "../../../../components/Snackbar/slice";
+import PaginatedResponse from "../../../../types/PaginatedResponse";
 
 export function* getTradeRequests(): Generator<any> {
   try {
     const response = yield call(getAllTradeRequests);
     if (response)
-      yield put(actions.getTradeRequestsSuccess(response as TradeRequest[]));
+      yield put(
+        actions.getTradeRequestsSuccess(
+          (response as PaginatedResponse<TradeRequest>).content
+        )
+      );
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({

@@ -16,7 +16,11 @@ export function* getInvestors({ payload }: PayloadAction): Generator<any> {
   try {
     const response = yield call(getAllInvestors);
     if (response)
-      yield put(actions.getInvestorsSuccess(response as Investor[]));
+      yield put(
+        actions.getInvestorsSuccess(
+          (response as PaginatedResponse<Investor>).content
+        )
+      );
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
