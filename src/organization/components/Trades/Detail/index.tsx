@@ -153,7 +153,7 @@ const TradeDetail = (): React.ReactElement => {
   const dispatch = useDispatch();
   const { organizationId } = Lockr.get("USER_DATA");
   const { deskId, investorId, tradeId }: any = useParams();
-  const [activeTabIndex, setActiveTabIndex] = React.useState(0);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const tradeRequest = useSelector(selectTradeRequestDetail);
   const tradeRequestLoading = useSelector(selectIsDetailLoading);
   const { actions: tradeDetailActions } = useTradeDetailSlice();
@@ -192,8 +192,7 @@ const TradeDetail = (): React.ReactElement => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="subtitle2" style={{ fontWeight: 600 }}>
-                  {`(Amount) from (${tradeRequest.accountFrom}) to (${tradeRequest.accountTo})
-                  (Estimated account)`}
+                  {`(Amount) from (${tradeRequest.accountFrom}) to (${tradeRequest.accountTo}) (Estimated account)`}
                 </Typography>
               </Grid>
               <Grid item xs={12}>

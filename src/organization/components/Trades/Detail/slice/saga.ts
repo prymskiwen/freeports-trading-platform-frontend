@@ -28,7 +28,7 @@ export function* retrieveTradeRequest({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
