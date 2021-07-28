@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from "react";
-import { shallowEqual, useSelector } from "react-redux";
+import Lockr from "lockr";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   Accordion,
@@ -19,28 +20,29 @@ import {
   Grid,
   IconButton,
   makeStyles,
-  Snackbar,
   TextField,
   Theme,
   Typography,
 } from "@material-ui/core";
-import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { useRole } from "../../../hooks";
-
-export interface RoleType {
-  id: string;
-  name: string;
-  permissions: Array<string>;
-}
-interface PermissionType {
-  name: string;
-  permissions: Array<{ code: string; name: string }>;
-}
+import { useRolesSlice } from "./slice";
+import {
+  selectRoles,
+  selectIsRolesLoading,
+  selectIsRoleUpdating,
+  selectIsRoleRemoving,
+  selectPermissions,
+  selectIsPermissionsLoading,
+} from "./slice/selectors";
+/* import { usePermissionsSlice } from "./Add/slice";
+import { selectPermissions, selectIsRoleCreating } from "./Add/slice/selectors"; */
+import Role from "../../../types/Role";
+import Permission from "../../../types/Permission";
+import Loader from "../../../components/Loader";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -98,42 +100,28 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Alert = (props: AlertProps) => {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-};
-
 const Roles = (): React.ReactElement => {
   const classes = useStyles();
-  const { error } = useSelector(
-    (state: any) => ({
-      error: state.global.error,
-    }),
-    shallowEqual
-  );
-  const { retrieveRoles, retrievePermissions, updateRole, removeRole } =
-    useRole();
-  const [roles, setRoles] = useState([] as any[]);
-  const [permissions, setPermissions] = useState([] as any[]);
-  const [removing, setRemoving] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [submitResponse, setSubmitResponse] = useState({
-    type: "success",
-    message: "",
-  });
-  const [errorMessage, setErrorMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
+  const dispatch = useDispatch();
+  const { organizationId } = Lockr.get("USER_DATA");
+  const { actions: rolesActions } = useRolesSlice();
+  const roles = useSelector(selectRoles);
+  const permissions = useSelector(selectPermissions);
+  console.log(roles);
+  console.log(permissions);
+  const rolesLoading = useSelector(selectIsRolesLoading);
+  const permissionsLoading = useSelector(selectIsPermissionsLoading);
+  const roleUpdating = useSelector(selectIsRoleUpdating);
+  const roleRemoving = useSelector(selectIsRoleRemoving);
+  /* const roleCreating = useSelector(selectIsRoleCreating);
+  const permissions = useSelector(selectPermissions);
+  const permissionsLoading = useSelector(selectIsPermissionsLoading); */
 
   useEffect(() => {
     let unmounted = false;
 
     const init = async () => {
-      const rolesList = await retrieveRoles();
-      const permissionList = await retrievePermissions();
-
-      if (!unmounted) {
-        setRoles(rolesList);
-        setPermissions(permissionList);
-      }
+      dispatch(rolesActions.getRoles(organizationId));
     };
 
     init();
@@ -149,7 +137,7 @@ const Roles = (): React.ReactElement => {
   ) => {
     const { name, checked } = event.target;
 
-    const newRoles = roles.map((role: RoleType) => {
+    /* const newRoles = roles.map((role: RoleType) => {
       if (role.id === roleId) {
         if (checked) role.permissions.push(name);
         else {
@@ -162,9 +150,9 @@ const Roles = (): React.ReactElement => {
         }
       }
       return role;
-    });
+    }); */
 
-    setRoles(newRoles);
+    // setRoles(newRoles);
   };
 
   const onRoleNameChange = (
@@ -172,20 +160,21 @@ const Roles = (): React.ReactElement => {
     roleId: string
   ) => {
     const { value } = event.target;
-    const newRoles = roles.map((role: RoleType) => {
+    /* const newRoles = roles.map((role: RoleType) => {
       const newRole = { ...role };
       if (newRole.id === roleId) {
         newRole.name = value;
       }
       return newRole;
     });
-    setRoles(newRoles);
+    setRoles(newRoles); */
   };
 
   const onRoleSave = async (roleId: string) => {
-    const newRole = roles.filter((role: RoleType) => role.id === roleId)[0];
+    console.log(roleId);
+    // const newRole = roles.filter((role: RoleType) => role.id === roleId)[0];
 
-    setSaving(true);
+    /*  setSaving(true);
     setShowAlert(false);
     setSubmitResponse({ type: "", message: "" });
 
@@ -209,12 +198,12 @@ const Roles = (): React.ReactElement => {
           message: err.message,
         });
         setShowAlert(true);
-      });
+      }); */
   };
 
   const onRoleRemove = async (roleId: string) => {
     // const newRoles = roles.filter((role: any) => role.id !== roleId);
-    setRemoving(true);
+    /* setRemoving(true);
     setShowAlert(false);
     setSubmitResponse({ type: "", message: "" });
     await removeRole(roleId)
@@ -238,38 +227,29 @@ const Roles = (): React.ReactElement => {
           message: err.message,
         });
         setShowAlert(true);
-      });
-  };
-
-  const handleAlertClose = () => {
-    setShowAlert(false);
+      }); */
   };
 
   return (
     <div className="main-wrapper">
       <Container>
-        {errorMessage !== "" ? (
-          <div className={classes.errorMessage}>
-            <Typography variant="h2" align="center" color="textSecondary">
-              {errorMessage}
-            </Typography>
-          </div>
-        ) : (
-          <Grid container spacing={2}>
-            <Grid container item alignItems="center" xs={12}>
-              <Typography variant="h4">Roles</Typography>
-              <Link to="/roles/add">
-                <IconButton color="inherit" aria-label="Add Role">
-                  <AddCircleIcon fontSize="large" />
-                </IconButton>
-              </Link>
-            </Grid>
-            {roles.length > 0 ? (
+        <Grid container spacing={2}>
+          <Grid container item alignItems="center" xs={12}>
+            <Typography variant="h4">Roles</Typography>
+            <Link to="/roles/add">
+              <IconButton color="inherit" aria-label="Add Role">
+                <AddCircleIcon fontSize="large" />
+              </IconButton>
+            </Link>
+          </Grid>
+          {rolesLoading && <Loader />}
+          {!rolesLoading &&
+            (roles.length > 0 ? (
               <Grid container item>
                 <Grid item xs={12}>
                   {roles
-                    .filter((role: RoleType) => role.name !== "_default")
-                    .map((role: RoleType) => (
+                    .filter((role: Role) => role.name !== "_default")
+                    .map((role: Role) => (
                       <Accordion key={role.id}>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
@@ -296,7 +276,7 @@ const Roles = (): React.ReactElement => {
                             </Grid>
                           </Grid>
                         </AccordionDetails>
-                        {permissions.map((perm: PermissionType) => (
+                        {permissions.map((perm: Permission) => (
                           <FormGroup
                             key={perm.name}
                             className={classes.permissionContainer}
@@ -346,12 +326,12 @@ const Roles = (): React.ReactElement => {
                             <Button
                               variant="contained"
                               size="small"
-                              disabled={removing}
+                              disabled={roleRemoving}
                               onClick={() => onRoleRemove(role.id)}
                             >
                               Remove
                             </Button>
-                            {removing && (
+                            {roleRemoving && (
                               <CircularProgress
                                 size={24}
                                 className={classes.progressButton}
@@ -364,11 +344,11 @@ const Roles = (): React.ReactElement => {
                               size="small"
                               color="primary"
                               onClick={() => onRoleSave(role.id)}
-                              disabled={saving}
+                              disabled={roleUpdating}
                             >
                               Save
                             </Button>
-                            {saving && (
+                            {roleUpdating && (
                               <CircularProgress
                                 size={24}
                                 className={classes.progressButton}
@@ -382,24 +362,8 @@ const Roles = (): React.ReactElement => {
               </Grid>
             ) : (
               <></>
-            )}
-            <Snackbar
-              autoHideDuration={2000}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-              open={showAlert}
-              onClose={handleAlertClose}
-            >
-              <Alert
-                onClose={handleAlertClose}
-                severity={
-                  submitResponse.type === "success" ? "success" : "error"
-                }
-              >
-                {submitResponse.message}
-              </Alert>
-            </Snackbar>
-          </Grid>
-        )}
+            ))}
+        </Grid>
       </Container>
     </div>
   );
