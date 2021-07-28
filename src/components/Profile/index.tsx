@@ -405,7 +405,7 @@ const Profile = (): React.ReactElement => {
           </Grid>
           <Grid item xs={12}>
             <Card>
-              <CardHeader title="Reset Password" />
+              <CardHeader title="Password update" />
               <Divider />
               <CardContent>
                 <Grid container alignItems="flex-start" spacing={2}>

@@ -180,7 +180,7 @@ const InvestorDetail = (): React.ReactElement => {
       })
     );
     dispatch(
-      investorDetailActions.getTradeRequests({
+      investorDetailActions.getInvestorTradeRequests({
         organizationId,
         deskId,
         investorId,

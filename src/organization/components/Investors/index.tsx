@@ -126,10 +126,10 @@ const Investors = (): React.ReactElement => {
   const { getOrganizerdetail } = useOrganization();
   const investors = useSelector(selectInvestors);
   const investorsLoading = useSelector(selectIsInvestorsLoading);
+  const desks = useSelector(selectDesks);
   const { actions: investorsActions } = useInvestorsSlice();
   const { actions: investorDetailActions } = useInvestorDetailSlice();
   const { actions: deskActions } = useDesksSlice();
-  const desks = useSelector(selectDesks);
   const { organizationId } = Lockr.get("USER_DATA");
   const [investor, setInvestor] = useState<investorType>({
     deskId: "",
@@ -240,6 +240,7 @@ const Investors = (): React.ReactElement => {
   };
 
   const handleTradeCreate = async (values: tradeType) => {
+    console.log(values);
     await dispatch(
       investorDetailActions.addTradeRequest({
         organizationId,

@@ -7,7 +7,7 @@ import { investorDetailActions as actions } from ".";
 
 import { getInvestor } from "../../../../../services/investorService";
 import {
-  getTradeRequests,
+  getInvestorTradeRequests,
   createTradeRequest,
 } from "../../../../../services/tradeService";
 import { snackbarActions } from "../../../../../components/Snackbar/slice";
@@ -30,14 +30,14 @@ export function* retrieveInvestor({
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
   }
 }
 
-export function* retrieveTradeRequests({
+export function* retrieveInvestorTradeRequests({
   payload,
 }: PayloadAction<{
   organizationId: string;
@@ -46,19 +46,19 @@ export function* retrieveTradeRequests({
 }>): Generator<any> {
   try {
     const response = yield call(
-      getTradeRequests,
+      getInvestorTradeRequests,
       payload.organizationId,
       payload.deskId,
       payload.investorId
     );
     if (response)
       yield put(
-        actions.getTradeRequestsSuccess(response as Array<TradeRequest>)
+        actions.getInvestorTradeRequestsSuccess(response as Array<TradeRequest>)
       );
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -90,18 +90,18 @@ export function* addTradeRequest({
         })
       );
       yield put(
-        actions.getTradeRequests({
+        actions.getInvestorTradeRequests({
           organizationId: payload.organizationId,
           deskId: payload.deskId,
           investorId: payload.investorId,
         })
       );
-      yield take(actions.getTradeRequestsSuccess);
+      yield take(actions.getInvestorTradeRequestsSuccess);
     }
   } catch (error) {
     yield put(
       snackbarActions.showSnackbar({
-        message: error.message,
+        message: error.data.message,
         type: "error",
       })
     );
@@ -109,6 +109,9 @@ export function* addTradeRequest({
 }
 export function* investorDetailSaga(): Generator<any> {
   yield takeEvery(actions.getInvestor, retrieveInvestor);
-  yield takeEvery(actions.getTradeRequests, retrieveTradeRequests);
+  yield takeEvery(
+    actions.getInvestorTradeRequests,
+    retrieveInvestorTradeRequests
+  );
   yield takeEvery(actions.addTradeRequest, addTradeRequest);
 }

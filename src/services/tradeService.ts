@@ -1,7 +1,20 @@
 import axios from "../util/axios";
 import TradeRequest from "../types/TradeRequest";
 
-const getTradeRequests = (
+const getAllTradeRequests = (): Promise<TradeRequest[]> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/my/request/trade`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getInvestorTradeRequests = (
   organizationId: string,
   deskId: string,
   investorId: string
@@ -10,6 +23,26 @@ const getTradeRequests = (
     axios
       .get(
         `/organization/${organizationId}/desk/${deskId}/investor/${investorId}/trade`
+      )
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getTradeRequest = (
+  organizationId: string,
+  deskId: string,
+  investorId: string,
+  tradeId: string
+): Promise<TradeRequest> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(
+        `/organization/${organizationId}/desk/${deskId}/investor/${investorId}/trade/${tradeId}`
       )
       .then((res: any) => {
         return resolve(res.data);
@@ -41,4 +74,10 @@ const createTradeRequest = (
   });
 };
 
-export { getTradeRequests as default, getTradeRequests, createTradeRequest };
+export {
+  getAllTradeRequests as default,
+  getAllTradeRequests,
+  getTradeRequest,
+  getInvestorTradeRequests,
+  createTradeRequest,
+};

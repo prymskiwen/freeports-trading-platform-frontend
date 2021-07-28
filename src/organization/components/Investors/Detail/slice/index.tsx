@@ -45,7 +45,7 @@ const slice = createSlice({
       state.loadingDetail = false;
       state.selectedInvestor = action.payload;
     },
-    getTradeRequests(
+    getInvestorTradeRequests(
       state,
       action: PayloadAction<{
         organizationId: string;
@@ -56,7 +56,10 @@ const slice = createSlice({
       state.loadingTradeRequests = true;
       state.tradeRequests = [];
     },
-    getTradeRequestsSuccess(state, action: PayloadAction<Array<TradeRequest>>) {
+    getInvestorTradeRequestsSuccess(
+      state,
+      action: PayloadAction<Array<TradeRequest>>
+    ) {
       state.loadingTradeRequests = false;
       state.tradeRequests = action.payload;
     },
