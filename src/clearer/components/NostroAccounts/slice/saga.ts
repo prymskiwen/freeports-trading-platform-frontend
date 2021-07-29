@@ -42,12 +42,16 @@ export function* addAccount({
       yield take(actions.getAccountsSuccess);
     }
   } catch (error) {
-    yield put(
-      snackbarActions.showSnackbar({
-        message: error.data.message,
-        type: "error",
-      })
-    );
+    const errorList = error.data.message;
+    if (errorList.length) {
+      if (errorList[0].constraints.isIBAN)
+        yield put(
+          snackbarActions.showSnackbar({
+            message: errorList[0].constraints.isIBAN,
+            type: "error",
+          })
+        );
+    }
   }
 }
 
