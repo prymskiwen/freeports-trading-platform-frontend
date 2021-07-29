@@ -58,4 +58,5 @@ export function* addOrgRole({
 }
 export function* newOrgRoleSaga(): Generator<any> {
   yield takeEvery(actions.getOrgPermissions, getOrgPermissions);
+  yield takeEvery(actions.addOrgRole, addOrgRole);
 }

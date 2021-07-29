@@ -3,11 +3,16 @@ import React, { useEffect, useState } from "react";
 import Lockr from "lockr";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Field } from "react-final-form";
+import { FieldArray } from "react-final-form-arrays";
 import arrayMutators from "final-form-arrays";
 import { TextField, Select } from "mui-rff";
 import { useHistory } from "react-router";
 import {
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
   Checkbox,
   Container,
   createStyles,
@@ -29,6 +34,7 @@ import {
   selectIsOrgPermissionsLoading,
 } from "./slice/selectors";
 import actions from "../../../../store/actions";
+import Loader from "../../../../components/Loader";
 
 interface RoleType {
   name: string;
@@ -131,111 +137,128 @@ const NewOrgRole = (): React.ReactElement => {
     };
   }, []);
 
-  const handleRoleCreate = (values: RoleType) => {
-    console.log(values);
+  const handleRoleCreate = async (values: any) => {
+    /* console.log(values); */
+    await dispatch(
+      newOrgRoleActions.addOrgRole({ organizationId, role: values })
+    );
+    history.push("/roles");
   };
 
   return (
     <div className="main-wrapper">
       <Container>
-        <Grid container spacing={2}>
-          <Grid container item xs={12}>
-            <Typography variant="h4">Create new Organization role</Typography>
-          </Grid>
-          <Form
-            onSubmit={handleRoleCreate}
-            mutators={{
-              ...arrayMutators,
-            }}
-            initialValues={orgRole}
-            validate={validate}
-            render={({
-              handleSubmit,
-              submitting,
-              pristine,
-              form: {
-                mutators: { push },
-              },
-              values,
-            }) => (
-              <form onSubmit={handleSubmit} noValidate>
-                <Grid container item xs={12}>
-                  <Grid item xs={4}>
-                    <TextField
-                      className={classes.roleNameInput}
-                      label="Role Name"
-                      name="name"
-                    />
-                  </Grid>
-                </Grid>
-                <Grid container item xs={12}>
-                  {orgPermissions.map((perm: PermissionType) => (
-                    <Grid item key={perm.name} xs={12}>
-                      <FormGroup className={classes.permissionContainer}>
-                        <FormLabel
-                          component="legend"
-                          className={classes.permissionName}
-                        >
-                          {perm.name}
-                        </FormLabel>
-                        <Grid container>
-                          {perm.permissions.map(
-                            (avail: { name: string; code: string }) => (
-                              <Grid item key={avail.code} xs={2}>
-                                {/* <Grid container alignItems="center" spacing={1}>
-                                  <Grid item>
-                                    <Field
-                                      name="permissions[]"
-                                      component="input"
-                                      type="checkbox"
-                                      value={avail.code}
-                                    />
-                                  </Grid>
-                                  <Grid item>
-                                    <Typography variant="body1">
-                                      {avail.name}
-                                    </Typography>
-                                  </Grid>
-                                </Grid> */}
-                                <FormControlLabel
-                                  className={classes.checkboxLabel}
-                                  control={
-                                    <Field name="permissions[]" type="checkbox">
-                                      {(props) => (
-                                        <Checkbox
-                                          color="primary"
-                                          value={avail.code}
-                                        />
-                                      )}
-                                    </Field>
-                                  }
-                                  label={avail.name}
-                                />
-                              </Grid>
-                            )
-                          )}
+        <Form
+          onSubmit={handleRoleCreate}
+          mutators={{
+            ...arrayMutators,
+          }}
+          initialValues={orgRole}
+          validate={validate}
+          render={({
+            handleSubmit,
+            submitting,
+            pristine,
+            form: {
+              mutators: { push },
+            },
+            values,
+          }) => (
+            <form onSubmit={handleSubmit} noValidate>
+              <Card>
+                <CardHeader title="Create new Organization role" />
+                <Divider />
+                <CardContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <Grid container>
+                        <Grid item xs={4}>
+                          <TextField
+                            className={classes.roleNameInput}
+                            label="Role Name"
+                            name="name"
+                          />
                         </Grid>
-                      </FormGroup>
+                      </Grid>
                     </Grid>
-                  ))}
-                </Grid>
-                <Divider variant="middle" />
-                <Grid container justify="flex-end">
-                  <div className={classes.progressButtonWrapper}>
+                    {orgPermissionsLoading && <Loader />}
+                    {!orgPermissionsLoading && (
+                      <Grid item xs={12}>
+                        <Grid container>
+                          {orgPermissions.map((perm: PermissionType) => (
+                            <Grid item key={perm.name} xs={12}>
+                              <FormGroup
+                                className={classes.permissionContainer}
+                              >
+                                <FormLabel
+                                  component="legend"
+                                  className={classes.permissionName}
+                                >
+                                  {perm.name}
+                                </FormLabel>
+                                <Grid container>
+                                  {perm.permissions.map(
+                                    (avail: { name: string; code: string }) => (
+                                      <Grid item key={avail.code} xs={2}>
+                                        <Grid
+                                          container
+                                          alignItems="center"
+                                          spacing={1}
+                                        >
+                                          <Grid item>
+                                            <Field
+                                              name="permissions[]"
+                                              component="input"
+                                              type="checkbox"
+                                              value={avail.code}
+                                            />
+                                          </Grid>
+                                          <Grid item>
+                                            <Typography variant="body1">
+                                              {avail.name}
+                                            </Typography>
+                                          </Grid>
+                                        </Grid>
+                                        {/* <FormControlLabel
+                                          className={classes.checkboxLabel}
+                                          control={
+                                            <Checkbox
+                                              color="primary"
+                                              name="permissions[]"
+                                              value={avail.code}
+                                            />
+                                          }
+                                          label={avail.name}
+                                        /> */}
+                                      </Grid>
+                                    )
+                                  )}
+                                </Grid>
+                              </FormGroup>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Grid>
+                    )}
+                  </Grid>
+                </CardContent>
+                <Divider />
+                <CardActions>
+                  <Grid container justify="flex-end">
                     <Button
                       variant="contained"
                       type="submit"
                       color="primary"
                       disabled={submitting || pristine}
                     >
-                      Create Role
+                      Create
                     </Button>
-                  </div>
-                </Grid>
-              </form>
-            )}
-          />
-        </Grid>
+                  </Grid>
+                </CardActions>
+              </Card>
+            </form>
+          )}
+        />
       </Container>
     </div>
   );

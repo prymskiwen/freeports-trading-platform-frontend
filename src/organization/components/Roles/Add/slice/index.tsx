@@ -25,7 +25,10 @@ const slice = createSlice({
   name: "newOrgRole",
   initialState,
   reducers: {
-    addOrgRole(state, action: PayloadAction<string>) {
+    addOrgRole(
+      state,
+      action: PayloadAction<{ organizationId: string; role: Role }>
+    ) {
       state.orgRoleCreating = true;
     },
     addOrgRoleSuccess(state, action: PayloadAction<string>) {
