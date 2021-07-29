@@ -186,7 +186,9 @@ const generateKeyPair = async (
     ["sign"]
   );
 
-  return { publicKey: keyPair.publicKey, privateKey, name };
+  console.log("generatePublicKeyFromPrivateKey ");
+  const publicKey = await generatePublicKeyFromPrivateKey(keyPair.privateKey);
+  return { publicKey, privateKey, name };
 };
 
 const escapeHTML = (s: string): string => {
