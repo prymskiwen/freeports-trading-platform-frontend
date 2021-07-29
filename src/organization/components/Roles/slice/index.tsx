@@ -12,10 +12,18 @@ import { rolesSaga } from "./saga";
 import { OrgRolesState } from "./types";
 
 export const initialState: OrgRolesState = {
-  roles: [],
-  permissions: [],
-  rolesLoading: false,
-  permissionsLoading: false,
+  orgRoles: [],
+  multiDeskRoles: [],
+  deskRoles: [],
+  orgPermissions: [],
+  multiDeskPermissions: [],
+  deskPermissions: [],
+  orgRolesLoading: false,
+  multiDeskRolesLoading: false,
+  deskRolesLoading: false,
+  orgPermissionsLoading: false,
+  multiDeskPermissionsLoading: false,
+  deskPermissionsLoading: false,
   updating: false,
   deleting: false,
 };
@@ -24,30 +32,59 @@ const slice = createSlice({
   name: "orgRoles",
   initialState,
   reducers: {
-    getRoles(state, action: PayloadAction<string>) {
-      state.rolesLoading = true;
-      state.roles = [];
+    getOrgRoles(state, action: PayloadAction<string>) {
+      state.orgRolesLoading = true;
+      state.orgRoles = [];
     },
-    getRolesSuccess(state, action: PayloadAction<Role[]>) {
-      state.rolesLoading = false;
-      state.roles = action.payload;
+    getOrgRolesSuccess(state, action: PayloadAction<Role[]>) {
+      state.orgRolesLoading = false;
+      state.orgRoles = action.payload;
     },
-    removeRole(
+    getMultiDeskRoles(state, action: PayloadAction<string>) {
+      state.multiDeskRolesLoading = true;
+      state.multiDeskRoles = [];
+    },
+    getMultiDeskRolesSuccess(state, action: PayloadAction<Role[]>) {
+      state.multiDeskRolesLoading = false;
+      state.multiDeskRoles = action.payload;
+    },
+    getDeskRoles(state, action: PayloadAction<string>) {
+      state.deskRolesLoading = true;
+      state.deskRoles = [];
+    },
+    getDeskRolesSuccess(state, action: PayloadAction<Role[]>) {
+      state.deskRolesLoading = false;
+      state.deskRoles = action.payload;
+    },
+    getOrgPermissions(state, action: PayloadAction<string>) {
+      state.orgPermissionsLoading = true;
+      state.orgPermissions = [];
+    },
+    getOrgPermissionsSuccess(state, action: PayloadAction<Permission[]>) {
+      state.orgPermissionsLoading = false;
+      state.orgPermissions = action.payload;
+    },
+    getMultiDeskPermissions(
       state,
-      action: PayloadAction<{ organizationId: string; roleId: string }>
+      action: PayloadAction<{ organizationId: string; deskId?: string }>
     ) {
-      state.deleting = true;
+      state.multiDeskPermissionsLoading = true;
+      state.multiDeskPermissions = [];
     },
-    removeRoleSuccess(state, action: PayloadAction<string>) {
-      state.deleting = false;
+    getMultiDeskPermissionsSuccess(state, action: PayloadAction<Permission[]>) {
+      state.multiDeskPermissionsLoading = false;
+      state.multiDeskPermissions = action.payload;
     },
-    getPermissions(state, action: PayloadAction<string>) {
-      state.permissionsLoading = true;
-      state.permissions = [];
+    getDeskPermissions(
+      state,
+      action: PayloadAction<{ organizationId: string; deskId?: string }>
+    ) {
+      state.deskPermissionsLoading = true;
+      state.deskPermissions = [];
     },
-    getPermissionsSuccess(state, action: PayloadAction<Permission[]>) {
-      state.permissionsLoading = false;
-      state.permissions = action.payload;
+    getDeskPermissionsSuccess(state, action: PayloadAction<Permission[]>) {
+      state.deskPermissionsLoading = false;
+      state.deskPermissions = action.payload;
     },
   },
 });

@@ -11,6 +11,7 @@ import { InvestorDetailState } from "../../organization/components/Investors/Det
 import { TradesState } from "../../organization/components/Trades/slice/types";
 import { TradeDetailState } from "../../organization/components/Trades/Detail/slice/types";
 import { OrgRolesState } from "../../organization/components/Roles/slice/types";
+import { NewOrgRoleState } from "../../organization/components/Roles/Add/slice/types";
 import { SnackbarState } from "../../components/Snackbar/slice/types";
 import { ProfileState } from "../../components/Profile/slice/types";
 import { GlobalState } from "../../slice/types";
@@ -35,6 +36,7 @@ export interface RootState {
   trades?: TradesState;
   tradeDetail?: TradeDetailState;
   orgRoles?: OrgRolesState;
+  newOrgRole?: NewOrgRoleState;
   auth?: any;
   coWorkerForm: CoWorkerFormState;
   profileForm?: ProfileState;

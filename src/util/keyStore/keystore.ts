@@ -57,6 +57,33 @@ const open = (): Promise<any> => {
     };
   });
 };
+// close method
+//
+// Takes no parameters.
+//
+// Simply closes the database and returns immediately. Note that
+// the IndexedDB system actually closes the database in a separate
+// thread, and there is no way to know when that process is complete.
+//
+const close = (): Promise<void> => {
+  return new Promise((fulfill, reject) => {
+    if (!db) {
+      console.warn("KeyStore is not open.");
+      fulfill();
+      return;
+    }
+    db.close();
+    db = null;
+    fulfill();
+  });
+};
+
+export interface SavedKeyObject {
+  publicKey: CryptoKey;
+  privateKey: CryptoKey;
+  name: any;
+  spki?: ArrayBuffer;
+}
 
 // saveKey method
 //
@@ -67,12 +94,16 @@ const open = (): Promise<any> => {
 // Promise is fulfilled with a copy of the object
 // that was saved. Otherwise, it is rejected with an Error.
 //
-const saveKey = (
-  publicKey: CryptoKey | null,
+const saveKey = async (
+  publicKey: CryptoKey,
   privateKey: CryptoKey,
   name: any
-): Promise<any> => {
-  return new Promise((fulfill, reject) => {
+): Promise<SavedKeyObject> => {
+  console.log("open store ", db);
+  await open();
+  console.log("open store ", db);
+
+  const result = await new Promise((fulfill, reject) => {
     if (!db) {
       reject(new Error("KeyStore is not open."));
     }
@@ -131,6 +162,8 @@ const saveKey = (
       vault.init().then().catch(console.error);
     }
   });
+  await close();
+  return result as SavedKeyObject;
 };
 
 // getKey method
@@ -214,25 +247,6 @@ const listKeys = (): Promise<any> => {
         fulfill(list);
       }
     };
-  });
-};
-
-// close method
-//
-// Takes no parameters.
-//
-// Simply closes the database and returns immediately. Note that
-// the IndexedDB system actually closes the database in a separate
-// thread, and there is no way to know when that process is complete.
-//
-const close = (): Promise<void> => {
-  return new Promise((fulfill, reject) => {
-    if (!db) {
-      reject(new Error("KeyStore is not open."));
-    }
-    db.close();
-    db = null;
-    fulfill();
   });
 };
 

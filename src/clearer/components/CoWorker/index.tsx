@@ -157,7 +157,7 @@ const CoWorker = (): React.ReactElement => {
   return (
     <Grid>
       <Grid container className={classes.root}>
-        <Grid item className={classes.sideMenu} xs={12} sm={4} md={4}>
+        <Grid item className={classes.sideMenu} xs={12} sm={4} md={4} lg={3}>
           <Grid container justify="flex-start">
             <Grid sm={8} item className={classes.accordionCoWorker}>
               <Typography variant="h6">CO-WORKER</Typography>
@@ -202,7 +202,7 @@ const CoWorker = (): React.ReactElement => {
             </List>
           )}
         </Grid>
-        <Grid item className={classes.main} xs={12} sm={8} lg={9}>
+        <Grid item className={classes.main} xs={12} sm={8} md={8} lg={9}>
           {selectedCoWorker && (
             <Accordion expanded>
               <AccordionSummary
@@ -229,7 +229,6 @@ const CoWorker = (): React.ReactElement => {
                 )}
                 {selectedCoWorker.suspended && !suspendStateLoading && (
                   <Button onClick={handleOnResume} color="primary">
-                    {" "}
                     Activate
                   </Button>
                 )}

@@ -26,4 +26,17 @@ const getUserProfile = (orgId: string, userId: string): Promise<any> => {
   });
 };
 
-export { getUserProfile as default, getUserProfile };
+const addPublicKey = (key: string, name: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/my/public-key`, { key, name })
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+export { getUserProfile as default, getUserProfile, addPublicKey };

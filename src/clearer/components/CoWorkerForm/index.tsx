@@ -16,6 +16,7 @@ import profile from "../../../assets/images/profile.jpg";
 import { useCoWorkerFormSlice } from "./slice";
 import { selectRoles } from "./slice/selectors";
 import User from "../../../types/User";
+import { selectUser } from "../../../slice/selectors";
 
 const useStyles = makeStyles((theme) => ({
   sideMenu: {
@@ -118,6 +119,15 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
   const { actions } = useCoWorkerFormSlice();
   const existingRoles = useSelector(selectRoles);
 
+  const currentUser = useSelector(selectUser);
+
+  const canCreateVaultUser =
+    currentUser &&
+    currentUser.vaultUserId &&
+    coWorker.publicKeys &&
+    coWorker.publicKeys[0] &&
+    !coWorker.vaultUserId;
+
   useEffect(() => {
     dispatch(actions.getRoles());
   }, []);
@@ -126,6 +136,18 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
     const updates: Partial<User> = diff(coWorker, values);
     updates.roles = values.roles;
     onSubmit(updates as User);
+  };
+
+  const handleAddVaultUser = () => {
+    console.log("handle add to vault ", coWorker, currentUser);
+    if (coWorker.id && coWorker.publicKeys && coWorker.publicKeys[0]) {
+      dispatch(
+        actions.addUserToVault({
+          userId: coWorker.id,
+          publicKey: coWorker.publicKeys[0],
+        })
+      );
+    }
   };
   return (
     <Container>
@@ -289,6 +311,19 @@ const CoWorkerForm: React.FC<CoWorkerFormProps> = ({
                         />
                       </Grid>
                     </Grid>
+                    {canCreateVaultUser && (
+                      <Grid container spacing={3}>
+                        <Grid item sm={12} md={6}>
+                          <Button
+                            fullWidth
+                            color="primary"
+                            onClick={handleAddVaultUser}
+                          >
+                            Add to vault
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    )}
                   </Grid>
                   <Grid
                     item

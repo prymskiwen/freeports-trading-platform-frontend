@@ -1,13 +1,17 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from "axios";
 
 import { VaultAccountType } from "./enum/vault-account-type";
 import { PermissionOwnerType } from "./enum/permission-owner-type";
 import sendRequest, { Method, VaultRequestDto } from "../services/vaultService";
-import arrayBufferToBase64 from "../util/keyStore/functions";
-import { open, listKeys, close } from "../util/keyStore/keystore";
-import { keyPairType } from "../components/Profile/slice/types";
-
+import arrayBufferToBase64, { spki2String } from "../util/keyStore/functions";
+import {
+  open,
+  listKeys,
+  close,
+  SavedKeyObject,
+} from "../util/keyStore/keystore";
 // eslint-disable-next-line no-shadow
 export enum VaultPermissions {
   "CreateDeleteOrganization" = "CreateDeleteOrganization",
@@ -68,13 +72,24 @@ export class Vault {
 
   private hashingAlgorithm = "SHA-256";
 
+  private static _instance: Vault;
+
+  constructor() {
+    if (Vault._instance) {
+      throw new Error(
+        "Singleton classes can't be instantiated more than once."
+      );
+    }
+    Vault._instance = this;
+  }
+
   public async init(): Promise<any> {
     const keys = await this.getKeyList();
     if (!keys[0]) {
       console.warn("User has no keys");
       return;
     }
-    this.publicKey = this.spki2String(new Uint8Array(keys[0].spki));
+    this.publicKey = spki2String(new Uint8Array(keys[0].spki));
     if (keys[0].privateKey) {
       this.privateKey = keys[0].privateKey;
     } else {
@@ -91,12 +106,15 @@ export class Vault {
     return request;
   }
 
-  public async createVaultUser(publicKey: string): Promise<VaultRequestDto> {
+  public createVaultUser = async (
+    publicKey: string
+  ): Promise<VaultRequestDto> => {
+    console.log("createVaultUser ", this);
     const request = await this.createRequest(Method.POST, "/vault/user", {
       publicKey,
     });
     return request;
-  }
+  };
 
   public async createOrganizationUser(
     publicKey: string
@@ -324,17 +342,6 @@ export class Vault {
     return request;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public spki2String(byteArray: Uint8Array): string {
-    let binaryString = "";
-
-    for (let i = 0; i < byteArray.byteLength; i += 1) {
-      binaryString += String.fromCharCode(byteArray[i]);
-    }
-    const exportedAsBase64 = window.btoa(binaryString);
-    return exportedAsBase64;
-  }
-
   private async signMessage(message: ArrayBuffer): Promise<string> {
     console.log("sign message ", message);
     const signature = await window.crypto.subtle.sign(
@@ -388,7 +395,9 @@ export class Vault {
     const keysList = await listKeys();
 
     await close();
-    return keysList.map((key: { id: number; value: keyPairType }) => key.value);
+    return keysList.map(
+      (key: { id: number; value: SavedKeyObject }) => key.value
+    );
   }
 }
 

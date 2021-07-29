@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-param-reassign */
 import { PayloadAction } from "@reduxjs/toolkit";
+import { PublicKeyDoc } from "../../../../types/User";
 import { createSlice } from "../../../../util/@reduxjs/toolkit";
 import {
   useInjectReducer,
@@ -25,6 +27,12 @@ const slice = createSlice({
     getRolesSuccess(state, action: PayloadAction<RoleType[]>) {
       state.loading = true;
       state.roles = action.payload;
+    },
+    addUserToVault(
+      state,
+      action: PayloadAction<{ userId: string; publicKey: PublicKeyDoc }>
+    ) {
+      state.loading = true;
     },
   },
 });

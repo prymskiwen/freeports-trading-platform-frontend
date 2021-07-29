@@ -28,9 +28,14 @@ export default function configureAppStore() {
     //   enhancers.push(window.__REDUX_DEVTOOLS_EXTENSION__())
   }
 
+  const defaultMiddleware = getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: ["profileForm/addPublicKey"],
+    },
+  });
   const store = configureStore({
     reducer: createReducer(),
-    middleware: [...getDefaultMiddleware(), ...middlewares],
+    middleware: [...defaultMiddleware, ...middlewares],
     devTools:
       /* istanbul ignore next line */
       process.env.NODE_ENV !== "production",

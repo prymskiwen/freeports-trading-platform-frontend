@@ -4,7 +4,9 @@ import Lockr from "lockr";
 
 import { profileActions as actions } from ".";
 
-import { getUserProfile } from "../../../services/profileService";
+import { addPublicKey, getUserProfile } from "../../../services/profileService";
+import { SavedKeyObject, saveKey } from "../../../util/keyStore/keystore";
+import { publicKeyToString } from "../../../util/keyStore/functions";
 
 export function* getProfile(): Generator<any> {
   try {
@@ -16,6 +18,23 @@ export function* getProfile(): Generator<any> {
   }
 }
 
+export function* addPublicKeySaga({
+  payload: { publicKey, privateKey, name },
+}: PayloadAction<SavedKeyObject>): Generator<any> {
+  try {
+    const keyString = yield call(publicKeyToString, publicKey);
+    const response = yield call(addPublicKey, keyString as string, name);
+
+    const results = yield call(saveKey, publicKey, privateKey, name);
+
+    // addToKeyList(action.payload);
+    if (response) yield put(actions.addPublicKeySuccess());
+  } catch (error) {
+    console.log("error", error);
+  }
+}
+
 export function* profileSaga(): Generator<any> {
   yield takeEvery(actions.getProfile, getProfile);
+  yield takeEvery(actions.addPublicKey, addPublicKeySaga);
 }

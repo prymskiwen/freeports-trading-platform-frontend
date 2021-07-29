@@ -120,10 +120,29 @@ const updateClearerRolesToUser = (
   });
 };
 
-const getOrgRoles = (organizationId: string): Promise<Array<RoleType>> => {
+const getAllOrgRoles = (organizationId: string): Promise<Array<RoleType>> => {
   return new Promise((resolve, reject) => {
     axios
       .get(`/organization/${organizationId}/role`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const createOrgRole = (
+  organizationId: string,
+  role: {
+    name: string;
+    permissions: Array<string>;
+  }
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/organization/${organizationId}/role`, role)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -149,12 +168,72 @@ const deleteOrgRole = (
   });
 };
 
-const getOrgPermissions = (
+const getAllOrgPermissions = (
   organizationId: string
 ): Promise<Array<PermissionType>> => {
   return new Promise((resolve, reject) => {
     axios
       .get(`/organization/${organizationId}/permission`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getAllMultiDeskRoles = (
+  organizationId: string
+): Promise<Array<RoleType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/multidesk/role`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getAllMultiDeskPermissions = (
+  organizationId: string,
+  deskId?: string
+): Promise<Array<PermissionType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/desk/${deskId}/permission`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getAllDeskRoles = (organizationId: string): Promise<Array<RoleType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/deskrole`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getAllDeskPermissions = (
+  organizationId: string,
+  deskId?: string
+): Promise<Array<PermissionType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/desk/${deskId}/permission`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -173,7 +252,12 @@ export {
   getClearerPermissions,
   assignClearerRolesToUser,
   updateClearerRolesToUser,
-  getOrgRoles,
+  getAllOrgRoles,
+  createOrgRole,
   deleteOrgRole,
-  getOrgPermissions,
+  getAllOrgPermissions,
+  getAllMultiDeskRoles,
+  getAllMultiDeskPermissions,
+  getAllDeskRoles,
+  getAllDeskPermissions,
 };
