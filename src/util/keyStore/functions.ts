@@ -3,7 +3,14 @@ import {
   encryptMegolmKeyFile,
   readFileAsArrayBuffer,
 } from "./MegolmExportEncryption";
-import { open, saveKey, getKey, listKeys, close } from "./keystore";
+import {
+  open,
+  saveKey,
+  getKey,
+  listKeys,
+  close,
+  SavedKeyObject,
+} from "./keystore";
 
 const algorithmName = "ECDSA";
 const usages: Array<KeyUsage> = ["sign", "verify"];
@@ -56,6 +63,20 @@ function str2ab(str: string) {
   return buf;
 }
 
+function spki2String(byteArray: Uint8Array): string {
+  let binaryString = "";
+
+  for (let i = 0; i < byteArray.byteLength; i += 1) {
+    binaryString += String.fromCharCode(byteArray[i]);
+  }
+  const exportedAsBase64 = window.btoa(binaryString);
+  return exportedAsBase64;
+}
+
+async function publicKeyToString(key: CryptoKey): Promise<string> {
+  const spki = await window.crypto.subtle.exportKey("spki", key);
+  return spki2String(new Uint8Array(spki));
+}
 const downloadString = (
   text: ArrayBufferLike,
   fileType: string,
@@ -101,7 +122,7 @@ const generatePublicKeyFromPrivateKey = async (
 const importPrivateKeyFromFile = async (
   importedFile: File,
   importKeyPassword: string
-) => {
+): Promise<SavedKeyObject> => {
   const arrayBuffer = await readFileAsArrayBuffer(importedFile);
   const decryptedKey = await decryptMegolmKeyFile(
     arrayBuffer,
@@ -131,14 +152,17 @@ const importPrivateKeyFromFile = async (
     ["sign"]
   );
 
-  await open();
-  const results = await saveKey(publicKey, privateKey, importedFile.name);
+  // await open();
+  // const results = await saveKey(publicKey, privateKey, importedFile.name);
 
-  await close();
-  return results;
+  // await close();
+  return { publicKey, privateKey, name: importedFile.name };
 };
 
-const generateAndSaveKeyPair = async (name: string, passphrase: string) => {
+const generateKeyPair = async (
+  name: string,
+  passphrase: string
+): Promise<SavedKeyObject> => {
   const keyPair = await crypto.subtle.generateKey(params, true, usages);
   const keyArrayBuffer = await window.crypto.subtle.exportKey(
     "pkcs8",
@@ -161,12 +185,10 @@ const generateAndSaveKeyPair = async (name: string, passphrase: string) => {
     false,
     ["sign"]
   );
-  await open();
-  console.log("generated public key ", keyPair.publicKey);
-  const results = await saveKey(keyPair.publicKey, privateKey, name);
 
-  await close();
-  return results;
+  console.log("generatePublicKeyFromPrivateKey ");
+  const publicKey = await generatePublicKeyFromPrivateKey(keyPair.privateKey);
+  return { publicKey, privateKey, name };
 };
 
 const escapeHTML = (s: string): string => {
@@ -187,7 +209,9 @@ export {
   downloadString,
   escapeHTML,
   importPrivateKeyFromFile,
-  generateAndSaveKeyPair,
+  generateKeyPair,
   generatePublicKeyFromPrivateKey,
   str2ab,
+  spki2String,
+  publicKeyToString,
 };

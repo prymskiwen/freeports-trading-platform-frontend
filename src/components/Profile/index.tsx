@@ -23,17 +23,20 @@ import {
 
 import { useProfileSlice } from "./slice";
 import { selectProfile } from "./slice/selectors";
-import { keyPairType } from "./slice/types";
 
-import { open, listKeys, close } from "../../util/keyStore/keystore";
+import {
+  open,
+  listKeys,
+  close,
+  SavedKeyObject,
+} from "../../util/keyStore/keystore";
 import {
   createDataUrlFromByteArray,
   escapeHTML,
-  generateAndSaveKeyPair,
+  generateKeyPair,
   importPrivateKeyFromFile,
 } from "../../util/keyStore/functions";
 import defaultAvatar from "../../assets/images/profile.jpg";
-import { Vault } from "../../vault";
 
 const useStyles = makeStyles((theme) => ({
   saveBtn: {
@@ -105,10 +108,10 @@ const Profile = (): React.ReactElement => {
   const [importKeyPassword, setImportKeyPassword] = useState("");
   const [keyList, setKeyList] = useState<
     Array<{
-      publicKey: CryptoKey | null;
-      privateKey: CryptoKey | null;
+      publicKey: CryptoKey;
+      privateKey: CryptoKey;
       name: string;
-      spki: ArrayBuffer;
+      spki?: ArrayBuffer;
     }>
   >([]);
   const [loading, setLoading] = useState(false);
@@ -124,8 +127,8 @@ const Profile = (): React.ReactElement => {
       await listKeys()
         .then((list) => {
           console.log("list ", list);
-          const storedKeyList: Array<keyPairType> = [];
-          list.forEach((item: { id: number; value: keyPairType }) =>
+          const storedKeyList: Array<SavedKeyObject> = [];
+          list.forEach((item: { id: number; value: SavedKeyObject }) =>
             storedKeyList.push(item.value)
           );
           setKeyList(storedKeyList);
@@ -207,8 +210,9 @@ const Profile = (): React.ReactElement => {
   const onCreateCertificate = async () => {
     setLoading(true);
 
-    const results = await generateAndSaveKeyPair(key, passphrase);
+    const results = await generateKeyPair(key, passphrase);
 
+    dispatch(actions.addPublicKey(results));
     addToKeyList(results);
 
     setLoading(false);
@@ -223,6 +227,7 @@ const Profile = (): React.ReactElement => {
         importedFile,
         importKeyPassword
       );
+      dispatch(actions.addPublicKey(results));
       addToKeyList(results);
 
       setLoading(false);
@@ -400,7 +405,7 @@ const Profile = (): React.ReactElement => {
           </Grid>
           <Grid item xs={12}>
             <Card>
-              <CardHeader title="Reset Password" />
+              <CardHeader title="Password update" />
               <Divider />
               <CardContent>
                 <Grid container alignItems="flex-start" spacing={2}>

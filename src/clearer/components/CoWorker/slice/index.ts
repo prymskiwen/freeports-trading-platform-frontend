@@ -12,13 +12,14 @@ import { coWorkersSaga } from "./saga";
 import { CoWorkersState } from "./types";
 
 const defaultCoWorker = {
-  roles: [""],
+  roles: [],
   nickname: "",
   phone: "",
   email: "",
   avatar: "",
   jobTitle: "",
   suspended: false,
+  publicKeys: [],
 };
 export const initialState: CoWorkersState = {
   coWorkers: [],

@@ -32,6 +32,8 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import SendIcon from "@material-ui/icons/Send";
 import GroupIcon from "@material-ui/icons/Group";
 import { useAuth, useTheme } from "../../../hooks";
+import { usePermissions } from "../../../hooks/permissions";
+import { PermissionClearer } from "../../../types/Permissions";
 
 const navLinks = [
   { title: `Dashboard`, path: `/dashboard`, hasChildren: false },
@@ -68,6 +70,7 @@ const Header = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { theme, toggleTheme } = useTheme();
 
+  const { userHasPermissions } = usePermissions();
   const redirect = (path: string) => {
     setAnchorEl(null);
     history.push(path);
@@ -175,18 +178,22 @@ const Header = ({
                     <ListItemText primary="Profile" />
                   </MenuItem>
                   <Divider />
-                  <MenuItem onClick={() => redirect("/roles")}>
-                    <ListItemIcon>
-                      <SendIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Roles" />
-                  </MenuItem>
-                  <MenuItem onClick={() => redirect("/co-workers")}>
-                    <ListItemIcon>
-                      <GroupIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Co-workers" />
-                  </MenuItem>
+                  {userHasPermissions([PermissionClearer.roleRead]) && (
+                    <MenuItem onClick={() => redirect("/roles")}>
+                      <ListItemIcon>
+                        <SendIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary="Roles" />
+                    </MenuItem>
+                  )}
+                  {userHasPermissions([PermissionClearer.coworkerRead]) && (
+                    <MenuItem onClick={() => redirect("/co-workers")}>
+                      <ListItemIcon>
+                        <GroupIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary="Co-workers" />
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={() => redirect("/settings")}>
                     <ListItemIcon>
                       <Settings fontSize="small" />

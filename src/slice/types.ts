@@ -1,8 +1,8 @@
-import User from "../types/User";
+import { CurrentUser } from "../types/User";
 
 /* --- STATE --- */
 export interface GlobalState {
-  user: User | undefined;
+  user: CurrentUser | undefined;
   loading: boolean;
   theme: string;
   error: { errorType: string; message: string } | undefined;
