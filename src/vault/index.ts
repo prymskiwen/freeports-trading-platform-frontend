@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
 import axios, { AxiosResponse } from "axios";
 
@@ -71,6 +72,17 @@ export class Vault {
 
   private hashingAlgorithm = "SHA-256";
 
+  private static _instance: Vault;
+
+  constructor() {
+    if (Vault._instance) {
+      throw new Error(
+        "Singleton classes can't be instantiated more than once."
+      );
+    }
+    Vault._instance = this;
+  }
+
   public async init(): Promise<any> {
     const keys = await this.getKeyList();
     if (!keys[0]) {
@@ -94,12 +106,15 @@ export class Vault {
     return request;
   }
 
-  public async createVaultUser(publicKey: string): Promise<VaultRequestDto> {
+  public createVaultUser = async (
+    publicKey: string
+  ): Promise<VaultRequestDto> => {
+    console.log("createVaultUser ", this);
     const request = await this.createRequest(Method.POST, "/vault/user", {
       publicKey,
     });
     return request;
-  }
+  };
 
   public async createOrganizationUser(
     publicKey: string

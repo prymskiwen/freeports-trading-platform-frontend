@@ -1,16 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 
-import {
-  takeEvery,
-  call,
-  put,
-  select,
-  take,
-  takeLatest,
-  delay,
-} from "redux-saga/effects";
+import { call, put, takeLatest } from "redux-saga/effects";
 import { globalActions as actions } from ".";
-import User from "../types/User";
+import { CurrentUser } from "../types/User";
 import { getClearerUser } from "../services/clearerUsersService";
 
 function* getCurrentClearerUser(): Generator<any> {
@@ -19,7 +11,7 @@ function* getCurrentClearerUser(): Generator<any> {
     if (userData.data) {
       const user = yield call(getClearerUser, userData.data.id);
 
-      yield put(actions.setCurrentUser(user as User));
+      yield put(actions.setCurrentUser(user as CurrentUser));
     }
   } catch (error) {
     console.log("error", error);

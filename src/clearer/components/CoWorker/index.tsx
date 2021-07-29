@@ -229,7 +229,6 @@ const CoWorker = (): React.ReactElement => {
                 )}
                 {selectedCoWorker.suspended && !suspendStateLoading && (
                   <Button onClick={handleOnResume} color="primary">
-                    {" "}
                     Activate
                   </Button>
                 )}
