@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-param-reassign */
 import { PayloadAction } from "@reduxjs/toolkit";
-import User from "../types/User";
+import { CurrentUser } from "../types/User";
 import { createSlice } from "../util/@reduxjs/toolkit";
 import { useInjectReducer, useInjectSaga } from "../util/redux-injectors";
 import { globalSaga } from "./saga";
@@ -29,7 +29,7 @@ const slice = createSlice({
     getCurrentOrganizationUser(state) {
       state.loading = true;
     },
-    setCurrentUser(state, action: PayloadAction<User>) {
+    setCurrentUser(state, action: PayloadAction<CurrentUser>) {
       state.user = action.payload;
       state.loading = false;
     },
