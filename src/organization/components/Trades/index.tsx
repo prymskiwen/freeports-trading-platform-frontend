@@ -66,7 +66,7 @@ const Trades = (): React.ReactElement => {
             {tradeRequestsLoading && <Loader />}
             {!tradeRequestsLoading && (
               <MaterialTable
-                title="ORDER REQUESTS"
+                title="TRADE REQUESTS"
                 columns={[
                   {
                     field: "createdAt",
