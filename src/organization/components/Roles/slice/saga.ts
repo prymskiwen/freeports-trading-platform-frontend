@@ -10,6 +10,7 @@ import {
   deleteOrgRole,
   getAllOrgPermissions,
   getAllMultiDeskRoles,
+  getAllMultiDeskPermissions,
   getAllDeskRoles,
   getAllDeskPermissions,
 } from "../../../../services/roleService";
@@ -65,15 +66,34 @@ export function* getMultiDeskRoles({
   }
 }
 
-export function* getDeskRoles({
+export function* getMultiDeskPermissions({
   payload,
-}: PayloadAction<{ organizationId: string; deskId: string }>): Generator<any> {
+}: PayloadAction<{ organizationId: string; deskId?: string }>): Generator<any> {
   try {
     const response = yield call(
-      getAllDeskRoles,
+      getAllMultiDeskPermissions,
       payload.organizationId,
       payload.deskId
     );
+    if (response)
+      yield put(
+        actions.getMultiDeskPermissionsSuccess(response as Permission[])
+      );
+  } catch (error) {
+    yield put(
+      snackbarActions.showSnackbar({
+        message: error.data.message,
+        type: "error",
+      })
+    );
+  }
+}
+
+export function* getDeskRoles({
+  payload,
+}: PayloadAction<string>): Generator<any> {
+  try {
+    const response = yield call(getAllDeskRoles, payload);
     if (response) yield put(actions.getDeskRolesSuccess(response as Role[]));
   } catch (error) {
     yield put(
@@ -142,6 +162,7 @@ export function* rolesSaga(): Generator<any> {
   yield takeEvery(actions.getOrgRoles, getOrgRoles);
   yield takeEvery(actions.getOrgPermissions, getOrgPermissions);
   yield takeEvery(actions.getMultiDeskRoles, getMultiDeskRoles);
+  yield takeEvery(actions.getMultiDeskPermissions, getMultiDeskPermissions);
   yield takeEvery(actions.getDeskRoles, getDeskRoles);
   yield takeEvery(actions.getDeskPermissions, getDeskPermissions);
 }

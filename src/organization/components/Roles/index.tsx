@@ -158,10 +158,9 @@ const Roles = (): React.ReactElement => {
     const init = async () => {
       await dispatch(rolesActions.getOrgRoles(organizationId));
       await dispatch(rolesActions.getMultiDeskRoles(organizationId));
-      /*  await dispatch(
-        rolesActions.getDeskRoles({ organizationId, deskId: "0" })
-      ); */
+      await dispatch(rolesActions.getDeskRoles(organizationId));
       await dispatch(rolesActions.getOrgPermissions(organizationId));
+      await dispatch(rolesActions.getMultiDeskPermissions({ organizationId }));
       await dispatch(rolesActions.getDeskPermissions({ organizationId }));
     };
 
