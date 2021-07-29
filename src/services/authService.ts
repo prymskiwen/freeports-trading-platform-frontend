@@ -84,10 +84,10 @@ const publicKey = (): Promise<any> => {
   });
 };
 
-const resetPassword = (user_id:string, params: ResetPasswordParamsType): Promise<ResetPasswordResponseType> => {
+const resetPassword = (userId:string, params: ResetPasswordParamsType): Promise<ResetPasswordResponseType> => {
   return new Promise((resolve, reject) => {
     axios
-      .post(`/auth/${user_id}/setpassword`, params)
+      .post(`/auth/${userId}/setpassword`, params)
       .then((res: any) => {
         return resolve(res.data);
       })
