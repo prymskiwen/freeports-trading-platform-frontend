@@ -133,6 +133,25 @@ const getAllOrgRoles = (organizationId: string): Promise<Array<RoleType>> => {
   });
 };
 
+const createOrgRole = (
+  organizationId: string,
+  role: {
+    name: string;
+    permissions: Array<string>;
+  }
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`/organization/${organizationId}/role`, role)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
 const deleteOrgRole = (
   organizationId: string,
   roleId: string
@@ -164,13 +183,41 @@ const getAllOrgPermissions = (
   });
 };
 
-const getAllDeskRoles = (
-  organizationId: string,
-  deskId: string
+const getAllMultiDeskRoles = (
+  organizationId: string
 ): Promise<Array<RoleType>> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(`/organization/${organizationId}/desk/${deskId}/role`)
+      .get(`/organization/${organizationId}/multidesk/role`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getAllMultiDeskPermissions = (
+  organizationId: string,
+  deskId?: string
+): Promise<Array<PermissionType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/desk/${deskId}/permission`)
+      .then((res: any) => {
+        return resolve(res.data);
+      })
+      .catch((err) => {
+        return reject(err.response.data);
+      });
+  });
+};
+
+const getAllDeskRoles = (organizationId: string): Promise<Array<RoleType>> => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`/organization/${organizationId}/deskrole`)
       .then((res: any) => {
         return resolve(res.data);
       })
@@ -196,21 +243,6 @@ const getAllDeskPermissions = (
   });
 };
 
-const getAllMultiDeskRoles = (
-  organizationId: string
-): Promise<Array<RoleType>> => {
-  return new Promise((resolve, reject) => {
-    axios
-      .get(`/organization/${organizationId}/multidesk/role`)
-      .then((res: any) => {
-        return resolve(res.data);
-      })
-      .catch((err) => {
-        return reject(err.response.data);
-      });
-  });
-};
-
 export {
   getClearerRoles as default,
   addNewRole,
@@ -221,9 +253,11 @@ export {
   assignClearerRolesToUser,
   updateClearerRolesToUser,
   getAllOrgRoles,
+  createOrgRole,
   deleteOrgRole,
   getAllOrgPermissions,
   getAllMultiDeskRoles,
+  getAllMultiDeskPermissions,
   getAllDeskRoles,
   getAllDeskPermissions,
 };
