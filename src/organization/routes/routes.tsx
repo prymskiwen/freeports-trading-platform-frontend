@@ -84,6 +84,18 @@ export default [
     auth: true,
     component: lazy(() => import("../components/Roles/Add")),
   },
+  {
+    path: "/multi-desk/roles/add",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Roles/Add/MultiDeskRole")),
+  },
+  {
+    path: "/desk/roles/add",
+    exact: true,
+    auth: true,
+    component: lazy(() => import("../components/Roles/Add/DeskRole")),
+  },
   /* {
     path: "/error",
     exact: true,l

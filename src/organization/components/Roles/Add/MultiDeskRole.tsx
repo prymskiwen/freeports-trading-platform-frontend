@@ -93,7 +93,7 @@ const Alert = (props: AlertProps) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
 
-const NewOrgRole = (): React.ReactElement => {
+const NewMultiDeskRole = (): React.ReactElement => {
   const classes = useStyles();
   const history = useHistory();
   const { retrievePermissions, createNewRole } = useRole();
@@ -188,7 +188,7 @@ const NewOrgRole = (): React.ReactElement => {
       <Container>
         <Grid container spacing={2}>
           <Grid container item xs={12}>
-            <Typography variant="h4">Create new Organization role</Typography>
+            <Typography variant="h4">Create new Multi-desk role</Typography>
           </Grid>
           <Grid container item xs={12}>
             <Grid item xs={4}>
@@ -275,4 +275,4 @@ const NewOrgRole = (): React.ReactElement => {
   );
 };
 
-export default NewOrgRole;
+export default NewMultiDeskRole;
